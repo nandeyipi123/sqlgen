@@ -1,0 +1,1396 @@
+[
+  {
+    "table_name": "m_a_acct_bal",
+    "fields": [
+      {
+        "field_name": "bal_type",
+        "code_types": [
+          "prepayCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_pay_flow",
+    "fields": [
+      {
+        "field_name": "pay_mode",
+        "code_types": [
+          "payMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "settle_mode",
+        "code_types": [
+          "settleMode"
+        ],
+        "hardcoded_values": {},
+        "source": ""
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "chargeType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_rcvbl_flow_arc",
+    "fields": [
+      {
+        "field_name": "amt_type",
+        "code_types": [
+          "paTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "settle_flag",
+        "code_types": [
+          "amtSettleFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "status_code",
+        "code_types": [
+          "chargeStat"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_rcved_flow",
+    "fields": [
+      {
+        "field_name": "settle_flag",
+        "code_types": [
+          "amtSettleFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_acct",
+    "fields": [
+      {
+        "field_name": "pay_mode",
+        "code_types": [
+          "payMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_bill_rela",
+    "fields": [
+      {
+        "field_name": "mp_direction_code",
+        "code_types": [
+          "mpDirection"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rela_sort_code",
+        "code_types": [
+          "relaSortCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_cert",
+    "fields": [
+      {
+        "field_name": "cert_type_code",
+        "code_types": [
+          "certType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_cons",
+    "fields": [
+      {
+        "field_name": "busi_scale",
+        "code_types": [
+          "busiScale"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "cons_sort_code",
+        "code_types": [
+          "custSortCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "hec_industry_code",
+        "code_types": [
+          "hecIndustryCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "lode_attr_code",
+        "code_types": [
+          "lodeAttrCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "note_type_code",
+        "code_types": [
+          "noteTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "notify_mode",
+        "code_types": [
+          "notifyMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rrio_code",
+        "code_types": [
+          "rrioCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rural_cons_code",
+        "code_types": [
+          "ruralConsCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "settle_mode",
+        "code_types": [
+          "feeSettleMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "shift_no",
+        "code_types": [
+          "shiftNo"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "status_code",
+        "code_types": [
+          "statusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tmp_flag",
+        "code_types": [
+          "tmpFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tmp_trade_code",
+        "code_types": [
+          "tmpTradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "trade_code",
+        "code_types": [
+          "tradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "transfer_code",
+        "code_types": [
+          "transferFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_cons_prc",
+    "fields": [
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "fe_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pf_std_code",
+        "code_types": [
+          "pfStdCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "trade_code",
+        "code_types": [
+          "tradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ts_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_cons_prc_tactic",
+    "fields": [
+      {
+        "field_name": "ba_calc_mode",
+        "code_types": [
+          "baCalcMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pf_eval_mode",
+        "code_types": [
+          "pfEvalMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "prcTacticType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_fc_gc",
+    "fields": [
+      {
+        "field_name": "abso_mode",
+        "code_types": [
+          "absoMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "elec_gener_type",
+        "code_types": [
+          "gcTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "gc_sort_code",
+        "code_types": [
+          "gcSortCodeType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "gc_type",
+        "code_types": [
+          "gcType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "owner_classify",
+        "code_types": [
+          "ownerClassify"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "status_code",
+        "code_types": [
+          "gcStatusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "trade_code",
+        "code_types": [
+          "tradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_fc_mechanism",
+    "fields": [
+      {
+        "field_name": "end_time_type",
+        "code_types": [
+          "endTimeType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pro_sort",
+        "code_types": [
+          "prosort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "start_time_type",
+        "code_types": [
+          "startTimeType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_meter",
+    "fields": [
+      {
+        "field_name": "ref_meter_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_meter_read",
+    "fields": [
+      {
+        "field_name": "read_type_code",
+        "code_types": [
+          "readTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "usage_code",
+        "code_types": [
+          "usageTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_mp",
+    "fields": [
+      {
+        "field_name": "calc_mode",
+        "code_types": [
+          "calcMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ll_bill_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ll_calc_mode",
+        "code_types": [
+          "llCalcMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ll_share_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "md_type_code",
+        "code_types": [
+          "mdTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "meas_mode",
+        "code_types": [
+          "measMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "mp_attr_code",
+        "code_types": [
+          "mpAttrCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "side_code",
+        "code_types": [
+          "sideCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "status_code",
+        "code_types": [
+          "mpStatus"
+        ],
+        "hardcoded_values": {
+          "04": "撤销",
+          "01": "设立",
+          "02": "在用",
+          "03": "停用"
+        },
+        "source": "both"
+      },
+      {
+        "field_name": "tl_bill_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tl_share_flag",
+        "code_types": [
+          "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "mpSortCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "usage_type_code",
+        "code_types": [
+          "usageTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "wiring_mode",
+        "code_types": [
+          "wiringMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_ps",
+    "fields": [
+      {
+        "field_name": "linein_mode",
+        "code_types": [
+          "lineInMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "phase_code",
+        "code_types": [
+          "phaseCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pr_point",
+        "code_types": [
+          "prPoint"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "protect_mode",
+        "code_types": [
+          "psProtectMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ps_attr",
+        "code_types": [
+          "psAttr"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ps_volt",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "relay_protect_mode",
+        "code_types": [
+          "protectMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "run_mode",
+        "code_types": [
+          "runMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "psTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_sp",
+    "fields": [
+      {
+        "field_name": "interlock_mode",
+        "code_types": [
+          "interlockMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "lock_mode",
+        "code_types": [
+          "psLockMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ps_num_code",
+        "code_types": [
+          "psNumCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ps_switch_mode",
+        "code_types": [
+          "psSwitchMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "spare_power_flag",
+        "code_types": [
+          "sparePowerFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "spTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_d_it",
+    "fields": [
+      {
+        "field_name": "manufacturer",
+        "code_types": [
+          "meterFacturer"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "model_code",
+        "code_types": [
+          "ciModelNo",
+          "compItModelNo",
+          "viModelNo"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rc_ratio_code",
+        "code_types": [
+          "currentItRatio"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rv_code",
+        "code_types": [
+          "meterVolt"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "sort_code",
+        "code_types": [
+          "itSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ta_pre_code",
+        "code_types": [
+          "itPreLevelCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tv_pre_code",
+        "code_types": [
+          "itPreLevelCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "itTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_ratio_code",
+        "code_types": [
+          "voltRatioCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "wiring_mode",
+        "code_types": [
+          "wiringMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_d_meter",
+    "fields": [
+      {
+        "field_name": "cpu_type",
+        "code_types": [
+          "cpuType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "cur_status_code",
+        "code_types": [
+          "meterStatus"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "manufacturer",
+        "code_types": [
+          "meterFacturer"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "model_code",
+        "code_types": [
+          "meterModelNo"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rated_current",
+        "code_types": [
+          "meterRcSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "sort_code",
+        "code_types": [
+          "meterSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "meterTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "meterVolt"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "wiring_mode",
+        "code_types": [
+          "wiringMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cat_prc",
+    "fields": [
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cons_prc_amt_arc",
+    "fields": [
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cons_snap_arc",
+    "fields": [
+      {
+        "field_name": "cons_sort_code",
+        "code_types": [
+          "custSortCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "trade_type_code",
+        "code_types": [
+          "tradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_kwh_amt_arc",
+    "fields": [
+      {
+        "field_name": "prc_ts_code",
+        "code_types": [
+          "prcTsCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_chkunit",
+    "fields": [
+      {
+        "field_name": "chkunit_type_code",
+        "code_types": [
+          "chkunitSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_io_mp",
+    "fields": [
+      {
+        "field_name": "io_id",
+        "code_types": [],
+        "hardcoded_values": {
+          "0": "出口计量"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_line",
+    "fields": [
+      {
+        "field_name": "run_status_code",
+        "code_types": [
+          "runStatusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_subs",
+    "fields": [
+      {
+        "field_name": "run_status_code",
+        "code_types": [
+          "runStatusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_tg",
+    "fields": [
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [
+          "pubPrivFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "run_status_code",
+        "code_types": [
+          "runStatusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_tran",
+    "fields": [
+      {
+        "field_name": "frstside_volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ground_flag",
+        "code_types": [
+          "groundMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "model_no",
+        "code_types": [
+          "tranModelNo"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ms_flag",
+        "code_types": [
+          "msFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pr_code",
+        "code_types": [
+          "propertyRight"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [
+          "pubPrivFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "run_status_code",
+        "code_types": [
+          "runStatusCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "sndside_volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tran_type",
+        "code_types": [
+          "tranTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ts_alg_flag",
+        "code_types": [
+          "tlAlgCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "equipTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_ps_purchase",
+    "fields": [
+      {
+        "field_name": "chargechannel",
+        "code_types": [
+          "payMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "paytype",
+        "code_types": [
+          "settleMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "tradeResult",
+        "code_types": [],
+        "hardcoded_values": {
+          "02": "失败"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_coll_obj",
+    "fields": [
+      {
+        "field_name": "baudrate_code",
+        "code_types": [
+          "meterBaudRate"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "comm_mode",
+        "code_types": [
+          "commumnPort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "comm_prot_no",
+        "code_types": [
+          "commProtocol"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "major",
+        "code_types": [
+          "majorCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "minor",
+        "code_types": [
+          "minorCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_cp",
+    "fields": [
+      {
+        "field_name": "cp_type_code",
+        "code_types": [
+          "cpType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_data_arc",
+    "fields": [
+      {
+        "field_name": "actual_mode",
+        "code_types": [
+          "mrModeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "read_type_code",
+        "code_types": [
+          "readTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_plan_day",
+    "fields": [
+      {
+        "field_name": "event_type",
+        "code_types": [
+          "mrEventType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "mr_mode_code",
+        "code_types": [
+          "mrModeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "period_code",
+        "code_types": [
+          "periodCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_sect",
+    "fields": [
+      {
+        "field_name": "attr",
+        "code_types": [
+          "mrSectAttr"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_tmnl_run",
+    "fields": [
+      {
+        "field_name": "freeze_mode",
+        "code_types": [
+          "freezeMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "protocol_code",
+        "code_types": [
+          "commProtocolVer"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "terminal_type_code",
+        "code_types": [
+          "lcTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_s_market_push_log",
+    "fields": [
+      {
+        "field_name": "status",
+        "code_types": [],
+        "hardcoded_values": {
+          "1": "成功"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_st_sms_send_record",
+    "fields": [
+      {
+        "field_name": "send_status",
+        "code_types": [],
+        "hardcoded_values": {
+          "00": "发送成功"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "re",
+    "fields": [
+      {
+        "field_name": "read_type_code",
+        "code_types": [
+          "readTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  }
+]

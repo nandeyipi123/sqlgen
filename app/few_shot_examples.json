@@ -1,0 +1,2322 @@
+[
+  {
+    "question": "查询资中地区（org_no='5100434'）当前生效的目录电价信息，包括电价编号、电价名称、电压等级、用电类别、容量单价、需量单价，以及各时段（平、尖、峰、谷）在平水期、丰水期、枯水期的目录电度电价，阶梯电价各档止度和单价，代征费用（农网还贷、水利基金、库区移民基金、可再生能源），省级代理购电价代码和名称，代理购电价和输配电价在各时段的数值，以及居民损益折合度、代理偏差折合度、平均电价差额。",
+    "business_rules": "1. 表关联：m_e_cat_prc 为主表，通过 cat_prc_id 关联 m_e_cat_prc_det、m_e_prc_scope、m_e_base_prc、m_e_add_pl_prc（通过 m_e_cat_prc_det 间接）、m_e_agent_items（通过 m_e_cat_prc_det_items 间接）。2. 时段枚举：prc_ti_code 中 '01'=尖，'02'=峰，'03'=平，'04'=谷。3. 丰枯水期：range_type_code 中 '31-11' 或 '11' 表示丰水期，'31-12' 或 '12' 表示枯水期，'31-13' 或 '13' 表示平水期。4. 阶梯电价：policy_type_code='33' 表示阶梯电价，range_type_code 中 '31-12' 等表示第一档止度，'32-12' 第二档止度，'33-12' 第三档止度；单价通过 range_type_code 中 '31-11'/'31-12'/'31-13' 等区分档位。5. 代征费用：pl_code 中 '10000'=农网还贷，'20000'=水利基金，'30000'=库区移民基金，'40000'=可再生能源。6. 版本控制：para_vn 通过函数 f_get_curver_para_vn(1, @org) 获取当前版本。7. 电压等级和用电类别通过 m_p_code 表翻译。",
+    "search_keywords": [
+      "资中",
+      "目录电价",
+      "代理购电",
+      "输配电价",
+      "代征费用",
+      "丰枯",
+      "阶梯电价",
+      "容量需量",
+      "居民损益",
+      "代理偏差"
+    ],
+    "complexity": "complex",
+    "sql": "select a.prc_code 电价编号,a.cat_prc_name 电价名称,(select name from m_p_code where code_type='prcVoltCode' and value=a.prc_volt_code) 电价电压等级,(select name from m_p_code where code_type='elecTypeCode' and value=a.elec_type_code) 用电类别,e.cap_prc 容量单价,e.dmd_prc 需量单价,平平,平尖,平峰,平谷,丰平,丰尖,丰峰,丰谷,枯平,枯尖,枯峰,枯谷,c.第一阶梯止度,d.第一阶梯单价,c.第二阶梯止度,d.第二阶梯单价,c.第三阶梯止度,d.第三阶梯单价,add1 '农网还贷(10000)',add2 '水利基金(20000)',add3 '库区移民基金(30000)',add4 '可再生能源(40000)'\n,省级代理购电价代码,省级代理购电价名称,`代理购电价(尖)`,`代理购电价(峰)`,`代理购电价(平)`,`代理购电价(谷)`,`输配电价(尖)`,`输配电价(峰)`,`输配电价(平)`,`输配电价(谷)`,其中居民损益折合度,其中代理偏差折合度,平均电价差额\nfrom m_e_cat_prc a \nleft join (\nSELECT cat_prc_id,\nSUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='03' THEN cat_kwh_prc ELSE 0 END) as '平平',\nSUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='01' THEN cat_kwh_prc ELSE 0 END) as '平尖',\nSUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='02' THEN cat_kwh_prc ELSE 0 END) as '平峰',\nSUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='04' THEN cat_kwh_prc ELSE 0 END) as '平谷',\nSUM(CASE WHEN range_type_code in ('31-11','11') and prc_ti_code='03' THEN cat_kwh_prc ELSE 0 END) as '丰平',\nSUM(CASE WHEN range_type_code in ('31-11','11') and prc_ti_code='01' THEN cat_kwh_prc ELSE 0 END) as '丰尖',\nSUM(CASE WHEN range_type_code in ('31-11','11') and prc_ti_code='02' THEN cat_kwh_prc ELSE 0 END) as '丰峰',\nSUM(CASE WHEN range_type_code in ('31-11','11') and prc_ti_code='04' THEN cat_kwh_prc ELSE 0 END) as '丰谷',\nSUM(CASE WHEN range_type_code in ('31-12','12') and prc_ti_code='03' THEN cat_kwh_prc ELSE 0 END) as '枯平',\nSUM(CASE WHEN range_type_code in ('31-12','12') and prc_ti_code='01' THEN cat_kwh_prc ELSE 0 END) as '枯尖',\nSUM(CASE WHEN range_type_code in ('31-12','12') and prc_ti_code='02' THEN cat_kwh_prc ELSE 0 END) as '枯峰',\nSUM(CASE WHEN range_type_code in ('31-12','12') and prc_ti_code='04' THEN cat_kwh_prc ELSE 0 END) as '枯谷'\nFROM m_e_cat_prc_det \nGROUP BY cat_prc_id\n) b on a.id=b.cat_prc_id\nleft join\n(\nselect cat_prc_id\n,max(ifnull((case range_type_code when '31-12' then end_value end),'')) 第一阶梯止度\n,max(ifnull((case range_type_code when '32-12' then end_value end),'')) 第二阶梯止度\n,max(ifnull((case range_type_code when '33-12' then end_value end),'')) 第三阶梯止度\nfrom m_e_prc_scope where policy_type_code='33' group by cat_prc_id\n) c on a.id=c.cat_prc_id\nleft join\n(\nselect cat_prc_id\n,max(ifnull((case when range_type_code in('31-11','31-12','31-13') then 0 end),'')) 第一阶梯单价\n,max(ifnull((case when range_type_code in('32-11','32-12','32-13') then cat_kwh_prc end),'')) 第二阶梯单价\n,max(ifnull((case when range_type_code in('33-11','33-12','33-13') then cat_kwh_prc end),'')) 第三阶梯单价\nfrom m_e_cat_prc_det where range_type_code in ('31-11','31-12','31-13','32-11','32-12','32-13','33-11','33-12','33-13') group by cat_prc_id\n) d on a.id=d.cat_prc_id\nleft join m_e_base_prc e on a.id=e.cat_prc_id \nleft join\n(\nselect cat_prc_id\n,max(ifnull((case when pl_code in('10000') then pl_prc end),'')) add1\n,max(ifnull((case when pl_code in('20000') then pl_prc end),'')) add2\n,max(ifnull((case when pl_code in('30000') then pl_prc end),'')) add3\n,max(ifnull((case when pl_code in('40000') then pl_prc end),'')) add4\nfrom m_e_add_pl_prc f1\njoin m_e_cat_prc_det f2 on f1.det_id=f2.id\n group by cat_prc_id\n) f on a.id=f.cat_prc_id\nleft join (\nselect c.id cat_prc_id,a.agent_code 省级代理购电价代码,a.agent_name 省级代理购电价名称\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='03' THEN b.agent_prc ELSE 0 END) as '代理购电价(平)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='01' THEN b.agent_prc ELSE 0 END) as '代理购电价(尖)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='02' THEN b.agent_prc ELSE 0 END) as '代理购电价(峰)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='04' THEN b.agent_prc ELSE 0 END) as '代理购电价(谷)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='03' THEN b.trans_dist_prc ELSE 0 END) as '输配电价(平)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='01' THEN b.trans_dist_prc ELSE 0 END) as '输配电价(尖)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='02' THEN b.trans_dist_prc ELSE 0 END) as '输配电价(峰)'\n,SUM(CASE WHEN range_type_code in ('31-13','13') and prc_ti_code='04' THEN b.trans_dist_prc ELSE 0 END) as '输配电价(谷)'\n,b.agent_gain_prc 其中居民损益折合度,b.agent_offset_prc 其中代理偏差折合度,b.content1 平均电价差额\nfrom m_e_agent_items a\njoin m_e_cat_prc_det_items b on a.id=b.agent_items_id\njoin m_e_cat_prc c on b.prc_id=c.id\njoin m_e_cat_prc_det d on b.det_id=d.id and c.id=d.cat_prc_id\ngroup by c.id,a.agent_code,a.agent_name,b.agent_gain_prc,b.agent_offset_prc,b.content1\n) g on a.id=g.cat_prc_id\nwhere a.org_no like concat(@org,'%')\nand para_vn=f_get_curver_para_vn(1, @org)\nset @org:='5100434'",
+    "title": "资中代征",
+    "tables_used": [
+      "m_e_add_pl_prc",
+      "m_e_agent_items",
+      "m_e_base_prc",
+      "m_e_cat_prc",
+      "m_e_cat_prc_det",
+      "m_e_cat_prc_det_items",
+      "m_e_prc_scope",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询某供电单位下所有用电客户的全量算费档案信息，包括单位信息、用户基本信息、电价信息、计量点信息、变压器信息、抄表段信息等，要求用户状态不为已注销，并按单位编码排序。",
+    "business_rules": "1. 主表m_c_cons通过org_no关联ac_org获取单位名称，通过mr_sect_no关联m_r_sect获取抄表段名称。2. 用户状态status_code='9'表示已注销，查询中过滤掉。3. 计量点类型type_code='01'表示用电客户计量点。4. 变压器子查询中，run_status_code='01'表示运行状态，用于统计在运变压器数量和容量。5. 多个m_p_code表用于将代码值翻译为名称，如code_type='prcTacticType'对应定价策略类型。6. 目录电价关联时使用了函数f_get_curver_para_vn获取当前版本。7. 档案示数通过GROUP_CONCAT将多个示数类型名称拼接。8. 是否采集通过子查询判断m_r_coll_obj中是否存在对应meter_id。",
+    "search_keywords": [
+      "用户全量算费档案",
+      "用电客户",
+      "计量点",
+      "变压器",
+      "电价",
+      "抄表段",
+      "综合倍率",
+      "定量定比值",
+      "费控类型",
+      "运行容量"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o1.`name` 单位名称,a.mr_sect_no 抄表段编号,sect.`name` 抄表段名称 ,a.cons_no 用户编号,a.cons_name 用户名称,p20.`name` 用户状态,p28.name 费控类型,p22.`name` 用电分类,p23.`name` 用电类别 ,p25.`name` 行业分类,p4.`name` 供电电压,a.contract_cap 合同容量,a.run_cap 运行容量 ,p1.`name` 定价策略类型,p2.`name` 基本电费计算方式,e.dmd_spec_value 核定值,p3.`name` 功率因数考核方式 ,mp.mp_no 计量点编码,p21.`name` 计量点状态,p27.name '公专变',mgtg.tg_no '台区编码',mgtg.tg_name '台区名称',mgline.line_no '线路编码', mgline.line_name '线路名称',cm.made_no 表号,cm.t_factor 综合倍率,p17.`name` 参考表 ,ifnull((select '是' from m_r_coll_obj where meter_id=cm.id),'否') 是否采集 ,p9.`name` 计量方式,p10.`name` 计量点性质,p11.`name` 电量计算方式,mp.fqr_value 定量定比值 ,p12.`name` 变损分摊标识,p13.`name` 变损计费标识,p14.`name` 线损计算方式,p15.`name` 线损分摊标识,p16.`name` 线损计费标识 ,consprc.prc_code 电价码,catprc.cat_prc_name 电价名称,p24.`name` 电价用电类别,p26.`name` 电价行业分类 ,p6.`name` 执行水期,p7.`name` 执行峰谷,p8.`name` 力调标准 ,t.zsl 变压器总数,t.zrl 变压器总容量,t.zysl 在运变压器数量,t.zyrl 在运变压器容量,t.bsjsfs 在运变压器变损计算方式 ,left(a.build_date,10) 立户日期,GROUP_CONCAT(p29.name SEPARATOR ',') 档案示数 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' left join m_g_line mgline on mp.line_id=mgline.id left join m_g_tg mgtg on mp.tg_id=mgtg.id left join m_c_cons_prc consprc on mp.tariff_id=consprc.id left join m_e_cat_prc catprc on consprc.prc_code=catprc.prc_code and catprc.para_vn=f_get_curver_para_vn('1',@org_no) left join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id left join m_c_meter cm on cmmr.meter_id=cm.id left join m_r_sect sect on a.mr_sect_no=sect.id left join ( select ta.cons_id,count(ta.id) zsl,sum(ta.plate_cap) zrl ,count(case when run_status_code='01' then ta.id end) zysl ,sum(case when run_status_code='01' then ta.plate_cap else 0 end) zyrl ,group_concat(distinct(case when run_status_code='01' then tp1.`name` else '' end)) bsjsfs from m_g_tran ta left join m_p_code tp1 on tp1.code_type='tlAlgCode' and tp1.`value`=ta.ts_alg_flag where ta.org_no like concat(@org_no,'%') and ta.cons_id is not null group by ta.cons_id ) t on a.id=t.cons_id left join m_c_meter_read re on re.meter_id=cm.id and mp.id=re.mp_id left join m_p_code p1 on p1.code_type='prcTacticType' and p1.`value`=e.type_code left join m_p_code p2 on p2.code_type='baCalcMode' and p2.`value`=e.ba_calc_mode left join m_p_code p3 on p3.code_type='pfEvalMode' and p3.`value`=e.pf_eval_mode left join m_p_code p4 on p4.code_type='psVoltCode' and p4.`value`=a.volt_code left join m_p_code p6 on p6.code_type='ynJudgeFlag' and p6.`value`=consprc.fe_flag left join m_p_code p7 on p7.code_type='ynJudgeFlag' and p7.`value`=consprc.ts_flag left join m_p_code p8 on p8.code_type='pfStdCode' and p8.`value`=consprc.pf_std_code left join m_p_code p9 on p9.code_type='measMode' and p9.`value`=mp.meas_mode left join m_p_code p10 on p10.code_type='mpAttrCode' and p10.`value`=mp.mp_attr_code left join m_p_code p11 on p11.code_type='calcMode' and p11.`value`=mp.calc_mode left join m_p_code p12 on p12.code_type='ynJudgeFlag' and p12.`value`=mp.tl_share_flag left join m_p_code p13 on p13.code_type='ynJudgeFlag' and p13.`value`=mp.tl_bill_flag left join m_p_code p14 on p14.code_type='llCalcMode' and p14.`value`=mp.ll_calc_mode left join m_p_code p15 on p15.code_type='ynJudgeFlag' and p15.`value`=mp.ll_share_flag left join m_p_code p16 on p16.code_type='ynJudgeFlag' and p16.`value`=mp.ll_bill_flag left join m_p_code p17 on p17.code_type='ynJudgeFlag' and p17.`value`=cm.ref_meter_flag left join m_p_code p20 on p20.code_type='statusCode' and p20.`value`=a.status_code left join m_p_code p21 on p21.code_type='mpStatus' and p21.`value`=mp.status_code left join m_p_code p22 on p22.code_type='custSortCode' and p22.`value`=a.cons_sort_code left join m_p_code p23 on p23.code_type='elecTypeCode' and p23.`value`=a.elec_type_code left join m_p_code p24 on p24.code_type='elecTypeCode' and p24.`value`=consprc.elec_type_code left join m_p_code p25 on p25.code_type='tradeCode' and p25.`value`=a.trade_code left join m_p_code p26 on p26.code_type='tradeCode' and p26.`value`=consprc.trade_code left join m_p_code p27 on p27.code_type='pubPrivFlag' and p27.value=mgtg.pub_priv_flag left join m_p_code p28 on p28.code_type='ctlMode' and p28.value=a.ctl_mode left join m_p_code p29 on p29.code_type='readTypeCode' and p29.value=re.read_type_code where a.org_no like concat(@org_no,'%') and a.status_code<>'9' group by a.cons_no,mp.mp_no order by a.org_no",
+    "title": "用户全量算费档案",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_c_sp",
+      "m_e_cat_prc",
+      "m_g_line",
+      "m_g_tg",
+      "m_g_tran",
+      "m_p_code",
+      "m_r_coll_obj",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询指定供电单位下所有非注销用电客户的完整档案信息，包括单位信息、用户基本信息、受电点信息、定价策略、计量点信息、电能表信息、变压器汇总信息、电价信息等，并关联代码表翻译各状态和类型字段。",
+    "business_rules": "1. 主表m_c_cons关联ac_org获取单位名称，关联条件a.org_no=o1.id。2. 用户状态status_code不为'9'（注销）。3. 计量点mp.type_code='01'（用电客户计量点）。4. 变压器子查询按cons_id分组，统计总数、总容量、在运数量（run_status_code='01'）、在运容量、在运变损计算方式（ts_alg_flag通过代码表tlAlgCode翻译）。5. 电价关联m_e_cat_prc时使用函数f_get_curver_para_vn获取当前版本。6. 大量字段通过m_p_code代码表翻译，code_type对应不同枚举类型。7. 是否采集字段通过子查询判断m_r_coll_obj中是否存在对应meter_id。8. 过滤条件a.org_no like concat(@org_no,'%')，即按供电单位前缀匹配。",
+    "search_keywords": [
+      "全量算费",
+      "用户档案",
+      "计量点",
+      "变压器汇总",
+      "电价",
+      "代码翻译",
+      "供电单位",
+      "在运变压器",
+      "综合倍率",
+      "抄表段"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o1.`name` 单位名称,a.mr_sect_no 抄表段编号,sect.`name` 抄表段名称 ,a.cons_no 用户编号,a.cons_name 用户名称,p20.`name` 用户状态,p28.name 费控类型,p22.`name` 用电分类,p23.`name` 用电类别 ,p25.`name` 行业分类,p4.`name` 供电电压,a.contract_cap 合同容量,a.run_cap 运行容量 ,p1.`name` 定价策略类型,p2.`name` 基本电费计算方式,e.dmd_spec_value 核定值,p3.`name` 功率因数考核方式 ,mp.mp_no 计量点编码,p21.`name` 计量点状态,p27.name '公专变',mgtg.tg_no '台区编码',mgtg.tg_name '台区名称',mgline.line_no '线路编码', mgline.line_name '线路名称',cm.made_no 表号,cm.t_factor 综合倍率,p17.`name` 参考表 ,ifnull((select '是' from m_r_coll_obj where meter_id=cm.id),'否') 是否采集 ,p9.`name` 计量方式,p10.`name` 计量点性质,p11.`name` 电量计算方式,mp.fqr_value 定量定比值 ,p12.`name` 变损分摊标识,p13.`name` 变损计费标识,p14.`name` 线损计算方式,p15.`name` 线损分摊标识,p16.`name` 线损计费标识 ,consprc.prc_code 电价码,catprc.cat_prc_name 电价名称,p24.`name` 电价用电类别,p26.`name` 电价行业分类 ,p6.`name` 执行水期,p7.`name` 执行峰谷,p8.`name` 力调标准 ,t.zsl 变压器总数,t.zrl 变压器总容量,t.zysl 在运变压器数量,t.zyrl 在运变压器容量,t.bsjsfs 在运变压器变损计算方式 ,left(a.build_date,10) 立户日期 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' left join m_g_line mgline on mp.line_id=mgline.id left join m_g_tg mgtg on mp.tg_id=mgtg.id left join m_c_cons_prc consprc on mp.tariff_id=consprc.id left join m_e_cat_prc catprc on consprc.prc_code=catprc.prc_code and catprc.para_vn=f_get_curver_para_vn('1',@org_no) left join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id left join m_c_meter cm on cmmr.meter_id=cm.id left join m_r_sect sect on a.mr_sect_no=sect.id left join ( select ta.cons_id,count(ta.id) zsl,sum(ta.plate_cap) zrl ,count(case when run_status_code='01' then ta.id end) zysl ,sum(case when run_status_code='01' then ta.plate_cap else 0 end) zyrl ,group_concat(distinct(case when run_status_code='01' then tp1.`name` else '' end)) bsjsfs from m_g_tran ta left join m_p_code tp1 on tp1.code_type='tlAlgCode' and tp1.`value`=ta.ts_alg_flag where ta.org_no like concat(@org_no,'%') and ta.cons_id is not null group by ta.cons_id ) t on a.id=t.cons_id left join m_p_code p1 on p1.code_type='prcTacticType' and p1.`value`=e.type_code left join m_p_code p2 on p2.code_type='baCalcMode' and p2.`value`=e.ba_calc_mode left join m_p_code p3 on p3.code_type='pfEvalMode' and p3.`value`=e.pf_eval_mode left join m_p_code p4 on p4.code_type='psVoltCode' and p4.`value`=a.volt_code left join m_p_code p6 on p6.code_type='ynJudgeFlag' and p6.`value`=consprc.fe_flag left join m_p_code p7 on p7.code_type='ynJudgeFlag' and p7.`value`=consprc.ts_flag left join m_p_code p8 on p8.code_type='pfStdCode' and p8.`value`=consprc.pf_std_code left join m_p_code p9 on p9.code_type='measMode' and p9.`value`=mp.meas_mode left join m_p_code p10 on p10.code_type='mpAttrCode' and p10.`value`=mp.mp_attr_code left join m_p_code p11 on p11.code_type='calcMode' and p11.`value`=mp.calc_mode left join m_p_code p12 on p12.code_type='ynJudgeFlag' and p12.`value`=mp.tl_share_flag left join m_p_code p13 on p13.code_type='ynJudgeFlag' and p13.`value`=mp.tl_bill_flag left join m_p_code p14 on p14.code_type='llCalcMode' and p14.`value`=mp.ll_calc_mode left join m_p_code p15 on p15.code_type='ynJudgeFlag' and p15.`value`=mp.ll_share_flag left join m_p_code p16 on p16.code_type='ynJudgeFlag' and p16.`value`=mp.ll_bill_flag left join m_p_code p17 on p17.code_type='ynJudgeFlag' and p17.`value`=cm.ref_meter_flag left join m_p_code p20 on p20.code_type='statusCode' and p20.`value`=a.status_code left join m_p_code p21 on p21.code_type='mpStatus' and p21.`value`=mp.status_code left join m_p_code p22 on p22.code_type='custSortCode' and p22.`value`=a.cons_sort_code left join m_p_code p23 on p23.code_type='elecTypeCode' and p23.`value`=a.elec_type_code left join m_p_code p24 on p24.code_type='elecTypeCode' and p24.`value`=consprc.elec_type_code left join m_p_code p25 on p25.code_type='tradeCode' and p25.`value`=a.trade_code left join m_p_code p26 on p26.code_type='tradeCode' and p26.`value`=consprc.trade_code left join m_p_code p27 on p27.code_type='pubPrivFlag' and p27.value=mgtg.pub_priv_flag left join m_p_code p28 on p28.code_type='ctlMode' and p28.value=a.ctl_mode left join m_p_code p29 on p29.code_type='readTypeCode' and p29.value=re.read_type_code where a.org_no like concat(@org_no,'%') and a.status_code<>'9' order by a.org_no",
+    "title": "全量算费原始版本",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_mp",
+      "m_c_sp",
+      "m_e_cat_prc",
+      "m_g_line",
+      "m_g_tg",
+      "m_g_tran",
+      "m_p_code",
+      "m_r_coll_obj",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询供电所5100102下，截至2025年11月3日，所有欠费用户（欠费金额不为0）的欠费信息，包括用户编号、欠费总额（应收未收+发行后实收）、违约金总额、应收总额、总电量、抄表段编号及名称、线路编号及名称、台区编号及名称、用户名称、用电地址、抄表员编号、联系电话。",
+    "business_rules": "1. 欠费总额 = 应收未收金额（应收金额-实收金额） + 发行后实收金额（发行日期后实收的金额）。2. 违约金总额 = 应收未收违约金（应收违约金-实收违约金） + 发行后实收违约金。3. 应收未收金额和违约金从m_a_rcvbl_flow_arc（历史应收）和m_a_rcvbl_flow（当前应收）中分别计算，通过UNION ALL合并。4. 发行后实收金额从m_a_rcved_flow中获取，条件为rcved_date > 查询日期，且rcvbl_ym <= 查询年月，且rcvbl_amt_id在发行日期<=查询日期的应收记录中。5. 用户信息关联m_c_cons，抄表段关联m_r_sect，计量点关联m_c_mp（取每个用户的一个计量点），线路关联m_g_line，台区关联m_g_tg，抄表员关联m_r_oper_activity（操作环节为'03'抄表，且有效标志为'1'）。6. 联系电话从m_c_contact中取手机号长度为11且优先级最高的一个。7. 过滤条件：org_no like '5100102%'，发行日期<=20251103。8. 最终结果只保留欠费总额不为0的记录。",
+    "search_keywords": [
+      "欠费查询",
+      "欠费冻结",
+      "应收未收",
+      "违约金",
+      "供电所",
+      "发行日期",
+      "实收金额",
+      "抄表段",
+      "线路",
+      "台区"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT consNo, ( IFNULL( rcvbl_amt, 0 ) + IFNULL( rcvedAmtAfter, 0 ) ) qf, (IFNULL( rcvbl_penalty, 0 ) + IFNULL( thisPenalty, 0 )) owePenalty, rcvblAmt, tPq, mrSectNo, mrSectName, lineNo, lineName, tgNo, tgName, consName, elecAddr, operatorNo, tel FROM ( ( SELECT marf.cons_no consNo, sum( IFNULL( marf.rcvbl_amt, 0 ) ) - sum( IFNULL( marf.rcved_amt, 0 ) ) AS rcvbl_amt, sum( IFNULL( marf.rcvbl_penalty, 0 ) ) - sum( IFNULL( marf.rcved_penalty, 0 ) ) AS rcvbl_penalty, sum(IFNULL(marf.rcvbl_amt, 0)) rcvblAmt, sum(IFNULL(marf.t_pq, 0)) tPq, a.mr_sect_no mrSectNo, sect.name mrSectName, mg.line_no lineNo, mg.line_name lineName, mt.tg_no tgNo, mt.tg_name tgName, a.cons_name consName, a.elec_addr elecAddr, oper.operator_no operatorNo, ( SELECT mobile FROM m_c_contact b, m_c_cons_contact_rela rela WHERE b.id = rela.contact_id AND rela.cons_id = a.id AND LENGTH(b.mobile) = 11 ORDER BY b.contact_prio LIMIT 1) tel FROM m_a_rcvbl_flow_arc marf LEFT JOIN m_c_cons a ON a.cons_no = marf.cons_no LEFT JOIN m_r_sect sect ON sect.id = a.mr_sect_no LEFT JOIN ( SELECT cons_id, line_id, tg_id FROM m_c_mp GROUP BY cons_id) m ON a.id = m.cons_id LEFT JOIN m_g_line mg ON mg.id = m.line_id LEFT JOIN m_g_tg mt ON mt.id = m.tg_id LEFT JOIN m_r_oper_activity oper ON oper.mr_sect_no = sect.id AND oper.act_code = '03' AND oper.effect_flag = '1' WHERE 1 = 1 AND marf.org_no LIKE concat('5100102', '%') AND marf.release_date <= REPLACE('2025-11-03', '-', '') GROUP BY marf.cons_no ) ma LEFT JOIN ( SELECT macf.cons_no, sum( IFNULL( macf.this_rcved_amt, 0 ) ) rcvedAmtAfter, sum( IFNULL( macf.this_penalty, 0 ) ) thisPenalty FROM m_a_rcved_flow macf LEFT JOIN m_c_cons a ON a.cons_no = macf.cons_no WHERE 1 = 1 AND macf.rcvbl_amt_id IN ( SELECT id FROM m_a_rcvbl_flow_arc WHERE release_date <= REPLACE('2025-11-03', '-', '')) AND macf.rcved_date > '2025-11-03' AND macf.rcvbl_ym <= SUBSTR(REPLACE('2025-11-03' , '-', ''), 1, 6) AND macf.org_no LIKE concat('5100102', '%') GROUP BY macf.cons_no ) mc ON ma.consNo = mc.cons_no ) HAVING qf != 0 UNION ALL SELECT consNo, ( IFNULL( rcvbl_amt, 0 ) + IFNULL( rcvedAmtAfter, 0 ) ) qf, (IFNULL( rcvbl_penalty, 0 ) + IFNULL( thisPenalty, 0 )) owePenalty, rcvblAmt, tPq, mrSectNo, mrSectName, lineNo, lineName, tgNo, tgName, consName, elecAddr, operatorNo, tel FROM ( ( SELECT marf.cons_no consNo, sum( IFNULL( marf.rcvbl_amt, 0 ) ) - sum( IFNULL( marf.rcved_amt, 0 ) ) AS rcvbl_amt, sum( IFNULL( marf.rcvbl_penalty, 0 ) ) - sum( IFNULL( marf.rcved_penalty, 0 ) ) AS rcvbl_penalty, sum(IFNULL(marf.rcvbl_amt, 0)) rcvblAmt, sum(IFNULL(marf.t_pq, 0)) tPq, a.mr_sect_no mrSectNo, sect.name mrSectName, mg.line_no lineNo, mg.line_name lineName, mt.tg_no tgNo, mt.tg_name tgName, a.cons_name consName, a.elec_addr elecAddr, oper.operator_no operatorNo, ( SELECT mobile FROM m_c_contact b, m_c_cons_contact_rela rela WHERE b.id = rela.contact_id AND rela.cons_id = a.id AND LENGTH(b.mobile) = 11 ORDER BY b.contact_prio LIMIT 1) tel FROM m_a_rcvbl_flow marf LEFT JOIN m_c_cons a ON a.cons_no = marf.cons_no LEFT JOIN m_r_sect sect ON sect.id = a.mr_sect_no LEFT JOIN ( SELECT cons_id, line_id, tg_id FROM m_c_mp GROUP BY cons_id) m ON a.id = m.cons_id LEFT JOIN m_g_line mg ON mg.id = m.line_id LEFT JOIN m_g_tg mt ON mt.id = m.tg_id LEFT JOIN m_r_oper_activity oper ON oper.mr_sect_no = sect.id AND oper.act_code = '03' AND oper.effect_flag = '1' WHERE 1 = 1 AND marf.org_no LIKE concat('5100102', '%') AND marf.release_date <= REPLACE('2025-11-03', '-', '') GROUP BY marf.cons_no ) ma LEFT JOIN ( SELECT macf.cons_no, sum( IFNULL( macf.this_rcved_amt, 0 ) ) rcvedAmtAfter, sum( IFNULL( macf.this_penalty, 0 ) ) thisPenalty FROM m_a_rcved_flow macf LEFT JOIN m_c_cons a ON a.cons_no = macf.cons_no WHERE 1 = 1 AND macf.rcvbl_amt_id IN ( SELECT id FROM m_a_rcvbl_flow WHERE release_date <= REPLACE('2025-11-03', '-', '')) AND macf.rcved_date > '2025-11-03' AND macf.rcvbl_ym <= SUBSTR(REPLACE('2025-11-03' , '-', ''), 1, 6) AND macf.org_no LIKE concat('5100102', '%') GROUP BY macf.cons_no ) mc ON ma.consNo = mc.cons_no ) HAVING qf != 0",
+    "title": "欠费冻结查询",
+    "tables_used": [
+      "m_a_rcvbl_flow",
+      "m_a_rcvbl_flow_arc",
+      "m_a_rcved_flow",
+      "m_c_cons",
+      "m_c_contact",
+      "m_c_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_r_oper_activity",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询单位编码、单位名称、抄表段编号、抄表段名称、用户编号、用户名称、用户状态、用电分类、用电类别、行业分类、供电电压、合同容量、运行容量、定价策略类型、基本电费计算方式、核定值、功率因数考核方式、计量点编码、计量点状态、表号、综合倍率、参考表、是否采集、计量方式、计量点性质、电量计算方式、定量定比值、变损分摊标识、变损计费标识、线损计算方式、线损分摊标识、线损计费标识、电价码、电价名称、电价用电类别、电价行业分类、执行水期、执行峰谷、力调标准、变压器标识、变压器名称、变压器状态、变压器容量、实际启用时间、实际停用时间、设备恢复时间、立户日期，筛选条件：单位编码以@org_no开头，用户状态不为'9'，计量点状态为'01'或'02'，合同容量>=315，按单位编码排序。",
+    "business_rules": "1. 主表m_c_cons通过org_no关联ac_org获取单位名称，通过mr_sect_no关联m_r_sect获取抄表段名称。2. 用户状态(status_code)通过m_p_code(code_type='statusCode')翻译，排除值为'9'的记录。3. 计量点状态(mp.status_code)通过m_p_code(code_type='mpStatus')翻译，只取'01'(运行)和'02'(停用)。4. 定价策略类型(type_code)通过m_p_code(code_type='prcTacticType')翻译。5. 基本电费计算方式(ba_calc_mode)通过m_p_code(code_type='baCalcMode')翻译。6. 功率因数考核方式(pf_eval_mode)通过m_p_code(code_type='pfEvalMode')翻译。7. 供电电压(volt_code)通过m_p_code(code_type='psVoltCode')翻译。8. 执行水期(fe_flag)、执行峰谷(ts_flag)、力调标准(pf_std_code)等标志位通过m_p_code(code_type='ynJudgeFlag'或'pfStdCode')翻译。9. 计量方式(meas_mode)、计量点性质(mp_attr_code)、电量计算方式(calc_mode)等通过对应code_type翻译。10. 变损分摊标识(tl_share_flag)、变损计费标识(tl_bill_flag)、线损计算方式(ll_calc_mode)、线损分摊标识(ll_share_flag)、线损计费标识(ll_bill_flag)通过m_p_code翻译。11. 参考表(ref_meter_flag)通过m_p_code(code_type='ynJudgeFlag')翻译。12. 是否采集通过子查询判断m_r_coll_obj中是否存在对应meter_id。13. 电价码(prc_code)关联m_e_cat_prc获取电价名称，并过滤para_vn等于f_get_curver_para_vn('1',@org_no)的版本。14. 变压器信息通过m_g_tran关联，获取变压器标识、名称、状态、容量、启用停用时间等。15. 合同容量>=315。",
+    "search_keywords": [
+      "变压器状态",
+      "实际启用时间",
+      "实际停用时间",
+      "用户编号",
+      "计量点编码",
+      "电价名称",
+      "综合倍率",
+      "合同容量",
+      "运行容量",
+      "变压器容量"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o1.`name` 单位名称,a.mr_sect_no 抄表段编号,sect.`name` 抄表段名称 ,a.cons_no 用户编号,a.cons_name 用户名称,p20.`name` 用户状态,p22.`name` 用电分类,p23.`name` 用电类别 ,p25.`name` 行业分类,p4.`name` 供电电压,a.contract_cap 合同容量,a.run_cap 运行容量 ,p1.`name` 定价策略类型,p2.`name` 基本电费计算方式,e.dmd_spec_value 核定值,p3.`name` 功率因数考核方式 ,mp.mp_no 计量点编码,p21.`name` 计量点状态,cm.made_no 表号,cm.t_factor 综合倍率,p17.`name` 参考表 ,ifnull((select '是' from m_r_coll_obj where meter_id=cm.id),'否') 是否采集 ,p9.`name` 计量方式,p10.`name` 计量点性质,p11.`name` 电量计算方式,mp.fqr_value 定量定比值 ,p12.`name` 变损分摊标识,p13.`name` 变损计费标识,p14.`name` 线损计算方式,p15.`name` 线损分摊标识,p16.`name` 线损计费标识 ,consprc.prc_code 电价码,catprc.cat_prc_name 电价名称,p24.`name` 电价用电类别,p26.`name` 电价行业分类 ,p6.`name` 执行水期,p7.`name` 执行峰谷,p8.`name` 力调标准 ,t.id 变压器标识,t.tran_name 变压器名称,t.chg_remark 变压器状态,t.plate_cap 变压器容量,t.actual_start_date 实际启用时间,t.actual_stop_use_date 实际停用时间,t.plan_resume_date 设备恢复时间 ,left(a.build_date,10) 立户日期 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' left join m_c_cons_prc consprc on mp.tariff_id=consprc.id left join m_e_cat_prc catprc on consprc.prc_code=catprc.prc_code and catprc.para_vn=f_get_curver_para_vn('1',@org_no) left join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id left join m_c_meter cm on cmmr.meter_id=cm.id left join m_r_sect sect on a.mr_sect_no=sect.id left join m_g_tran t on a.id=t.cons_id left join m_p_code p1 on p1.code_type='prcTacticType' and p1.`value`=e.type_code left join m_p_code p2 on p2.code_type='baCalcMode' and p2.`value`=e.ba_calc_mode left join m_p_code p3 on p3.code_type='pfEvalMode' and p3.`value`=e.pf_eval_mode left join m_p_code p4 on p4.code_type='psVoltCode' and p4.`value`=a.volt_code left join m_p_code p6 on p6.code_type='ynJudgeFlag' and p6.`value`=consprc.fe_flag left join m_p_code p7 on p7.code_type='ynJudgeFlag' and p7.`value`=consprc.ts_flag left join m_p_code p8 on p8.code_type='pfStdCode' and p8.`value`=consprc.pf_std_code left join m_p_code p9 on p9.code_type='measMode' and p9.`value`=mp.meas_mode left join m_p_code p10 on p10.code_type='mpAttrCode' and p10.`value`=mp.mp_attr_code left join m_p_code p11 on p11.code_type='calcMode' and p11.`value`=mp.calc_mode left join m_p_code p12 on p12.code_type='ynJudgeFlag' and p12.`value`=mp.tl_share_flag left join m_p_code p13 on p13.code_type='ynJudgeFlag' and p13.`value`=mp.tl_bill_flag left join m_p_code p14 on p14.code_type='llCalcMode' and p14.`value`=mp.ll_calc_mode left join m_p_code p15 on p15.code_type='ynJudgeFlag' and p15.`value`=mp.ll_share_flag left join m_p_code p16 on p16.code_type='ynJudgeFlag' and p16.`value`=mp.ll_bill_flag left join m_p_code p17 on p17.code_type='ynJudgeFlag' and p17.`value`=cm.ref_meter_flag left join m_p_code p20 on p20.code_type='statusCode' and p20.`value`=a.status_code left join m_p_code p21 on p21.code_type='mpStatus' and p21.`value`=mp.status_code left join m_p_code p22 on p22.code_type='custSortCode' and p22.`value`=a.cons_sort_code left join m_p_code p23 on p23.code_type='elecTypeCode' and p23.`value`=a.elec_type_code left join m_p_code p24 on p24.code_type='elecTypeCode' and p24.`value`=consprc.elec_type_code left join m_p_code p25 on p25.code_type='tradeCode' and p25.`value`=a.trade_code left join m_p_code p26 on p26.code_type='tradeCode' and p26.`value`=consprc.trade_code where a.org_no like concat(@org_no,'%') and a.status_code<>'9' and mp.status_code in('01','02') and a.contract_cap>=315 order by a.org_no",
+    "title": "变压器状态及停用启用时间查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_mp",
+      "m_c_sp",
+      "m_e_cat_prc",
+      "m_g_tran",
+      "m_p_code",
+      "m_r_coll_obj",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询供电单位代码以'5100102'开头的用电客户中，电网户号在指定列表内的客户信息，包括供电单位、电网户号、户名、地址、开户日期、联系人姓名、联系方式（多个手机号合并）、用电类型，并且联系人类型为'07'（电气联系人），结果按电网户号排序。",
+    "business_rules": "1. 表关联：m_c_cons（用电客户）通过org_no关联ac_org（组织机构）获取供电单位名称；通过id关联m_c_cons_contact_rela（用电客户联系信息关系），再通过contact_id关联m_c_contact（联系信息）获取联系人信息；通过elec_type_code关联m_p_code（代码表）获取用电类型名称，其中code_type='elecTypeCode'。2. 筛选条件：a.org_no like '5100102%'（供电单位代码前缀匹配）；ct.contact_mode='07'（联系人类型为电气联系人）；a.cons_no in (指定列表)。3. 字段处理：left(a.build_date,10)截取开户日期前10位；GROUP_CONCAT(ct.mobile)将多个手机号合并为一个字段。4. 分组与排序：按a.cons_no分组，并按a.cons_no升序排序。",
+    "search_keywords": [
+      "证件信息",
+      "用电客户",
+      "联系人",
+      "电网户号",
+      "户名",
+      "地址",
+      "开户日期",
+      "联系方式",
+      "用电类型",
+      "供电单位"
+    ],
+    "complexity": "complex",
+    "sql": "select ac.name 供电单位,a.cons_no 电网户号,a.cons_name 户名,a.elec_addr 地址,left(a.build_date,10) 开户日期,ct.contact_name 联系人姓名,GROUP_CONCAT(ct.mobile)联系方式 ,p1.`name` 用电类型 from m_c_cons a join ac_org ac on ac.id=a.org_no left join m_c_cons_contact_rela bc on a.id=bc.cons_id left join m_c_contact ct on bc.contact_id=ct.id left join m_p_code p1 on p1.code_type='elecTypeCode' and p1.`value`=a.elec_type_code where a.org_no like '5100102%' and ct.contact_mode='07' and a.cons_no in( '010233403766', '010223403161', '010219403072', '010226402898', '010224402773', '010223402753', '010218402658', '010219402482', '010217402390', '010223402072', '010223402071', '010224402009', '010232402008', '010217402006', '010233401869', '010232401771', '010232401764', '010232401762', '010225401407', '010217397544', '010233397536', '010221397440', '010226397208', '010226397207', '010226397206', '010226397205', '010226397204', '010220397192', '010219397055', '010218397054', '010219396981', '010220396980', '010219396810', '010233396256', '010232396220', '010217396216', '010226396055', '010224395884', '010221395883', '010221395857', '010232395757', '010218395735', '010224395585', '010221395578', '010232395577', '010221395575', '010219394864', '010222394813', '010222394812', '010222394811', '010226394810', '010225394805', '010225394802', '010222394800', '010222394797', '010222394796', '010226394780', '010222394776', '010226394774', '010226394773', '010220394772', '010222394754', '010217394700', '010232392140', '010219392135', '010233392125', '010224392083', '010218392027', '010228392015', '010228391763', '010219391762', '010221391676', '010232391674', '010224391084', '010232390902', '010227390824', '010223390720', '010228390607', '010232390601', '010219390441', '010219390385', '010224390133', '010221390131', '010221389861', '010232389858', '010219389842', '010218389734', '010218389724', '010219389707', '010217389571', '010217389463', '010217389459', '010219389448', '010225388919', '010225388917', '010225388859', '010225388852', '010225388833', '010225388662', '010225388660', '010225388659', '010225388654', '010225388456', '010225388451', '010225388434', '010225388426', '010226388391', '010217388354', '010233388342', '010218387495', '010218387494', '010221387493', '010221387492', '010221387491', '010221387487', '010223387480', '010226385914', '010226385912', '010221385751', '010233385502', '010232385499', '010233385254', '010219385241', '010219385210', '010225385073', '010227384924', '010227384909', '010232384815', '010219384460', '010218384400', '010224383254', '010232382241', '010218382240', '010218382114', '010228381853', '010232381745', '010224381655', '010219381653', '010219381647', '010232381545', '010226381544', '010228381233', '010221380965', '010219380711', '010218380660', '010218380658', '010218380643', '010224380408', '010228380403', '010217380256', '010221380228', '010227380196', '010232380123', '010221379935', '010221379932', '010221379930', '010221379928', '010219379881', '010219379826', '010221379320', '010226379189', '010227378369', '010233378363', '010219378066', '010221378060' ) group by a.cons_no order by a.cons_no",
+    "title": "证件信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_contact_rela",
+      "m_c_contact",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有用电客户的详细信息，包括供电单位、抄表段编号、抄表段名称、用户编号、用户名称、客户编号、客户名称、用电地址、立户日期、合同容量、用户状态、运行容量、用户分类、用电类别、负荷性质、供电电压、行业分类、生产班次、电费结算方式、电费通知方式、临时用电标志、临时用电到期日期、票据类型、增值税号、增值税名、增值税银行、增值账号、注册地址、送电日期、缴费方式、重要性等级、高耗能行业类别、费控分类、转供标志、城农网标志、企业规模、临时用电用户分类、统一社会信用代码，并按供电单位和用户编号排序。",
+    "business_rules": "1. 主表为m_c_cons（用电客户表），通过org_no关联ac_org（组织机构表）获取供电单位名称，且供电单位ID需以@org参数开头。2. 通过cust_id左关联m_c_cust（客户表）获取客户编号、客户名称、统一社会信用代码。3. 通过vat_id左关联m_c_vat（增值税表）获取增值税相关信息。4. 通过cons_id左关联m_c_acct（账户表）获取缴费方式。5. 通过mr_sect_no左关联m_r_sect（抄表段表）获取抄表段名称。6. 多个m_p_code（代码表）左关联用于翻译状态码和分类代码，每个代码表通过code_type和value匹配，且只取take_effect_flag=1的记录。7. 排序按供电单位（o.name）和用户编号（a.cons_no）升序。",
+    "search_keywords": [
+      "资中代征",
+      "用电客户",
+      "供电单位",
+      "抄表段",
+      "增值税",
+      "代码翻译",
+      "客户信息",
+      "缴费方式",
+      "用户分类",
+      "行业分类"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.mr_sect_no 抄表段编号,e.name 抄表段名称,a.cons_no 用户编号,a.cons_name 用户名称,b.cust_no 客户编号,b.name 客户名称,a.elec_addr 用电地址,\na.build_date 立户日期,a.contract_cap 合同容量,p1.name 用户状态,a.run_cap 运行容量,p2.name 用户分类,p3.name 用电类别,p4.name 负荷性质,p5.name 供电电压,\np6.name 行业分类,p7.name 生产班次,p8.name 电费结算方式,p9.name 电费通知方式,p10.name 临时用电标志,a.tmp_date 临时用电到期日期,p11.name 票据类型,\nc.vat_no 增值税号,c.vat_name 增值税名,c.bank_code 增值税银行,c.vat_acct 增值账号,c.reg_addr 注册地址,a.ps_date 送电日期,p12.name 缴费方式,\np13.name 重要性等级,p14.name 高耗能行业类别,p15.name 费控分类,p16.name 转供标志,p17.name 城农网标志,p18.name 企业规模,p19.name 临时用电用户分类,\nb.social_credit_code 统一社会信用代码\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join m_c_cust b on a.cust_id=b.id \nleft join m_c_vat c on a.vat_id=c.id \nleft join m_c_acct d on a.id=d.cons_id \nleft join m_r_sect e on a.mr_sect_no=e.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='StatusCode' and p1.value=a.status_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='custSortCode' and p2.value=a.cons_sort_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='electypecode' and p3.value=a.elec_type_code \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='lodeattrcode' and p4.value=a.lode_attr_code \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='psvoltcode' and p5.value=a.volt_code \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='tradecode' and p6.value=a.trade_code \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='shiftno' and p7.value=a.shift_no \nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='feeSettleMode' and p8.value=a.settle_mode \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='notifymode' and p9.value=a.notify_mode \nleft join m_p_code p10 on p10.take_effect_flag=1 and p10.code_type='tmpFlag' and p10.value=a.tmp_flag \nleft join m_p_code p11 on p11.take_effect_flag=1 and p11.code_type='notetypecode' and p11.value=a.note_type_code \nleft join m_p_code p12 on p12.take_effect_flag=1 and p12.code_type='paymode' and p12.value=d.pay_mode \nleft join m_p_code p13 on p13.take_effect_flag=1 and p13.code_type='rriocode' and p13.value=a.rrio_code \nleft join m_p_code p14 on p14.take_effect_flag=1 and p14.code_type='hecindustrycode' and p14.value=a.hec_industry_code \nleft join m_p_code p15 on p15.take_effect_flag=1 and p15.code_type='ctlmode' and p15.value=a.ctl_mode \nleft join m_p_code p16 on p16.take_effect_flag=1 and p16.code_type='transferFlag' and p16.value=a.transfer_code \nleft join m_p_code p17 on p17.take_effect_flag=1 and p17.code_type='ruralconscode' and p17.value=a.rural_cons_code \nleft join m_p_code p18 on p18.take_effect_flag=1 and p18.code_type='busiscale' and p18.value=a.busi_scale \nleft join m_p_code p19 on p19.take_effect_flag=1 and p19.code_type='tmpTradeCode' and p19.value=a.tmp_trade_code \norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_acct",
+      "m_c_cons",
+      "m_c_cust",
+      "m_c_vat",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询用户编号为'010221024543'的日常档案信息，包括单位编码、单位名称、抄表段编号、抄表段名称、用户编号、用户名称、用户状态、费控类型、用电分类、用电类别、合同容量、运行容量、计量点编码、计量点状态、表号、综合倍率、参考表、档案示数、峰谷标志、电表规范、电价码、电价名称。",
+    "business_rules": "1. 主表为m_c_cons，关联ac_org获取单位名称，关联m_r_sect获取抄表段名称。2. 通过m_c_sp和m_c_mp关联计量点，计量点类型为'01'（用电客户）。3. 通过m_c_cons_prc_tactic关联定价策略，通过m_c_cons_prc和m_e_cat_prc获取电价信息，其中m_e_cat_prc使用函数f_get_curver_para_vn获取当前版本。4. 通过m_c_meter_mp_rela和m_c_meter获取电能表信息，通过m_d_meter获取电表规范。5. 通过m_c_meter_read获取档案示数，使用GROUP_CONCAT合并多个示数类型。6. 通过m_g_tran子查询统计变压器数量、容量等，但最终未在SELECT中使用。7. 大量使用m_p_code表进行代码值翻译，如用户状态、费控类型、用电分类等。8. 筛选条件：org_no以@org_no开头，status_code<>'9'（非删除），cons_no='010221024543'。9. 分组按cons_no和mp_no，排序按org_no。",
+    "search_keywords": [
+      "日常档案查询",
+      "用户档案",
+      "计量点",
+      "电价",
+      "电能表",
+      "抄表段",
+      "用户编号",
+      "合同容量",
+      "运行容量",
+      "综合倍率"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o1.`name` 单位名称,a.mr_sect_no 抄表段编号,sect.`name` 抄表段名称 ,a.cons_no 用户编号,a.cons_name 用户名称,p20.`name` 用户状态,p28.name 费控类型,p22.`name` 用电分类,p23.`name` 用电类别 ,a.contract_cap 合同容量,a.run_cap 运行容量 ,mp.mp_no 计量点编码,p21.`name` 计量点状态,cm.made_no 表号,cm.t_factor 综合倍率,p17.`name` 参考表 ,GROUP_CONCAT(p29.name SEPARATOR ',') 档案示数,p1.name 峰谷标志,p2.name 电表规范,consprc.prc_code 电价码,catprc.cat_prc_name 电价名称 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' left join m_g_line mgline on mp.line_id=mgline.id left join m_g_tg mgtg on mp.tg_id=mgtg.id left join m_c_cons_prc consprc on mp.tariff_id=consprc.id left join m_e_cat_prc catprc on consprc.prc_code=catprc.prc_code and catprc.para_vn=f_get_curver_para_vn('1',@org_no) left join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id left join m_c_meter cm on cmmr.meter_id=cm.id left join m_r_sect sect on a.mr_sect_no=sect.id left join ( select ta.cons_id,count(ta.id) zsl,sum(ta.plate_cap) zrl ,count(case when run_status_code='01' then ta.id end) zysl ,sum(case when run_status_code='01' then ta.plate_cap else 0 end) zyrl ,group_concat(distinct(case when run_status_code='01' then tp1.`name` else '' end)) bsjsfs from m_g_tran ta left join m_p_code tp1 on tp1.code_type='tlAlgCode' and tp1.`value`=ta.ts_alg_flag where ta.org_no like concat(@org_no,'%') and ta.cons_id is not null group by ta.cons_id ) t on a.id=t.cons_id left join m_c_meter_read re on re.meter_id=cm.id and mp.id=re.mp_id left join m_d_meter de on de.id=cm.id left join m_p_code p1 on p1.code_type='ynJudgeFlag' and p1.`value`=consprc.ts_flag left join m_p_code p2 on p2.code_type='cpuType' and p2.`value`=de.cpu_type left join m_p_code p17 on p17.code_type='ynJudgeFlag' and p17.`value`=cm.ref_meter_flag left join m_p_code p20 on p20.code_type='statusCode' and p20.`value`=a.status_code left join m_p_code p21 on p21.code_type='mpStatus' and p21.`value`=mp.status_code left join m_p_code p22 on p22.code_type='custSortCode' and p22.`value`=a.cons_sort_code left join m_p_code p23 on p23.code_type='elecTypeCode' and p23.`value`=a.elec_type_code left join m_p_code p24 on p24.code_type='elecTypeCode' and p24.`value`=consprc.elec_type_code left join m_p_code p25 on p25.code_type='tradeCode' and p25.`value`=a.trade_code left join m_p_code p26 on p26.code_type='tradeCode' and p26.`value`=consprc.trade_code left join m_p_code p27 on p27.code_type='pubPrivFlag' and p27.value=mgtg.pub_priv_flag left join m_p_code p28 on p28.code_type='ctlMode' and p28.value=a.ctl_mode left join m_p_code p29 on p29.code_type='readTypeCode' and p29.value=re.read_type_code where a.org_no like concat(@org_no,'%') and a.status_code<>'9' and a.cons_no in('010221024543') group by a.cons_no,mp.mp_no order by a.org_no",
+    "title": "日常档案查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_c_sp",
+      "m_d_meter",
+      "m_e_cat_prc",
+      "m_g_line",
+      "m_g_tg",
+      "m_g_tran",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询2024年1月至12月期间，管理单位编码以'5100434'开头的发电厂的上网汇总数据，包括管理单位名称、年月、发电厂编号、发电厂名称、企业编号、企业名称、抄见有功电量、线损电量、拒购电量、过网电量、结算有效电量、网内收购电量及电费、网外代销电量及电费、无功考核电量、超欠发无功电费、税费、税后电费、应付电费、应收过网费、发电电量、上网电量、厂用率。",
+    "business_rules": "1. 表关联：m_r_plan_arc 与 m_r_sect 通过 mr_sect_no 关联，且 m_r_sect.attr='23'（表示发电侧抄表段）。2. m_e_gc_snap_arc 与 m_r_plan_arc 通过 app_no 关联。3. m_c_fc_geg_gc_rela 与 m_e_gc_snap_arc 通过 gc_id 关联，再与 m_c_fc_geg 通过 geg_id 关联。4. m_e_mp_para_snap_arc 与 m_e_gc_snap_arc 通过 calc_id 关联，且 data_src 不在 ('99','98')。5. m_e_fc_mp_pq_det_arc 与 m_e_mp_para_snap_arc 通过 mp_para_snap_id 关联。6. m_e_cons_prc_amt_arc 与 m_e_gc_snap_arc 通过 calc_id 关联。7. m_c_fc_gc 与 m_e_gc_snap_arc 通过 gc_id 关联。8. 筛选条件：c.ym BETWEEN 202401 and 202412，c.org_no like '5100434%'。9. 发电电量：usage_type_code='1101' 的计量点结算电量之和。10. 上网电量：usage_type_code='1102' 的计量点结算电量之和。11. 结算有效电量：amt_type='200'或'201'的结算电量之和。12. 网内收购电量/电费：amt_type='201'。13. 网外代销电量/电费：amt_type='200'。14. 超欠发无功电费：amt_type='204'。15. 税费 = 应付电费 - 税后电费，税后电费 = 应付电费 / (1+增值税率)，增值税率来自 m_c_fc_gc.value_added_tax。16. 厂用率 = (发电电量 - 上网电量) / 发电电量，若发电电量为0则厂用率为0。",
+    "search_keywords": [
+      "购电侧",
+      "上网汇总",
+      "发电厂",
+      "发电电量",
+      "上网电量",
+      "厂用率",
+      "结算电量",
+      "网内收购",
+      "网外代销",
+      "无功考核"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT (SELECT name FROM ac_org WHERE id = amt.org_no) 管理单位, amt.年月, amt.发电厂编号, amt.发电厂名称, amt.企业编号, amt.企业名称, amt.抄见有功电量, amt.线损电量, amt.拒购电量, amt.过网电量, amt.结算有效电量, amt.网内收购电量, amt.网内收购电费, amt.网外代销电量, amt.网外代销电费, amt.无功考核电量, amt.超欠发无功电费, amt.税费, amt.税后电费, amt.应付电费, amt.应收过网费, amt.发电电量, amt.上网电量, if(amt.发电电量=0,0,round((amt.发电电量-amt.上网电量)/amt.发电电量,2)) 厂用率 FROM (SELECT amt.*, IFNULL((SELECT sum(q.settle_apq) FROM m_e_mp_pq_arc q LEFT JOIN m_e_mp_para_snap_arc p ON p.id = q.mp_para_snap_id AND p.usage_type_code = '1101' WHERE p.calc_id = amt.id),0) 发电电量, IFNULL((SELECT sum(q.settle_apq) FROM m_e_mp_pq_arc q LEFT JOIN m_e_mp_para_snap_arc p ON p.id = q.mp_para_snap_id AND p.usage_type_code = '1102' WHERE p.calc_id = amt.id),0) 上网电量 FROM (SELECT t.id,t.org_no, t.年月, t.发电厂编号, t.发电厂名称, t.企业编号, t.企业名称, t.抄见有功电量, t.线损电量, t.拒购电量, t.过网电量, SUM(if(b.amt_type='200' or b.amt_type='201',IFNULL(b.T_SETTLE_PQ, 0),0)) 结算有效电量, SUM(if(b.amt_type='201',IFNULL(b.T_SETTLE_PQ, 0),0)) 网内收购电量, SUM(if(b.amt_type='201',IFNULL(b.T_AMT, 0),0)) 网内收购电费, SUM(if(b.amt_type='200',IFNULL(b.T_SETTLE_PQ, 0),0)) 网外代销电量, SUM(if(b.amt_type='200',IFNULL(b.T_AMT, 0),0)) 网外代销电费, t.无功考核电量, SUM(if(b.amt_type='204',IFNULL(b.T_AMT, 0),0)) 超欠发无功电费, round(SUM(if(b.amt_type='200' or b.amt_type='201' or b.amt_type='204',IFNULL(b.T_AMT, 0),0)) -round(SUM(if(b.amt_type='200' or b.amt_type='201' or b.amt_type='204', IFNULL(b.T_AMT, 0),0)) / (1+ifnull(c.value_added_tax,0)),2),2) 税费, round(SUM(if(b.amt_type='200' or b.amt_type='201' or b.amt_type='204', IFNULL(b.T_AMT, 0),0)) / (1+ifnull(c.value_added_tax,0)),2) 税后电费, SUM(if(b.amt_type='200' or b.amt_type='201' or b.amt_type='204',IFNULL(b.T_AMT, 0),0)) 应付电费, SUM(if(b.amt_type='202',IFNULL(b.T_AMT, 0),0)) 应收过网费 FROM ( SELECT c.id, c.gc_id, c.org_no, a.amt_ym 年月, c.gc_no 发电厂编号, c.gc_name 发电厂名称, d.geg_no 企业编号, d.geg_name 企业名称, sum(ifnull(mp.flaten_apq,0)) 抄见有功电量, sum(ifnull(mp.ap_ll,0)) 线损电量, sum(ifnull(mp.rfspuh_share_pq,0)) 拒购电量, sum(ifnull(mp.ssu_pq,0)) 过网电量, sum(ifnull(mp.check_rp,0)) 无功考核电量 FROM m_r_plan_arc a INNER JOIN m_r_sect b ON a.mr_sect_no = b.id AND b.attr='23' INNER JOIN m_e_gc_snap_arc c ON a.app_no = c.app_code INNER JOIN m_c_fc_geg_gc_rela rela ON rela.gc_id = c.gc_id inner join m_c_fc_geg d on d.id = rela.geg_id INNER JOIN m_e_mp_para_snap_arc e ON c.id = e.calc_id AND e.data_src not in ('99','98') left JOIN m_e_fc_mp_pq_det_arc mp ON mp.mp_para_snap_id = e.id where c.ym BETWEEN 202401 and 202412 c.org_no like '5100434%' GROUP BY c.id) t INNER JOIN m_e_cons_prc_amt_arc b ON t.ID = b.CALC_ID inner JOIN m_c_fc_gc c ON t.gc_id = c.id GROUP BY t.id) amt) amt",
+    "title": "购电侧上网汇总",
+    "tables_used": [
+      "ac_org",
+      "m_c_fc_gc",
+      "m_c_fc_geg",
+      "m_c_fc_geg_gc_rela",
+      "m_e_cons_prc_amt_arc",
+      "m_e_fc_mp_pq_det_arc",
+      "m_e_gc_snap_arc",
+      "m_e_mp_para_snap_arc",
+      "m_e_mp_pq_arc",
+      "m_r_plan_arc",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有用电客户的计量点详细信息，包括用户编号、用户名称、受电点编号、计量点编号、计量点名称、主要用途、线路、台区、计量点级数、计量点序号、抄表顺序号、计量点分类、电压等级、计量方式、计量点性质、计量装置分类、接线方式、计量点容量、是否装表、状态、计量点所属侧、申请日期、投运日期、计量点地址、电量计算方式、定量定比值、定比扣减标识、执行顺序、变损分摊标识、变损分摊协议值、变损计费标识、线损计算方式、有功线损计算值、无功线损计算值、线损分摊标识、线损分摊协议值、线损计费标识、PT有功加损、PT无功加损、电价编号、电价名称，并筛选用户状态为0、1、2、3（正常、暂停、销户、其他）的记录，按供电单位和用户编号排序。",
+    "business_rules": "1. 主表关联：m_c_cons（用户）与ac_org（组织机构）通过org_no关联，且org_no需匹配传入的@org参数（模糊匹配）。2. 计量点关联：m_c_mp与m_c_cons通过cons_id关联，且计量点类型type_code='01'（用电客户）。3. 线路和台区：m_c_mp通过line_id和tg_id左连接m_g_line和m_g_tg。4. 电价关联：m_c_mp通过tariff_id关联m_c_cons_prc，再通过prc_code关联m_e_cat_prc，且m_e_cat_prc的para_vn需通过函数f_get_curver_para_vn获取当前版本。5. 代码表翻译：多个字段通过m_p_code表翻译，条件为take_effect_flag=1且code_type匹配对应代码类型，如'usagetypecode'、'mpSortCode'等。6. 枚举值翻译：meter_flag=1时显示'是'，否则'否'；fr_deduct_flag=1时显示'是'，否则'否'；tl_share_flag=1时显示'是'，否则'否'；tl_bill_flag=1时显示'是'，否则'否'；ll_share_flag=1时显示'是'，否则'否'；ll_bill_flag=1时显示'是'，否则'否'。7. 用户状态筛选：a.status_code in ('0','1','2','3')，对应正常、暂停、销户等状态。8. 排序：按供电单位（o.name）和用户编号（a.cons_no）升序。",
+    "search_keywords": [
+      "资中代征",
+      "计量点",
+      "用户信息",
+      "电价",
+      "线损",
+      "变损",
+      "代码表翻译",
+      "供电单位",
+      "计量点分类",
+      "电压等级"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.sp_id 受电点编号,mp_no 计量点编号,mp_name 计量点名称,p1.name 主要用途,line_name 线路,\ntg_name 台区,mp_level 计量点级数,mp_sn 计量点序号,mr_sn 抄表顺序号,p2.name 计量点分类,p3.name 电压等级,p4.name 计量方式,p5.name 计量点性质,\np6.name 计量装置分类,p7.name 接线方式,mp_cap 计量点容量,(case meter_flag when 1 then '是' else '否' end) 是否装表,p8.name 状态,p9.name 计量点所属侧,\nb.app_date 申请日期,b.run_date 投运日期,b.mp_addr 计量点地址,p10.name 电量计算方式,b.fqr_value 定量定比值,\n(case fr_deduct_flag when 1 then '是' else '否' end) 定比扣减标识,b.deduct_order 执行顺序,\n(case tl_share_flag when 1 then '是' else '否' end) 变损分摊标识,b.tl_share_value 变损分摊协议值,\n(case tl_bill_flag when 1 then '是' else '否' end) 变损计费标识,p11.name 线损计算方式,b.ap_ll_value 有功线损计算值,\nb.rp_ll_value 无功线损计算值,(case ll_share_flag when 1 then '是' else '否' end) 线损分摊标识,b.ll_share_value 线损分摊协议值,\n(case ll_bill_flag when 1 then '是' else '否' end) 线损计费标识,b.pt_ap_loss PT有功加损,b.pt_rp_loss PT无功加损,g.prc_code 电价编号,\ng.cat_prc_name 电价名称\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp b on a.id=b.cons_id and b.type_code='01' \nleft join m_g_line d on b.line_id=d.id \nleft join m_g_tg e on b.tg_id=e.id \nleft join m_c_cons_prc f on b.tariff_id=f.id \nleft join m_e_cat_prc g on f.prc_code=g.prc_code and g.para_vn=f_get_curver_para_vn(1, @org) \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='usagetypecode' and p1.value=b.usage_type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='mpSortCode' and p2.value=b.type_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='psvoltcode' and p3.value=b.volt_code \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='measmode' and p4.value=b.meas_mode \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='mpattrcode' and p5.value=b.mp_attr_code \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='mdtypecode' and p6.value=b.md_type_code \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='wiringmode' and p7.value=b.wiring_mode \nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='mpstatus' and p8.value=b.status_code \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='sidecode' and p9.value=b.side_code \nleft join m_p_code p10 on p10.take_effect_flag=1 and p10.code_type='calcmode' and p10.value=b.calc_mode \nleft join m_p_code p11 on p11.take_effect_flag=1 and p11.code_type='llcalcmode' and p11.value=b.ll_calc_mode \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_mp",
+      "m_e_cat_prc",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2026年2月某供电公司（ID=5100118）下属所有县级供电所（level=3）的以下指标：自有电站总发电量（含厂用电量）、自有电站厂用电量、购光伏电费、购国网电费。其中自有电站总发电量统计发电客户类型为'3'且用电类型为'1101'的结算电量；自有电站厂用电量为总发电量减去用电类型为'1102'的结算电量；购光伏电费统计发电客户类型为'2'且发电类型为'04'的目录电度电费；购国网电费统计发电客户类型为'3'且管理单位为'03'的电费总额（amt_type为'200'或'201'）。",
+    "business_rules": "1. 表关联：m_e_gc_snap_arc（发电客户快照）通过gc_id关联m_c_fc_gc（发电客户），通过calc_id关联m_e_mp_para_snap_arc（计量点参数快照），再通过mp_para_snap_id关联m_e_mp_pq_arc（计量点电量）。购光伏和购国网还关联m_e_cons_prc_amt_arc（用户电价电费）。2. 组织过滤：通过ac_org表，根据给定org_id（5100118）的id_path，递归查找所有type=0且level=3的下级组织。3. 枚举值：usage_type_code='1101'表示总发电量，'1102'表示厂用电量；fc_cust_type='3'表示供电公司自有电站，'2'表示光伏用户；manage_agency='01'表示自有电站，'03'表示国网；elec_gener_type='04'表示光伏；amt_type='200'或'201'表示购国网电费。4. 计算逻辑：自有电站厂用电量=max(总发电量-厂用电量,0)；购光伏电费为目录电度电费之和；购国网电费为符合条件的电费总额。5. 单位转换：电量/电费除以10000，保留两位小数。",
+    "search_keywords": [
+      "自有电站总发电量",
+      "厂用电量",
+      "购光伏",
+      "购国网",
+      "发电客户",
+      "供电公司",
+      "县级供电所",
+      "202602",
+      "目录电度电费",
+      "结算电量"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT round(sum(IF(p.usage_type_code = '1101',q.settle_apq,0))/10000,2) as '2:自有电站总发电量(含厂用电量）', if(round((sum(IF(p.usage_type_code = '1101',q.settle_apq,0))-sum(IF(p.usage_type_code = '1102',q.settle_apq,0)))/10000,2) < 0,0,round((sum(IF(p.usage_type_code = '1101',q.settle_apq,0))-sum(IF(p.usage_type_code = '1102',q.settle_apq,0)))/10000,2)) as'3:自有电站厂用电量' FROM m_e_gc_snap_arc a inner JOIN m_c_fc_gc c ON a.gc_id = c.id AND c.manage_agency = '01' INNER JOIN m_e_mp_para_snap_arc p ON p.calc_id = a.id INNER JOIN m_e_mp_pq_arc q ON p.id = q.mp_para_snap_id where a.ym = '202602' and a.fc_cust_type = '3' and a.org_no in (SELECT a.id FROM ac_org a WHERE a.id_path LIKE ( SELECT CONCAT(ao.id_path, '%') FROM ac_org ao WHERE ao.id = '5100118' ) AND a.type = 0 AND a.level = 3) select round(ifnull(SUM(IFNULL(amt.t_cat_kwh_amt, 0)), 0)/ 10000, 2) as '26:（2）购光伏' from m_e_gc_snap_arc a inner join m_c_fc_gc c on a.gc_id = c.id inner join ( select p.calc_id, sum(p.t_cat_kwh_amt) t_cat_kwh_amt from m_e_gc_snap_arc q left join m_e_cons_prc_amt_arc p on p.calc_id = q.id where q.org_no in (select a.id from ac_org a where a.id_path like (select CONCAT(ao.id_path, '%') from ac_org ao where ao.id = '5100118' ) and a.type = 0 and a.level = 3) and q.ym = '202602' group by q.id ) amt on amt.calc_id = a.id inner join ( select p.calc_id, sum(q.settle_apq) settle_apq from m_e_mp_pq_arc q left join m_e_mp_para_snap_arc p on p.id = q.mp_para_snap_id and p.usage_type_code = '1102' where p.org_no in (select a.id from ac_org a where a.id_path like (select CONCAT(ao.id_path, '%') from ac_org ao where ao.id = '5100118' ) and a.type = 0 and a.level = 3) and p.ym = '202602' group by p.calc_id ) mp on mp.calc_id = a.id where a.ym = '202602' and a.fc_cust_type = '2' and a.org_no in (select a.id from ac_org a where a.id_path like (select CONCAT(ao.id_path, '%') from ac_org ao where ao.id = '5100118' ) and a.type = 0 and a.level = 3) and c.elec_gener_type='04' group by c.elec_gener_type SELECT round(ifnull(SUM(if(b.amt_type='200' or b.amt_type='201',IFNULL(b.T_AMT, 0),0)),0)/10000,2) as '33:1.购国网' FROM m_e_gc_snap_arc a INNER JOIN m_e_cons_prc_amt_arc b ON a.ID = b.CALC_ID inner JOIN m_c_fc_gc c ON a.gc_id = c.id AND c.manage_agency = '03' where a.ym = '202602' and a.fc_cust_type = '3' and a.org_no in (SELECT a.id FROM ac_org a WHERE a.id_path LIKE ( SELECT CONCAT(ao.id_path, '%') FROM ac_org ao WHERE ao.id = '5100118' ) AND a.type = 0 AND a.level = 3)",
+    "title": "发供一体（供电）公司生产经营情况报表_新",
+    "tables_used": [
+      "ac_org",
+      "m_c_fc_gc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_gc_snap_arc",
+      "m_e_mp_para_snap_arc",
+      "m_e_mp_pq_arc"
+    ]
+  },
+  {
+    "question": "查询资中代征相关数据，包括供电单位、用户编号、用户名称、电费年月、总电量、总电费、总目录电度电费、总代征电费、农网还贷、水利基金、库区移民基金、可再生能源、基本电费计费量值、基本电价、基本电费、参与调整电费金额、功率因数调整系数、力调电费、变损电量，筛选条件为供电单位org_no以@org开头且电费年月等于@ym，用户状态为正常、新装、变更等（0,1,2,3），按供电单位和用户编号排序。",
+    "business_rules": "1. 主表m_c_cons与ac_org关联，条件为a.org_no=o.id且o.id like concat(@org,'%')，用于获取供电单位名称。2. 子查询x从m_e_cons_snap_arc、m_e_consprc_snap_arc、m_e_cons_prc_amt_arc关联，按calc_id、cons_no、ym分组，计算总电量、总电费、总目录电度电费、总代征电费。3. 子查询y从m_e_mp_para_snap_arc和m_e_mp_pq_arc关联，按calc_id分组，计算抄表电量和变损电量（注意SQL中抄表电量未在最终select中使用，但变损电量使用了）。4. 子查询z从m_e_cons_prc_amt_arc和m_e_base_amt_arc关联，按calc_id分组，计算基本电费计费量值、基本电价（取max）、基本电费。5. 子查询m从m_e_cons_prc_amt_arc和m_e_pf_amt_arc关联，按calc_id分组，计算参与调整电费金额、功率因数调整系数（取max）、力调电费。6. 子查询n从m_e_cons_prc_amt_arc和m_e_pl_amt_arc关联，按calc_id分组，根据pl_code分类汇总农网还贷（10000）、水利基金（20000）、库区移民基金（30000）、可再生能源（40000）。7. 主查询过滤条件a.status_code in ('0','1','2','3')，其中0正常、1新装、2变更、3其他有效状态。8. 最终结果按供电单位、用户编号排序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "电费年月",
+      "总电量",
+      "总电费",
+      "代征电费",
+      "基本电费",
+      "力调电费",
+      "变损电量"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,电费年月,总电量,总电费,总目录电度电费,总代征电费,农网还贷,水利基金,库区移民基金,可再生能源,\n基本电费计费量值,基本电价,基本电费,参与调整电费金额,功率因数调整系数,力调电费,变损电量\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join (\n select econs.id calc_id,econs.cons_no,econs.ym 电费年月,sum(ifnull(eprcamt.t_settle_pq,0)) 总电量,sum(ifnull(eprcamt.t_amt,0)) 总电费,\n sum(ifnull(eprcamt.t_cat_kwh_amt,0)) 总目录电度电费,sum(ifnull(eprcamt.t_pl_amt,0)) 总代征电费\n from m_e_cons_snap_arc econs \n join m_e_consprc_snap_arc econsprc on econs.id=econsprc.calc_id \n join m_e_cons_prc_amt_arc eprcamt on econsprc.id=eprcamt.prc_snap_id \n where econs.org_no like concat(@org,'%') and econs.ym=@ym\n group by econs.id,econs.cons_no,econs.ym\n) x on a.cons_no=x.cons_no\nleft join (\n SELECT mppa.calc_id,sum(ifnull(mppq.flaten_apq,0)) 抄表电量, SUM(ifnull(mppq.ap_tl,0)) 变损电量\n FROM m_e_mp_para_snap_arc mppa\n join m_e_mp_pq_arc mppq on mppa.id = mppq.mp_para_snap_id\n where mppa.org_no like concat(@org,'%') and mppa.ym=@ym\n GROUP BY mppa.calc_id\n) y on x.calc_id=y.calc_id\nleft join (\n select eprcamt.calc_id,sum(ifnull(base.ba_value,0)) 基本电费计费量值,max(ifnull(base.base_prc,0)) 基本电价,sum(ifnull(base.ba,0)) 基本电费\n from m_e_cons_prc_amt_arc eprcamt\n join m_e_base_amt_arc base on base.prc_amt_id=eprcamt.id\n where eprcamt.org_no like concat(@org,'%') and eprcamt.ym=@ym\n group by eprcamt.calc_id\n) z on x.calc_id=z.calc_id\nleft join (\n select eprcamt.calc_id,sum(ifnull(pf.adj_amt,0)) 参与调整电费金额,max(ifnull(pf.adj_factor,0)) 功率因数调整系数,sum(ifnull(pf.pf_adj_amt,0)) 力调电费\n from m_e_cons_prc_amt_arc eprcamt\n join m_e_pf_amt_arc pf on pf.prc_amt_id=eprcamt.id\n where eprcamt.org_no like concat(@org,'%') and eprcamt.ym=@ym\n group by eprcamt.calc_id\n) m on x.calc_id=m.calc_id\nleft join (\nselect eprcamt.calc_id\n,sum(ifnull((case plamt.pl_code when '10000' then pl_amt end),0)) 农网还贷\n,sum(ifnull((case plamt.pl_code when '20000' then pl_amt end),0)) 水利基金\n,sum(ifnull((case plamt.pl_code when '30000' then pl_amt end),0)) 库区移民基金\n,sum(ifnull((case plamt.pl_code when '40000' then pl_amt end),0)) 可再生能源\nfrom m_e_cons_prc_amt_arc eprcamt\njoin m_e_pl_amt_arc plamt on eprcamt.id=plamt.prc_amt_id\nwhere eprcamt.org_no like concat(@org,'%') and eprcamt.ym=@ym\ngroup by eprcamt.calc_id\n) n on x.calc_id=n.calc_id\nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_e_base_amt_arc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc",
+      "m_e_consprc_snap_arc",
+      "m_e_mp_para_snap_arc",
+      "m_e_mp_pq_arc",
+      "m_e_pf_amt_arc",
+      "m_e_pl_amt_arc"
+    ]
+  },
+  {
+    "question": "查询单位编号为5100102开头的发电用户编号为010217359460的新能源当前档案信息，包括管理单位、发电用户编号、发电用户名称、发电用户状态、首次并网日期、发电量消纳方式、业主分类、项目编号、项目批复文号、发电地址、线路编码、线路名称、台区编号、台区名称、台区容量、抄表段编码、抄表段名称、合同容量、发电用户类型、客户类别、发电方式、并网电压、行业分类、上网关口计量点、上网关口表号、总示数、共用用户编号、共用用户名称。",
+    "business_rules": "1. 主表为m_c_fc_gc（发电客户），通过org_no关联ac_org获取管理单位名称。2. 通过m_c_fc_proinfo_gc_rela关联m_c_fc_proinfo获取项目信息（项目编号、批复文号）。3. 通过mr_sect_no关联m_r_sect获取抄表段名称。4. 通过id关联m_c_mp（计量点）获取上网关口计量点，再通过m_c_meter_mp_rela关联m_c_meter获取电能表信息（表号）。5. 通过m_c_meter_read子查询按meter_id和mp_id分组，使用case when将read_type_code为'11'的mr_read作为总示数。6. 通过m_c_meter的cons_id关联m_c_cons获取共用用户信息。7. 通过m_c_mp的line_id关联m_g_line获取线路信息，tg_id关联m_g_tg获取台区信息。8. 多个m_p_code左连接用于翻译状态码、类型等枚举值，code_type对应不同代码分类。9. 筛选条件：a.org_no like '5100102%' 且 a.gc_no='010217359460'。",
+    "search_keywords": [
+      "新能源",
+      "发电客户",
+      "档案信息",
+      "项目批复文号",
+      "上网关口",
+      "台区",
+      "线路",
+      "抄表段",
+      "合同容量",
+      "并网电压"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编号,o.`name` 管理单位,a.gc_no 发电用户编号,a.gc_name 发电用户名称,p1.`name` 发电用户状态 ,concat(date_format(a.gc_date,'%Y-%m-%d'),'') 首次并网日期 ,p7.`name` 发电量消纳方式,p8.`name` 业主分类 ,y.pro_no 项目编号,y.pro_app_doc 项目批复文号,a.gc_addr 发电地址 ,ln.line_no 线路编码,ln.line_name 线路名称 ,tg.tg_no 台区编号,tg.tg_name 台区名称,tg.tg_cap 台区容量,a.mr_sect_no 抄表段编码,rs.`name` 抄表段名称 ,a.contract_cap 合同容量,p2.`name` 发电用户类型,p3.`name` 客户类别,p4.`name` 发电方式,p5.`name` 并网电压,p6.`name` 行业分类 ,mp.mp_no 上网关口计量点,cm.made_no 上网关口表号,总,cons.cons_no 共用用户编号,cons_name 共用用户名称 from m_c_fc_gc a join ac_org o on a.org_no=o.id left join m_c_fc_proinfo_gc_rela x on x.gc_id=a.id left join m_c_fc_proinfo y on x.proinfo_id=y.id left join m_r_sect rs on a.mr_sect_no=rs.id left join m_c_mp mp on mp.cons_id=a.id left join m_c_meter_mp_rela mmr on mp.id=mmr.mp_id left join m_c_meter cm on mmr.meter_id=cm.id and mp.id=cm.mp_id left join (select meter_id,mp_id ,max(ifnull((case read_type_code when '11' then mr_read end),'')) 总 ,max(ifnull((case read_type_code when '12' then mr_read end),'')) 尖 ,max(ifnull((case read_type_code when '13' then mr_read end),'')) 峰 ,max(ifnull((case read_type_code when '14' then mr_read end),'')) 谷 from m_c_meter_read group by meter_id,mp_id ) d on cm.id=d.meter_id and mp.id=d.mp_id left join m_c_cons cons on cm.cons_id=cons.id left join m_g_line ln on mp.line_id=ln.id left join m_g_tg tg on mp.tg_id=tg.id left join m_p_code p1 on p1.code_type='gcStatusCode' and p1.`value`=a.status_code left join m_p_code p2 on p2.code_type='gcSortCodeType' and p2.`value`=a.gc_sort_code left join m_p_code p3 on p3.code_type='gcType' and p3.`value`=a.gc_type left join m_p_code p4 on p4.code_type='gcTypeCode' and p4.`value`=a.elec_gener_type left join m_p_code p5 on p5.code_type='psVoltCode' and p5.`value`=a.volt_code left join m_p_code p6 on p6.code_type='tradeCode' and p6.`value`=a.trade_code left join m_p_code p7 on p7.code_type='absoMode' and p7.`value`=a.abso_mode left join m_p_code p8 on p8.code_type='ownerClassify' and p8.`value`=a.owner_classify where a.org_no like concat('5100102','%') and a.gc_no='010217359460'",
+    "title": "新能源当前档案信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_fc_gc",
+      "m_c_fc_proinfo",
+      "m_c_fc_proinfo_gc_rela",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询新能源项目机制信息，包括县公司、单位编号、管理单位、发电用户编号、发电用户名称、发电用户状态、首次并网日期、发电量消纳方式、项目id、项目编号、项目名称、项目备案文号、项目批复文号、项目投资方、发电地址、项目类别、机制电量、机制电价、执行年限、执行开始时间类别、执行开始时间、执行终止时间、执行终止时间类别，以及2026年1月至12月各月的机制电量。筛选条件：管理单位编号以'510'开头，且发电客户类型为'2'。按单位编号和发电用户编号排序。",
+    "business_rules": "1. 表关联逻辑：m_c_fc_gc（发电客户）通过org_no关联ac_org（组织机构）获取管理单位名称；通过id关联m_c_fc_proinfo_gc_rela（项目客户关系）再关联m_c_fc_proinfo（项目信息）获取项目详情；通过mr_sect_no关联m_r_sect（抄表段）；通过id关联m_c_fc_mechanism（机制信息）获取机制电量、电价等；m_c_fc_mechanism_det（机制电量明细）按mechanism_id关联m_c_fc_mechanism，并按amt_ym（年月）汇总各月机制电量。2. 枚举值翻译：发电用户状态（status_code）通过m_p_code表code_type='gcStatusCode'翻译；发电量消纳方式（abso_mode）通过code_type='absoMode'翻译；项目类别（pro_sort）通过code_type='prosort'翻译；执行开始时间类别（start_time_type）通过code_type='startTimeType'翻译；执行终止时间类别（end_time_type）通过code_type='endTimeType'翻译。3. 特殊计算逻辑：县公司通过截取org_no前7位关联ac_org的id获取名称；各月机制电量通过条件聚合（case when amt_ym=202601 then mechanism_pq end）实现。4. 筛选条件：a.org_no like '510%' 且 a.fc_cust_type='2'。",
+    "search_keywords": [
+      "新能源项目",
+      "机制信息",
+      "发电用户",
+      "项目信息",
+      "机制电量",
+      "机制电价",
+      "执行年限",
+      "月度电量",
+      "组织机构",
+      "代码翻译"
+    ],
+    "complexity": "complex",
+    "sql": "select (SELECT name from ac_org WHERE id=LEFT(a.org_no,7)) 县公司,a.org_no 单位编号,o.`name` 管理单位,a.gc_no 发电用户编号,a.gc_name 发电用户名称,p1.`name` 发电用户状态 ,concat(date_format(a.gc_date,'%Y-%m-%d'),'') 首次并网日期 ,p2.`name` 发电量消纳方式 ,y.id 项目id,y.pro_no 项目编号,y.prj_name 项目名称,y.pro_fili_no 项目备案文号,y.pro_app_doc 项目批复文号,y.investor 项目投资方,a.gc_addr 发电地址,p3.`name` 项目类别,ms.mechanism_pq 机制电量,ms.mechanism_prc 机制电价,ms.execute_year 执行年限,p4.name 执行开始时间类别,ms.start_time 执行开始时间,ms.end_time 执行终止时间,p5.name 执行终止时间类别, 1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月 from m_c_fc_gc a join ac_org o on a.org_no=o.id left join m_c_fc_proinfo_gc_rela x on x.gc_id=a.id left join m_c_fc_proinfo y on x.proinfo_id=y.id left join m_r_sect rs on a.mr_sect_no=rs.id left JOIN m_c_fc_mechanism ms on a.id=ms.gc_id left join( SELECT mechanism_id, sum(case when amt_ym=202601 then mechanism_pq end) 1月 ,sum(case when amt_ym=202602 then mechanism_pq end) 2月 ,sum(case when amt_ym=202603 then mechanism_pq end) 3月 ,sum(case when amt_ym=202604 then mechanism_pq end) 4月 ,sum(case when amt_ym=202605 then mechanism_pq end) 5月 ,sum(case when amt_ym=202606 then mechanism_pq end) 6月 ,sum(case when amt_ym=202607 then mechanism_pq end) 7月 ,sum(case when amt_ym=202608 then mechanism_pq end) 8月 ,sum(case when amt_ym=202609 then mechanism_pq end) 9月 ,sum(case when amt_ym=202610 then mechanism_pq end) 10月 ,sum(case when amt_ym=202611 then mechanism_pq end) 11月 ,sum(case when amt_ym=202612 then mechanism_pq end) 12月 FROM m_c_fc_mechanism_det GROUP BY mechanism_id ) det on det.mechanism_id=ms.id left join m_p_code p1 on p1.code_type='gcStatusCode' and p1.`value`=a.status_code left join m_p_code p2 on p2.code_type='absoMode' and p2.`value`=a.abso_mode left join m_p_code p3 on p3.code_type='prosort' and p3.value=ms.pro_sort left join m_p_code p4 on p4.code_type='startTimeType' and p4.value=ms.start_time_type left join m_p_code p5 on p5.code_type='endTimeType' and p5.value=ms.end_time_type where a.org_no like '510%' and a.fc_cust_type='2' order by a.org_no,a.gc_no",
+    "title": "新能源项目机制信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_fc_gc",
+      "m_c_fc_mechanism",
+      "m_c_fc_mechanism_det",
+      "m_c_fc_proinfo",
+      "m_c_fc_proinfo_gc_rela",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有用电客户的互感器信息，包括供电单位名称、用户编号、用户名称、计量点编号、互感器类别、互感器标识、资产编号、条形码、出厂编号、出厂日期、电压、制造单位、型号、类型、接线方式、电流变比、电压变比、TV准确度等级、TA准确度等级、穿心匝数、安装日期、安装位置。筛选条件：用户状态为0、1、2、3，计量点类型为用电客户且状态为01或02，供电单位以@org开头。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过org_no关联，且ac_org.id以@org开头；m_c_cons与m_c_mp通过cons_id关联，且m_c_mp.type_code='01'（用电客户）、status_code in ('01','02')；m_c_cons与m_c_it_run通过cons_id关联，且m_c_it_run.mp_id等于m_c_mp.id；m_c_it_run与m_d_it通过id关联。2. 枚举值翻译：通过m_p_code表翻译代码值，如互感器类别（code_type='itSort'）、电压（code_type='meterVolt'）、制造单位（code_type='meterFacturer'）、型号（根据d.sort_code分别关联ciModelNo、viModelNo、compItModelNo）、类型（code_type='itTypeCode'）、接线方式（code_type='wiringMode'）、电流变比（code_type='currentItRatio'）、电压变比（code_type='voltRatioCode'）、TV/TA准确度等级（code_type='itPreLevelCode'）。3. 状态码含义：a.status_code in ('0','1','2','3')表示用户状态正常或运行中；b.status_code in ('01','02')表示计量点状态正常。4. 特殊逻辑：型号字段使用case when根据d.sort_code选择不同的代码表；出厂日期使用concat('',d.made_date)转为字符串。",
+    "search_keywords": [
+      "资中代征",
+      "互感器信息",
+      "用户编号",
+      "计量点编号",
+      "资产编号",
+      "条形码",
+      "出厂编号",
+      "电压变比",
+      "电流变比",
+      "穿心匝数"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.mp_no 计量点编号,p1.name 互感器类别,c.id 互感器标识,c.asset_no 资产编号,\nc.bar_code 条形码,c.made_no 出厂编号,concat('',d.made_date) 出厂日期,p2.name 电压,p3.name 制造单位,\n(case when d.sort_code='01' then p41.name when d.sort_code='02' then p42.name when d.sort_code='03' then p43.name else ifnull(d.model_code,'') end) 型号\n,p8.name 类型,p7.name 接线方式,p9.name 电流变比,p10.name 电压变比,p11.name TV准确度等级,p12.name TA准确度等级,d.ta_turns 穿心匝数,c.inst_date 安装日期,c.inst_loc 安装位置\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp b on a.id=b.cons_id and b.type_code='01' and b.status_code in ('01','02') \njoin m_c_it_run c on a.id=c.cons_id and b.id=c.mp_id \nleft join m_d_it d on c.id=d.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='itSort' and p1.value=d.sort_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='meterVolt' and p2.value=d.rv_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='meterFacturer' and p3.value=d.manufacturer \nleft join m_p_code p41 on p41.code_type='ciModelNo' and p41.value=d.model_code \nleft join m_p_code p42 on p42.code_type='viModelNo' and p42.value=d.model_code \nleft join m_p_code p43 on p43.code_type='compItModelNo' and p43.value=d.model_code \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='wiringMode' and p7.value=d.wiring_mode \nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='itTypeCode' and p8.value=d.type_code \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='currentItRatio' and p9.value=d.rc_ratio_code \nleft join m_p_code p10 on p10.take_effect_flag=1 and p10.code_type='voltRatioCode' and p10.value=d.volt_ratio_code \nleft join m_p_code p11 on p11.take_effect_flag=1 and p11.code_type='itPreLevelCode' and p11.value=d.tv_pre_code \nleft join m_p_code p12 on p12.take_effect_flag=1 and p12.code_type='itPreLevelCode' and p12.value=d.ta_pre_code \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_it_run",
+      "m_c_mp",
+      "m_d_it",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征相关用户的电费信息，包括供电单位、用户编号、用户名称、应收年月、电费发行日期、电费类别、总电量、应收金额、实收金额、欠费金额、费用状态、电费结清标志、违约金起算日期、应收违约金、实收违约金、应收价内电费、应收代征电费、实收价内电费、实收代征电费、费用类型。筛选条件：用户状态为正常（0,1,2,3），电费结清标志不为'03'（全部结清），且供电单位属于指定组织（@org）。按供电单位、用户编号、应收年月排序。",
+    "business_rules": "1. 表关联：m_c_cons（用户）与ac_org（组织机构）通过org_no关联，且ac_org.id以@org开头；m_c_cons与m_a_rcvbl_flow（应收实收流水）通过cons_no关联，且settle_flag<>'03'（排除全部结清）。2. 枚举值翻译：通过m_p_code表翻译amt_type（电费类别，code_type='paTypeCode'）、status_code（费用状态，code_type='chargeStat'）、settle_flag（电费结清标志，code_type='amtSettleFlag'）、ctl_mode（费用类型，code_type='ctlmode'），且take_effect_flag=1。3. 计算逻辑：欠费金额 = 应收金额 - 实收金额。4. 用户状态：a.status_code in ('0','1','2','3')表示正常用户。5. 注释部分为历史归档表m_a_rcvbl_flow_arc的union all，但被注释掉，实际只查当前表。",
+    "search_keywords": [
+      "资中代征",
+      "电费查询",
+      "应收实收",
+      "代征电费",
+      "用户电费明细",
+      "供电单位",
+      "电费类别",
+      "费用状态",
+      "电费结清标志",
+      "欠费金额"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.rcvbl_ym 应收年月,b.release_date 电费发行日期,p1.name 电费类别,b.t_pq 总电量,\nb.rcvbl_amt 应收金额,b.rcved_amt 实收金额,(b.rcvbl_amt-b.rcved_amt) 欠费金额,p2.name 费用状态,p3.name 电费结清标志,b.penalty_bgn_date 违约金起算日期,\nb.rcvbl_penalty 应收违约金,b.rcved_penalty 实收违约金,rcvbl_inprice_amt 应收价内电费,rcvbl_pl_amt 应收代征电费,rcved_in_price_amt 实收价内电费,\nrcved_pl_amt 实收代征电费,p4.name 费用类型\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_a_rcvbl_flow b on a.cons_no=b.cons_no and b.settle_flag<>'03' \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='paTypeCode' and p1.value=b.amt_type \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='chargeStat' and p2.value=b.status_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='amtSettleFlag' and p3.value=b.settle_flag \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='ctlmode' and p4.value=b.ctl_mode \nwhere a.status_code in ('0','1','2','3')\n/*union all\nselect\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.rcvbl_ym 应收年月,b.release_date 电费发行日期,p1.name 电费类别,b.t_pq 总电量,b.rcvbl_amt 应收金额,b.rcved_amt 实收金额,(b.rcvbl_amt-b.rcved_amt) 欠费金额,p2.name 费用状态,p3.name 电费结清标志,b.penalty_bgn_date 违约金起算日期,b.rcvbl_penalty 应收违约金,b.rcved_penalty 实收违约金,rcvbl_inprice_amt 应收价内电费,rcvbl_pl_amt 应收代征电费,rcved_in_price_amt 实收价内电费,rcved_pl_amt 实收代征电费,p4.name 费用类型\nfrom m_c_cons a\njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%')\njoin m_a_rcvbl_flow_arc b on a.cons_no=b.cons_no\nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='paTypeCode' and p1.value=b.amt_type\nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='chargeStat' and p2.value=b.status_code\nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='amtSettleFlag' and p3.value=b.settle_flag\nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='ctlmode' and p4.value=b.ctl_mode\nwhere a.status_code in ('0','1','2','3')\n*/\norder by 供电单位,用户编号,应收年月",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_a_rcvbl_flow",
+      "m_a_rcvbl_flow_arc",
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询某供电单位（如组织代码以'01'开头）在指定电费年月（如202301）下，已结算（抄表计划状态为'10'）且出厂编号不为空的用户抄表信息，包括单位名称、用户编号、用户名称、用户分类、用电地址、计量点编号、计量点分类、出厂编号、抄表日期、示数类型、上次示数、本次示数、综合倍率、上次抄见电量、本次抄见电量、抄表方式、抄表状态、台区名称、线路名称、抄表段编号、抄表段名称。支持按抄表方式、抄表段编号、台区名称、线路名称、户名、户号、抄表状态、用户分类、计量点分类进行筛选。",
+    "business_rules": "1. 主表关联：m_e_cons_snap_arc a 与 m_r_data_arc b 通过 a.id = b.calc_id 关联，获取抄表数据。\n2. 计量点关联：b.mp_id 关联 m_c_mp c，获取计量点信息。\n3. 台区关联：c.tg_id 左关联 m_g_tg tq，获取台区名称。\n4. 线路关联：c.line_id 左关联 m_g_line line，获取线路名称。\n5. 代码翻译：用户分类（cons_sort_code）通过 m_p_code 表 code_type='custSortCode' 翻译；计量点分类（type_code）通过 code_type='mpSortCode' 翻译；示数类型（read_type_code）通过 code_type='readTypeCode' 翻译；抄表方式（actual_mode）通过 code_type='mrModeCode' 翻译；抄表状态（mr_status_code）通过 code_type='mrStatusCode' 翻译。\n6. 单位名称：通过 ac_org 表 id=a.org_no 获取。\n7. 抄表段名称：通过 m_r_sect 表 id=a.mr_sect_no 获取。\n8. 筛选条件：组织代码前缀匹配（a.org_no like concat({组织}, '%')）、电费年月（a.ym={电费年月}）、存在已结算的抄表计划（exists select 1 from m_r_plan_arc where app_no=a.app_code and plan_status='10'）、出厂编号不为空（b.made_no is not null）。\n9. 可选筛选：抄表方式、抄表段编号、台区名称（模糊）、线路名称（模糊）、户名（模糊）、户号（模糊）、抄表状态、用户分类、计量点分类。\n10. 排序：按 org_no、cons_no、cons_name 升序。",
+    "search_keywords": [
+      "抄表方式查询",
+      "抄表数据",
+      "用户抄表信息",
+      "计量点",
+      "台区",
+      "线路",
+      "抄表段",
+      "电费年月",
+      "抄表计划状态",
+      "出厂编号"
+    ],
+    "complexity": "complex",
+    "sql": "select (select name from ac_org where id=a.org_no limit 1) 单位名称, a.cons_no 用户编号, a.cons_name 用户名称, p1.`name` 用户分类, a.elec_addr 用电地址, b.mp_id 计量点编号, p2.`name` 计量点分类, b.made_no 出厂编号, date_format(b.this_ymd,'%Y-%m-%d') 抄表日期, (select name from m_p_code m where m.code_type ='readTypeCode' and m.value=b.read_type_code limit 1) 示数类型, b.last_mr_num 上次示数, b.this_read 本次示数, b.t_factor 综合倍率, b.last_mr_pq 上次抄见电量, b.this_read_pq 本次抄见电量, (select name from m_p_code cd where cd.code_type='mrModeCode' and cd.value=b.actual_mode limit 1) 抄表方式, (select name from m_p_code cd where cd.code_type='mrStatusCode' and value=b.mr_status_code limit 1) 抄表状态, tq.tg_name 台区名称, line.line_name 线路名称, a.mr_sect_no 抄表段编号, (select name from m_r_sect where id=a.mr_sect_no limit 1) 抄表段名称 from m_e_cons_snap_arc a join m_r_data_arc b on a.id=b.calc_id left join m_c_mp c on c.id=b.mp_id left join m_g_tg tq on tq.id=c.tg_id left join m_g_line line on line.id=c.line_id left join m_p_code p1 on p1.code_type='custSortCode' and p1.`value`=a.cons_sort_code left join m_p_code p2 on p2.code_type='mpSortCode' and p2.`value`=c.type_code where a.org_no like concat({组织}, '%') and a.ym={电费年月} and exists (select 1 from m_r_plan_arc where app_no=a.app_code and plan_status='10') and b.made_no is not null and if(({抄表方式} is null or {抄表方式}=''),(1=1),(b.actual_mode={抄表方式})) and if(({抄表段编号} is null or {抄表段编号}=''),(1=1),(a.mr_sect_no={抄表段编号})) and if(({台区名称} is null or {台区名称}=''),(1=1),(tq.tg_name LIKE concat('%',{台区名称}, '%'))) and if(({线路名称} is null or {线路名称}=''),(1=1),(line.line_name LIKE concat('%',{线路名称}, '%'))) and if(({户名} is null or {户名}=''),(1=1),a.cons_name like CONCAT('%',{户名},'%')) and if(({户号} is null or {户号}=''),(1=1),a.cons_no like CONCAT('%',{户号},'%')) and if(({抄表状态} is null or {抄表状态}=''),(1=1),(b.mr_status_code={抄表状态})) and if(({用户分类} is null or {用户分类}=''),(1=1),(a.cons_sort_code={用户分类})) and if(({计量点分类} is null or {计量点分类}=''),(1=1),(c.type_code={计量点分类})) order by a.org_no,a.cons_no,a.cons_name",
+    "title": "抄表方式查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_mp",
+      "m_e_cons_snap_arc",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_data_arc",
+      "m_r_plan_arc",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询某供电公司下所有市场化用户（包括已签订交易合同和已注册）的计量点信息，展示县公司、供电所、供电所编号、用户编号、用户名称、交易状态、计量点编号、抄表段编号、抄表段名称、抄表段属性、电量计算方式、生效日期、失效日期、计量点当月是否参与交易。筛选条件：供电所编号以指定组织代码开头，且计量点当月是否参与交易匹配指定值（参与或不参与）。",
+    "business_rules": "1. 表关联：m_c_market_userinfo (a) 与 m_c_mp_info (b) 通过 a.id = b.market_user_id 关联；m_c_mp_info (b) 与 m_c_cons (c) 通过 b.cons_id = c.id 关联；m_c_mp (d) 与 m_c_mp_info (b) 通过 d.id = b.mp_id 关联；m_r_sect (s) 与 m_c_cons (c) 通过 s.id = c.mr_sect_no 左关联；ac_org (e) 通过 e.code = SUBSTR(c.org_no,1,7) 左关联（县公司）；ac_org (f) 通过 f.code = c.org_no 左关联（供电所）。2. 状态码：a.status=0 表示已签订交易合同，a.status=2 表示已注册（但 SQL 中 if 条件只判断 0 和 非0，非0 显示'已注册'，实际 status 可能为 2）。3. 枚举值翻译：抄表段属性从 m_p_code 表取，code_type='mrSectAttr'；电量计算方式从 m_p_code 表取，code_type='calcMode'。4. 计量点当月是否参与交易：通过子查询判断用户是否在 m_c_market_actual_variety 表中存在当年当月的有效记录（cons_status=1），若存在则参与，否则不参与。5. 两个 union all 部分：第一部分查询参与交易的用户，第二部分查询不参与交易的用户。6. 最终筛选：供电所编号 like concat({组织},'%') 和 计量点当月是否参与交易 like concat({是否参与交易},'%')。",
+    "search_keywords": [
+      "市场化用户",
+      "计量点",
+      "交易状态",
+      "供电所",
+      "抄表段",
+      "生效日期",
+      "失效日期",
+      "参与交易",
+      "县公司",
+      "用户编号"
+    ],
+    "complexity": "complex",
+    "sql": "select * from ( select e.name 县公司,f.name 供电所,c.org_no 供电所编号,c.cons_no 用户编号,c.cons_name 用户名称,if(a.`status`=0,'已签订交易合同','已注册') 交易状态 ,d.mp_no 计量点编号,c.mr_sect_no 抄表段编号,s.`name` 抄表段名称,(select name from m_p_code p where p.code_type = 'mrSectAttr' and p.`value`= s.attr)抄表段属性,(select name from m_p_code p where p.code_type = 'calcMode' and p.`value`= d.calc_mode) 电量计算方式,b.effect_date 生效日期,b.expiry_date 失效日期,if(b.effect_ym is null or b.expiry_ym<={电费年月},'不参与','参与') 计量点当月是否参与交易 from m_c_market_userinfo a join m_c_mp_info b on a.id = b.market_user_id join m_c_cons c on b.cons_id = c.id join m_c_mp d on d.id = b.mp_id LEFT JOIN m_r_sect s on s.id= c.mr_sect_no left join ac_org e on e.code = SUBSTR(c.org_no,1,7) left join ac_org f on f.code = c.org_no where a.`status` in(0,2) and c.cons_no in(SELECT cons_no FROM m_c_market_actual_variety where `year` =left({电费年月},4) and `month` =right({电费年月},2) and cons_status=1) union all select e.name 县公司,f.name 供电所,c.org_no 供电所编号,c.cons_no 用户编号,c.cons_name 用户名称,if(a.`status`=0,'已签订交易合同','已注册') 交易状态,d.mp_no 计量点编号,c.mr_sect_no 抄表段编号,s.`name` 抄表段名称,(select name from m_p_code p where p.code_type = 'mrSectAttr' and p.`value`= s.attr)抄表段属性,(select name from m_p_code p where p.code_type = 'calcMode' and p.`value`= d.calc_mode) 电量计算方式,b.effect_date 生效日期,b.expiry_date 失效日期,'不参与' 计量点当月是否参与交易 from m_c_market_userinfo a join m_c_mp_info b on a.id = b.market_user_id join m_c_cons c on b.cons_id = c.id join m_c_mp d on d.id = b.mp_id LEFT JOIN m_r_sect s on s.id= c.mr_sect_no left join ac_org e on e.code = SUBSTR(c.org_no,1,7) left join ac_org f on f.code = c.org_no where a.`status` in(0,2) and c.cons_no not in(SELECT cons_no FROM m_c_market_actual_variety where `year` =left({电费年月},4) and `month` =right({电费年月},2) and cons_status=1) )a where 供电所编号 like concat({组织},'%') and 计量点当月是否参与交易 like concat({是否参与交易},'%') ORDER BY 1,2,3,4,5",
+    "title": "综合查询，市场化",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_market_actual_variety",
+      "m_c_market_userinfo",
+      "m_c_mp",
+      "m_c_mp_info",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询2025年12月单位编码以5100102开头的两保户的电费汇总信息，包括年份、户数和总电费。",
+    "business_rules": "1. 两保户通过m_e_cons_prc_amt_arc表的amt_type='11'标识。2. 户数统计使用count(distinct cons_no)。3. 总电费为t_amt字段。4. 时间筛选条件为ym='202512'。5. 单位筛选条件为org_no like '5100102%'。",
+    "search_keywords": [
+      "两保户",
+      "电费汇总",
+      "户数",
+      "总电费",
+      "2025年12月",
+      "单位编码"
+    ],
+    "complexity": "simple",
+    "sql": "select LEFT(a.ym,4) nf,count(DISTINCT a.cons_no),sum(b.t_amt) from m_e_cons_snap_arc a join ac_org o on a.org_no=o.id join m_e_cons_prc_amt_arc b on a.id=b.calc_id and b.amt_type='11' where a.org_no like '5100102%' and a.ym='202512' GROUP BY nf select LEFT(a.ym,4) nf,COUNT(distinct a.cons_no) 户数,sum(b.t_amt) 电费,sum(c.dl) 电量 from m_e_cons_snap_arc a join ac_org o on a.org_no=o.id join m_e_cons_prc_amt_arc b on a.id=b.calc_id and b.amt_type='11' left join (select prc_amt_id, sum(round(ifnull(cat_kwh_amt,0)/NULLIF(ifnull(cat_kwh_prc, 0), 0),0)) dl from m_e_kwh_amt_arc where ym between 202511 and 202512 group by prc_amt_id ) c on b.id=c.prc_amt_id where a.org_no like '5100102%' and a.ym between 202511 and 202512 GROUP BY a.ym select LEFT(a.ym,4) nf,a.cons_no 户号,b.t_amt 电费,c.dl 电量 from m_e_cons_snap_arc a join ac_org o on a.org_no=o.id join m_e_cons_prc_amt_arc b on a.id=b.calc_id and b.amt_type='11' left join (select prc_amt_id, sum(round(ifnull(cat_kwh_amt,0)/NULLIF(ifnull(cat_kwh_prc, 0), 0),0)) dl from m_e_kwh_amt_arc where ym='202501' group by prc_amt_id ) c on b.id=c.prc_amt_id where a.org_no like '5100102%' and a.ym='202501' GROUP BY a.cons_no,b.calc_id select o.name 单位,a.cons_no 户号,a.cons_name 户名,a.ym 账期,d.prc_code 电价编号,d.cat_prc_name 电价名称,p1.name 时段,round(ifnull(cat_kwh_amt,0)/ifnull(cat_kwh_prc,0),0) 电量,cat_kwh_prc 目录电度电价单价,cat_kwh_amt 目录电度电费金额,(ifnull(kwh_amt,0)-ifnull(cat_kwh_amt,0)) 代征电费 from m_e_cons_snap_arc a join ac_org o on a.org_no=o.id join m_e_cons_prc_amt_arc b on a.id=b.calc_id and b.amt_type='11' join m_e_kwh_amt_arc c on b.id=c.prc_amt_id join m_e_cat_prc d on b.prc_code=d.prc_code and b.para_vn=d.para_vn left join m_p_code p1 on p1.code_type='prcTsCode' and p1.value=c.prc_ts_code where a.org_no like concat(ifnull({单位},''),'%') and a.ym=ifnull({账期},'') and if(({户号} is null or {户号}=''),(1=1),a.cons_no={户号})",
+    "title": "两保户查询",
+    "tables_used": [
+      "ac_org",
+      "m_e_cat_prc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc",
+      "m_e_kwh_amt_arc",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询单位编号以'5100102'开头的分布式发电用户（fc_cust_type='2'）的详细信息，包括管理单位、发电用户编号、名称、状态、并网日期、消纳方式、业主分类、项目编号、批复文号、发电地址、线路信息、台区信息、抄表段信息、合同容量、用户类型、客户类别、发电方式、并网电压、行业分类、上网关口计量点、表号、共用用户信息等，并按单位编号和发电用户编号排序。",
+    "business_rules": "1. 主表m_c_fc_gc关联ac_org获取管理单位名称，关联m_r_sect获取抄表段名称。2. 通过m_c_fc_proinfo_gc_rela和m_c_fc_proinfo获取项目信息。3. 通过m_c_fc_gn、m_c_fc_gn_mp_rela、m_c_mp、m_c_meter_mp_rela、m_c_meter获取上网关口计量点和表号。4. 通过m_c_meter关联m_c_cons获取共用用户信息。5. 通过m_g_line和m_g_tg获取线路和台区信息。6. 多个m_p_code左连接用于翻译状态码、类型等枚举值，code_type对应不同代码分类。7. 筛选条件：a.org_no like '5100102%' 且 a.fc_cust_type='2'。8. 排序：a.org_no, a.gc_no。",
+    "search_keywords": [
+      "分布式",
+      "发电用户",
+      "共用信息",
+      "上网关口",
+      "台区",
+      "线路",
+      "抄表段",
+      "项目批复",
+      "合同容量",
+      "并网"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编号,o.`name` 管理单位,a.gc_no 发电用户编号,a.gc_name 发电用户名称,p1.`name` 发电用户状态 ,concat(date_format(a.gc_date,'%Y-%m-%d'),'') 首次并网日期 ,p7.`name` 发电量消纳方式,p8.`name` 业主分类 ,y.pro_no 项目编号,y.pro_app_doc 项目批复文号,a.gc_addr 发电地址 ,ln.line_no 线路编码,ln.line_name 线路名称,tg.tg_no 台区编号,tg.tg_name 台区名称,tg.tg_cap 台区容量,a.mr_sect_no 抄表段编码,rs.`name` 抄表段名称 ,a.contract_cap 合同容量,p2.`name` 发电用户类型,p3.`name` 客户类别,p4.`name` 发电方式,p5.`name` 并网电压,p6.`name` 行业分类 ,mp.mp_no 上网关口计量点,cm.made_no 上网关口表号,cons.cons_no 共用用户编号,cons_name 共用用户名称,cons.mr_sect_no 用户抄表段,sect.name 抄表段名称 from m_c_fc_gc a join ac_org o on a.org_no=o.id left join m_c_fc_proinfo_gc_rela x on x.gc_id=a.id left join m_c_fc_proinfo y on x.proinfo_id=y.id left join m_r_sect rs on a.mr_sect_no=rs.id left join m_c_fc_gn b on a.id=b.gc_id left join m_c_fc_gn_mp_rela gmr on b.id=gmr.gn_id left join m_c_mp mp on gmr.mp_id=mp.id left join m_c_meter_mp_rela mmr on mp.id=mmr.mp_id left join m_c_meter cm on mmr.meter_id=cm.id left join m_c_cons cons on cm.cons_id=cons.id left join m_g_line ln on b.line_id=ln.id left join m_g_tg tg on b.tg_id=tg.id left join m_r_sect sect on cons.mr_sect_no=sect.id left join m_p_code p1 on p1.code_type='gcStatusCode' and p1.`value`=a.status_code left join m_p_code p2 on p2.code_type='gcSortCodeType' and p2.`value`=a.gc_sort_code left join m_p_code p3 on p3.code_type='gcType' and p3.`value`=a.gc_type left join m_p_code p4 on p4.code_type='gcTypeCode' and p4.`value`=a.elec_gener_type left join m_p_code p5 on p5.code_type='psVoltCode' and p5.`value`=a.volt_code left join m_p_code p6 on p6.code_type='tradeCode' and p6.`value`=a.trade_code left join m_p_code p7 on p7.code_type='absoMode' and p7.`value`=a.abso_mode left join m_p_code p8 on p8.code_type='ownerClassify' and p8.`value`=a.owner_classify where a.org_no like '5100102%' and a.fc_cust_type='2' order by a.org_no,a.gc_no",
+    "title": "分布式共用信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_fc_gc",
+      "m_c_fc_gn",
+      "m_c_fc_gn_mp_rela",
+      "m_c_fc_proinfo",
+      "m_c_fc_proinfo_gc_rela",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征单位（org='5100434'）下所有采集点的详细信息，包括单位、变电站、台区、采集点类别、采集点编号、采集点名称、终端编号、终端类型、通讯规约、冻结方式、户号、户名、计量点编号、表号、测点号、协议类型、端口号、密码、费率、波特率、大类号、小类号，并按单位、变电站、台区排序。",
+    "business_rules": "1. 单位过滤：通过ac_org表的id字段以'5100434'开头进行过滤（o.id like concat(@org,'%')）。2. 采集点与终端关联：m_r_cp与m_r_tmnl_run通过cp_no关联，m_r_tmnl_run与m_d_lc_equip通过id关联。3. 采集对象关联：m_r_cp与m_r_coll_obj通过cp_no关联，m_r_coll_obj与m_c_meter通过meter_id关联，且需满足cm.mp_id=c.mp_id和cm.cons_id=c.cons_id。4. 计量点与用户关联：m_c_meter与m_c_mp通过mp_id关联，m_c_mp与m_c_cons通过cons_id关联。5. 变电站和台区左连接：m_r_cp左连接m_g_subs和m_g_tg，可能为空。6. 代码翻译：多个m_p_code左连接，根据code_type和value翻译字段，如cpType、lcTypeCode、commProtocolVer等，且只取take_effect_flag=1的记录。7. 排序：按单位、变电站、台区升序。",
+    "search_keywords": [
+      "资中代征",
+      "采集点",
+      "终端",
+      "计量点",
+      "用户",
+      "台区",
+      "变电站",
+      "代码翻译",
+      "m_p_code",
+      "ac_org"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 单位,subs_name 变电站,tg_name 台区,p1.name 采集点类别,a.cp_no 采集点编号,a.name 采集点名称,d.made_no 终端编号,p2.name 终端类型,\np3.name 通讯规约,p4.name 冻结方式,cons_no 户号,cons_name 户名,mp_no 计量点编号,cm.made_no 表号,c.coll_port 测点号,p5.name 协议类型,p6.name 端口号,\nc.commun_psd 密码,c.rate 费率,p7.name 波特率,p8.name 大类号,p9.name 小类号\nfrom m_r_cp a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_r_tmnl_run b on a.cp_no=b.cp_no \njoin m_r_coll_obj c on a.cp_no=c.cp_no \njoin m_d_lc_equip d on b.id=d.id \njoin m_r_cp_comm_para e on a.cp_no=e.cp_no \njoin m_c_meter cm on c.meter_id=cm.id and cm.mp_id=c.mp_id and cm.cons_id=c.cons_id \njoin m_c_mp mp on cm.mp_id=mp.id \njoin m_c_cons cons on mp.cons_id=cons.id \nleft join m_g_subs subs on a.subs_id=subs.id \nleft join m_g_tg tg on a.tg_id=tg.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='cpType' and p1.value=a.cp_type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='lcTypeCode' and p2.value=b.terminal_type_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='commProtocolVer' and p3.value=b.protocol_code \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='freezemode' and p4.value=b.freeze_mode \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='commProtocol' and p5.value=c.comm_prot_no \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='commumnPort' and p6.value=c.comm_mode \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='meterBaudRate' and p7.value=c.baudrate_code \nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='majorCode' and p8.value=c.major \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='minorCode' and p9.value=c.minor \norder by 单位,变电站,台区\nset @org:='5100434'",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_mp",
+      "m_d_lc_equip",
+      "m_g_subs",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_coll_obj",
+      "m_r_cp",
+      "m_r_cp_comm_para",
+      "m_r_tmnl_run"
+    ]
+  },
+  {
+    "question": "查询2023年1月供电单位为'5100105%'（资中）的专变用户的电费明细，包括用户名称、用户编码、电费年月、合同容量、运行容量、电量、电费、计费容量、容量电费、计费需量、需量电费、力调电费、退补电量、退补电费，并按供电单位、用户编码、电费年月排序。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过cons.org_no=o.id关联，且o.id like concat(@org,'%')，@org为传入参数（如'5100105'）。2. 用户筛选：通过子查询m_c_mp与m_g_tg关联，mp.type_code='01'（用电客户），mp.status_code IN ('01','02')（正常或暂停），tg.pub_priv_flag='02'（专变），且cons.id=mp.cons_id。3. 用户状态：cons.status_code IN ('0','1','2','3')（正常、新装、变更等）。4. 电费年月：econs.ym=202301。5. 基本电费子查询：按prc_amt_id分组，ba_type_code='1'为容量，'2'为需量，计算容量、容量电费、需量、需量电费。6. 力调电费子查询：按prc_amt_id分组，取max(adj_factor)和sum(pf_adj_amt)，且org_no LIKE '5100105%'。7. 退补数据：当consprc.data_src='03'（退补）时，取prcamt.t_settle_pq和t_amt。8. 分组：按o.name, cons.cons_no, cons.cons_name, cons.run_cap, cons.contract_cap, econs.ym。9. 排序：按1,2,6。",
+    "search_keywords": [
+      "资中",
+      "代征",
+      "专变",
+      "电费明细",
+      "基本电费",
+      "容量电费",
+      "需量电费",
+      "力调电费",
+      "退补电量",
+      "202301"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT o.name 供电单位,\n cons.cons_no 用户编码,\n cons.cons_name 用户名称,\n cons.run_cap 运行容量,\n cons.contract_cap 合同容量,\n econs.ym 电费年月 ,\n sum(prcamt.t_settle_pq) 电量,\n sum(prcamt.t_amt) 电费,\n sum(容量) 计费容量,\n sum(容量电费) 容量电费,\n sum(需量) 计费需量,\n sum(需量电费) 需量电费,\n sum(力调电费) 力调电费 ,\n sum(ifnull((CASE WHEN consprc.data_src='03' THEN prcamt.t_settle_pq END),0)) 退补电量 ,\n sum(ifnull((CASE WHEN consprc.data_src='03' THEN prcamt.t_amt END),0)) 退补电费\nFROM m_c_cons cons\nJOIN ac_org o ON cons.org_no=o.id and o.id like concat(@org,'%')\nJOIN m_e_cons_snap_arc econs ON cons.cons_no=econs.cons_no and cons.id=econs.cons_id and econs.ym=202301\nJOIN m_e_consprc_snap_arc consprc ON econs.id=consprc.calc_id\nJOIN m_e_cons_prc_amt_arc prcamt ON consprc.id=prcamt.prc_snap_id and econs.id=prcamt.calc_id\nLEFT JOIN\n (SELECT prc_amt_id ,\n sum(ifnull((CASE WHEN ba_type_code='1' THEN ba_value END),0)) 容量 ,\n sum(ifnull((CASE WHEN ba_type_code='1' THEN ba END),0)) 容量电费 ,\n sum(ifnull((CASE WHEN ba_type_code='2' THEN ba_value END),0)) 需量 ,\n sum(ifnull((CASE WHEN ba_type_code='2' THEN ba END),0)) 需量电费\n FROM m_e_base_amt_arc\n WHERE org_no like concat(@org,'%') and ym=202301\n GROUP BY prc_amt_id ) base ON prcamt.id=base.prc_amt_id\nLEFT JOIN\n (SELECT prc_amt_id,\n max(adj_factor) 调整系数,\n sum(pf_adj_amt) 力调电费\n FROM m_e_pf_amt_arc\n WHERE org_no LIKE '5100105%' and ym=202301\n GROUP BY prc_amt_id) pfamt ON prcamt.id=pfamt.prc_amt_id\nWHERE EXISTS\n (SELECT 1\n FROM m_c_mp mp\n join m_g_tg tg on tg.id=mp.tg_id\n WHERE mp.type_code='01' and mp.status_code IN ('01','02') and ifnull(tg.pub_priv_flag,'')='02' and cons.id=mp.cons_id)\n and ifnull(cons.status_code,'') IN ('0','1','2','3')\nGROUP BY o.name , cons.cons_no ,cons.cons_name , cons.run_cap , cons.contract_cap , econs.ym\nORDER BY 1, 2, 6",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_mp",
+      "m_e_base_amt_arc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc",
+      "m_e_consprc_snap_arc",
+      "m_e_pf_amt_arc",
+      "m_g_tg"
+    ]
+  },
+  {
+    "question": "查询资中代征相关的变压器信息，包括单位、台区编号、台区名称、变压器编号、变压器名称、变压器型号、变压器状态、公专变标识、主备性质、变压器铭牌容量、设备类型、变压器类型、安装日期、设备首次运行日期、实际启用日期、实际停用日期、计划恢复日期、低压中性点是否接地、一次侧电压、二次侧电压、产权、无功变损协议值、有功变损协议值、变损编号、变损计算方式，并且按管理单位过滤（管理单位ID以@org开头）。",
+    "business_rules": "1. 主表为m_G_tran（变压器/高压电动机设备表），通过org_no关联ac_org（组织机构表）获取单位名称，并通过tg_id关联m_g_tg（台区表）获取台区信息。2. 多个代码字段（如model_no、run_status_code、pub_priv_flag等）通过m_p_code表进行翻译，关联条件为take_effect_flag=1且code_type匹配对应代码分类，value等于字段值。3. 过滤条件：a.org_no关联的ac_org.id以@org参数开头（即管理单位属于指定组织机构及其下级）。4. 枚举值含义：type_code=01为变压器，02为高压电动机；run_status_code=01运行、02停用、03拆除；pub_priv_flag=0公变、1专变；ms_flag为主备性质代码；ground_flag为低压中性点是否接地；frstside_volt_code和sndside_volt_code为一次/二次侧电压代码；pr_code为产权代码；ts_alg_flag为变损计算方式代码。",
+    "search_keywords": [
+      "资中代征",
+      "变压器信息",
+      "台区",
+      "变损",
+      "代码翻译",
+      "组织机构过滤",
+      "设备台账",
+      "公专变",
+      "变压器型号",
+      "运行状态"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 单位,tg_no 台区编号,tg_name 台区名称,made_no 变压器编号,tran_name 变压器名称,p1.name 变压器型号,p2.name 变压器状态,p3.name 公专变标识,\np4.name 主备性质,plate_cap 变压器铭牌容量,p9.name 设备类型,p11.name 变压器类型,inst_date 安装日期,frst_run_date 设备首次运行的日期,actual_start_date 实际启用日期,\nactual_stop_use_date 实际停用日期,plan_resume_date 计划恢复日期,p5.name 低压中性点是否接地,p6.name 一次侧电压,p7.name 二次侧电压,p8.name 产权,\nrp_tl_value 无功变损协议值,ap_tl_value 有功变损协议值,ts_no 变损编号,p10.name 变损计算方式\nfrom m_G_tran a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join m_g_tg c on c.id=a.tg_id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='tranModelNo' and p1.value=a.model_no \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='runStatusCode' and p2.value=a.run_status_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='pubprivflag' and p3.value=a.pub_priv_flag \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='msFlag' and p4.value=a.ms_Flag \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='groundMode' and p5.value=a.ground_flag \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='psVoltCode' and p6.value=a.frstside_volt_code \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='psVoltCode' and p7.value=a.sndside_volt_code\nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='propertyRight' and p8.value=a.pr_code \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='equipTypeCode' and p9.value=a.type_code \nleft join m_p_code p10 on p10.take_effect_flag=1 and p10.code_type='tlAlgCode' and p10.value=a.ts_alg_flag \nleft join m_p_code p11 on p11.take_effect_flag=1 and p11.code_type='tranTypeCode' and p11.value=a.tran_type",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_G_tran",
+      "m_g_tg",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询供电单位为'5100434'开头的所有用电客户（状态为0、1、2、3）的当前档案及电表示数信息，包括供电单位名称、户号、户名、公专变类型、费控类型、抄表段号、抄表段名称、台区编号、台区名称、定价策略、电价名称、电价编号、目录单价、计量点编号、表号、以及最近一次抄表的总、尖、峰、谷示数。",
+    "business_rules": "1. 用户表m_c_cons关联组织机构表ac_org，过滤条件为org_no以'5100434'开头。2. 计量点表m_c_mp关联用户表，过滤type_code='01'（用电客户）且status_code in ('01','02')（运行或停用）。3. 用户电价表m_c_cons_prc通过tariff_id关联计量点，并通过prc_code关联目录电价表m_e_cat_prc，同时目录电价需取当前版本（通过函数f_get_curver_para_vn获取）。4. 目录电价明细表m_e_cat_prc_det关联目录电价表，过滤range_type_code in ('13','31-13')且prc_ti_code='03'（平段）。5. 电能表m_c_meter通过cons_id和mp_id关联用户和计量点。6. 电能表示数子查询按meter_id和mp_id分组，使用case when将read_type_code转换为列：'11'->总，'12'->尖，'13'->峰，'14'->谷。7. 台区表m_g_tg通过tg_id关联计量点，但left(b.tg_id,0)可能为错误，实际应为b.tg_id。8. 抄表段表m_r_sect通过mr_sect_no关联用户。9. 定价策略表m_c_cons_prc_tactic通过cons_id和sp_id关联用户和计量点。10. 代码表m_p_code用于翻译公专变（code_type='pubprivflag'）、费控类型（code_type='ctlmode'）、定价策略（code_type='prcTacticType'）。11. 用户状态status_code in ('0','1','2','3')表示正常、暂停等。",
+    "search_keywords": [
+      "当前档案",
+      "电表示数",
+      "供电单位",
+      "户号",
+      "户名",
+      "公专变",
+      "费控类型",
+      "抄表段",
+      "台区",
+      "定价策略",
+      "电价名称",
+      "目录单价",
+      "计量点",
+      "表号",
+      "总尖峰谷示数"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 供电单位,a.cons_no 户号,a.cons_name 户名,p3.name 公专变,p1.name 费控类型,sect.id 抄表段号,sect.name 抄表段名字,tg.tg_no 台区编号,tg.tg_name 台区名字,p2.name 定价策略,eprc.cat_prc_name 电价名称,eprc.prc_code 电价编号,cat_kwh_prc 目录单价,b.mp_no 计量点,c.made_no 表号,总,尖,峰,谷 from m_c_cons a join ac_org o on a.org_no=o.id and o.id like '5100434%' join m_c_mp b on a.id=b.cons_id and b.type_code='01' and b.status_code in ('01','02') join m_c_cons_prc cprc on b.tariff_id=cprc.id and a.id=cprc.cons_id join m_e_cat_prc eprc on cprc.prc_code=eprc.prc_code and eprc.para_vn=f_get_curver_para_vn(1, '5100434') join m_e_cat_prc_det eprcdet on eprc.id=eprcdet.cat_prc_id and range_type_code in ('13','31-13') and prc_ti_code='03' left join m_c_meter c on a.id=c.cons_id and b.id=c.mp_id left join (select meter_id,mp_id ,max(ifnull((case read_type_code when '11' then mr_read end),'')) 总 ,max(ifnull((case read_type_code when '12' then mr_read end),'')) 尖 ,max(ifnull((case read_type_code when '13' then mr_read end),'')) 峰 ,max(ifnull((case read_type_code when '14' then mr_read end),'')) 谷 from m_c_meter_read group by meter_id,mp_id ) d on c.id=d.meter_id and b.id=d.mp_id left join m_g_tg tg on tg.id=left(b.tg_id,0) left join m_r_sect sect on a.mr_sect_no=sect.id left join m_c_cons_prc_tactic prct on a.id=prct.cons_id and prct.sp_id=b.sp_id left join m_p_code p3 on p3.code_type='pubprivflag' and p3.value=ifnull(tg.pub_priv_flag,'01') left join m_p_code p1 on p1.code_type='ctlmode' and p1.value=a.ctl_mode left join m_p_code p2 on p2.code_type='prcTacticType' and p2.value=prct.type_code where a.status_code in ('0','1','2','3') order by 1,2",
+    "title": "当前档案及电表示数",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_meter",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_e_cat_prc",
+      "m_e_cat_prc_det",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询2025年1月1日至2025年12月31日期间，单位编号以'5100102'开头的票据打印信息，包括票据号码、票据类型、打印金额、打印次数、打印时间和打印状态，并按票据号码、票据类型和打印金额分组；同时汇总各票据类型的合计打印金额。",
+    "business_rules": "1. 表关联：m_a_inv_print_flow e 左连接 m_a_inv f 通过 e.note_id = f.id 且 f.note_use_state='01'（已打印状态）；再左连接 m_a_inv_ver g 通过 f.ver_id = g.id；再左连接 m_p_code p1 通过 p1.code_type='noteTypeCode' 和 g.note_type_code = p1.value 获取票据类型名称；再左连接 m_p_code p2 通过 p2.code_type='noteUseState' 和 f.note_use_state = p2.value 获取打印状态名称。2. 筛选条件：e.org_no LIKE '5100102%'，e.print_date BETWEEN '2025-01-01 00:00:00' AND '2025-12-31 23:59:59'，g.note_type_code IN ('0102','0101','02','06','09','10')。3. 分组：按 f.note_no, g.note_type_code, e.print_amt 分组，并取 max(print_num) 和 max(e.print_date)。4. 汇总：外层查询按票据类型分组，对 print_amt 求和。5. 注意：原始SQL中第一个查询的日期范围不同（2026年），但第二个查询是主要部分。",
+    "search_keywords": [
+      "票据打印",
+      "打印金额",
+      "票据号码",
+      "票据类型",
+      "打印状态",
+      "打印次数",
+      "打印时间",
+      "单位编号",
+      "电费发票",
+      "电费收据"
+    ],
+    "complexity": "complex",
+    "sql": "select e.rcvbl_amt_id 实体ID,f.note_no 票据号码,p1.`name` 票据类型,e.print_amt 打印金额,max(print_num) 打印次数,max(e.print_date) 打印时间,p2.`name` 打印状态 from m_a_inv_print_flow e left join m_a_inv f on e.note_id=f.id AND f.note_use_state='01' left join m_a_inv_ver g on f.ver_id=g.id LEFT JOIN m_p_code p1 ON p1.code_type='noteTypeCode' AND g.note_type_code=p1.`value` LEFT JOIN m_p_code p2 ON p2.code_type='noteUseState' AND f.note_use_state=p2.`value` where e.org_no LIKE '5100102%' AND e.print_date BETWEEN '2026-02-01 00:00:00' AND '2026-02-27 00:00:00' group by f.note_no,g.note_type_code,e.print_amt SELECT mx.票据类型,SUM(mx.print_amt) 合计金额 FROM ( select e.rcvbl_amt_id 实体ID,f.note_no 票据号码,p1.`name` 票据类型,e.print_amt print_amt,max(print_num) 打印次数,max(e.print_date) 打印时间,p2.`name` 打印状态 from m_a_inv_print_flow e left join m_a_inv f on e.note_id=f.id AND f.note_use_state='01' left join m_a_inv_ver g on f.ver_id=g.id LEFT JOIN m_p_code p1 ON p1.code_type='noteTypeCode' AND g.note_type_code=p1.`value` LEFT JOIN m_p_code p2 ON p2.code_type='noteUseState' AND f.note_use_state=p2.`value` where e.org_no LIKE '5100102%' AND e.print_date BETWEEN '2025-01-01 00:00:00' AND '2025-12-31 23:59:59' AND g.note_type_code IN ('0102','0101','02','06','09','10') group by f.note_no,g.note_type_code,e.print_amt ) AS mx GROUP BY mx.票据类型 SELECT p1.`name` 票据类型,SUM(fo.t_amt) FROM `m_a_note_info` fo LEFT JOIN m_p_code p1 ON p1.code_type='noteTypeCode' AND fo.note_type_code=p1.`value` WHERE fo.billing_date BETWEEN '2025-01-01' AND '2025-12-31' AND fo.`status`='01' AND fo.org_no LIKE '5100102%' GROUP BY fo.note_type_code",
+    "title": "票据打印信息查询",
+    "tables_used": [
+      "m_a_inv",
+      "m_a_inv_print_flow",
+      "m_a_inv_ver",
+      "m_a_note_info",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2026年1月3日至2026年2月13日期间，供电单位编号以'5100102'开头的所有收费明细，包括户号、户名、台区名称、抄表段编号、抄表段名称、收款单位、管理单位、收款部门、收费员、收费日期、银行日期、收费时间、收费类型、结算方式、缴费方式、收费金额、实收电费、实收违约金、预收金额、收费类别。",
+    "business_rules": "1. 收费类型(p1.name)通过m_p_code表关联，code_type='chargeType'，value对应pf.type_code。2. 结算方式(p2.name)通过m_p_code表关联，code_type='settleMode'，value对应pf.settle_mode。3. 缴费方式(p3.name)通过m_p_code表关联，code_type='payMode'，value对应pf.pay_mode。4. 收费类别通过判断m_ps_purchase表中是否存在关联记录：若存在则为'预付费'，否则为'后付费'。5. 实收电费(d.this_rcved_amt)和实收违约金(d.this_penalty)来自子查询，按charge_id分组求和，且过滤条件为org_no like '5100102%'且rcved_date在指定日期范围内。6. 预收金额(c.prepay_amt)来自m_a_prepay_flow表，通过pf.id=c.charge_id左连接。7. 收款单位、管理单位、收款部门通过ac_org表的code字段关联pf.dept_no、pf.org_no、pf.rcv_org_no获取name。8. 收费员(us.user_name)通过ac_user表关联pf.charge_emp_no。9. 台区名称(m.tg_name)通过m_c_mp和m_g_tg关联获取。10. 抄表段编号(h.id)和名称(h.name)通过m_r_sect表关联g.mr_sect_no。11. 主表过滤条件：pf.org_no在指定机构及其子机构中（通过ac_org的id_path递归）。",
+    "search_keywords": [
+      "收费明细",
+      "电费",
+      "实收电费",
+      "违约金",
+      "预收金额",
+      "收费类型",
+      "结算方式",
+      "缴费方式",
+      "抄表段",
+      "台区"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT pf.cons_no 户号, g.cons_name 户名, m.tg_name 台区名称, h.id 抄表段编号, h.name 抄表段名称, (SELECT `name` FROM ac_org WHERE `code` = pf.dept_no) 收款单位, ( SELECT `name` FROM ac_org WHERE `code` = pf.org_no ) 管理单位, ( SELECT `name` FROM ac_org WHERE `code` = pf.rcv_org_no ) 收款部门, us.user_name 收费员, left(pf.charge_date,10) 收费日期, pf.bank_date 银行日期, pf.charge_date 收费时间, p1.name 收费类型, p2.name 结算方式, p3.name 缴费方式, IFNULL( pf.rcv_amt,0) 收费金额, d.this_rcved_amt 实收电费, d.this_penalty 实收违约金, c.prepay_amt 预收金额, ( CASE WHEN p.id IS NULL THEN '后付费' ELSE '预付费' END ) AS 收费类别 FROM m_a_pay_flow pf left join m_a_prepay_flow c on pf.id=c.charge_id left join (select f.charge_id charge_id,sum(f.this_rcved_amt) this_rcved_amt,sum(f.this_penalty)this_penalty from m_a_rcved_flow f where f.org_no like'5100102%' and f.rcved_date between '2026-01-03' and '2026-02-13' GROUP BY f.charge_id )d on pf.id=d.charge_id LEFT JOIN m_c_cons g ON pf.cons_no = g.cons_no LEFT JOIN m_r_sect h ON g.mr_sect_no = h.id LEFT JOIN m_c_mp k ON k.cons_id = g.id LEFT JOIN m_g_tg m ON k.tg_id = m.id LEFT JOIN m_a_pc_tran t ON t.charge_id = pf.id LEFT JOIN m_ps_purchase p ON p.chargeNo = t.bank_serial LEFT JOIN ac_user us on pf.charge_emp_no=us.id left join m_p_code p1 on p1.code_type='chargeType' and p1.`value`=pf.type_code left join m_p_code p2 on p2.code_type='settleMode' and p2.`value`=pf.settle_mode left join m_p_code p3 on p3.code_type='payMode' and p3.`value`=pf.pay_mode WHERE pf.org_no IN ( SELECT a.id FROM ac_org a WHERE a.id_path LIKE ( SELECT CONCAT( id_path, '%' ) FROM ac_org WHERE id = '5100102' )",
+    "title": "收费明细查询",
+    "tables_used": [
+      "ac_org",
+      "ac_user",
+      "m_a_pay_flow",
+      "m_a_pc_tran",
+      "m_a_prepay_flow",
+      "m_a_rcved_flow",
+      "m_c_cons",
+      "m_c_mp",
+      "m_g_tg",
+      "m_p_code",
+      "m_ps_purchase",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询截至2026年3月，某供电公司（org_no以5100102开头）下所有欠费大于0的用户信息，包括县公司、供电所、用户名称、用户编号、应收年月、应收电费、实收电费、欠费金额。其中实收电费需考虑2026年4月10日之后的实收流水，欠费计算为应收电费减去实收电费（含后续实收）。",
+    "business_rules": "1. 从m_a_rcvbl_flow（当前应收表）和m_a_rcvbl_flow_arc（历史应收表）中分别查询应收记录，通过UNION ALL合并。2. 左关联m_a_rcved_flow（实收流水表），关联条件为a.id = b.rcvbl_amt_id且b.create_time > '2026-04-10 00:00:00'，即只考虑2026年4月10日之后的实收流水。3. 左关联m_c_cons获取用户名称，左关联ac_org两次：一次通过c.org_no关联供电所（o），一次通过left(c.org_no,7)关联县公司（o1）。4. 筛选条件：a.rcvbl_ym <= 202603（应收年月不超过2026年3月），a.org_no LIKE concat(5100102,'%')（供电所编号以5100102开头），对于历史表额外限制a.create_time > '2026-04-10 00:00:00'。5. 计算字段：rcvbl_amt（应收电费），rcved_amt = ifnull(a.rcved_amt,0) - ifnull(sum(b.this_rcved_amt),0)（原实收减去后续实收，得到调整后实收），qf = ifnull(a.rcvbl_amt,0) - ifnull(a.rcved_amt,0) + ifnull(sum(b.this_rcved_amt),0)（欠费=应收-原实收+后续实收）。6. 外层查询过滤a.qf > 0。",
+    "search_keywords": [
+      "欠费查询",
+      "应收电费",
+      "实收电费",
+      "供电所",
+      "用户编号",
+      "应收年月",
+      "实收流水",
+      "欠费金额",
+      "供电公司",
+      "电费结清"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT a.orgname '县公司',a.`name` '供电所',a.cons_name '用户名称',a.cons_no '用户编号',a.rcvbl_ym '应收年月',a.rcvbl_amt '应收电费',a.rcved_amt '实收电费',a.qf '欠费' FROM ( SELECT c.cons_no, c.cons_name, o.`name`, o1.`name` orgname, a.rcvbl_ym, ifnull(a.rcvbl_amt,0) rcvbl_amt, ifnull(a.rcved_amt,0) y_rcved_amt, ifnull(sum(b.this_rcved_amt),0) this_rcved_amt, ifnull(a.rcved_amt,0)-ifnull(sum(b.this_rcved_amt),0) rcved_amt, ifnull(a.rcvbl_amt,0) - ifnull(a.rcved_amt,0) +ifnull(sum(b.this_rcved_amt),0) qf FROM m_a_rcvbl_flow a left JOIN m_a_rcved_flow b ON a.id = b.rcvbl_amt_id and b.create_time >'2026-04-10 00:00:00' LEFT JOIN m_c_cons c on c.cons_no = a.cons_no left join ac_org o on c.org_no = o.id left join ac_org o1 on left(c.org_no,7) = o1.id WHERE a.rcvbl_ym <= 202603 and a.org_no LIKE concat(5100102,'%') GROUP BY a.id UNION ALL SELECT c.cons_no, c.cons_name, o.`name`, o1.`name` orgname, a.rcvbl_ym, ifnull(a.rcvbl_amt,0) rcvbl_amt, ifnull(a.rcved_amt,0) y_rcved_amt, ifnull(sum(b.this_rcved_amt),0) this_rcved_amt, ifnull(a.rcved_amt,0)-ifnull(sum(b.this_rcved_amt),0) rcved_amt, ifnull(a.rcvbl_amt,0) - ifnull(a.rcved_amt,0) +ifnull(sum(b.this_rcved_amt),0) qf FROM m_a_rcvbl_flow_arc a left JOIN m_a_rcved_flow b ON a.id = b.rcvbl_amt_id and b.create_time >'2026-04-10 00:00:00' LEFT JOIN m_c_cons c on c.cons_no = a.cons_no left join ac_org o on c.org_no = o.id left join ac_org o1 on left(c.org_no,7) = o1.id WHERE a.create_time >'2026-04-10 00:00:00' and a.rcvbl_ym <= 202603 and a.org_no LIKE concat(5100102,'%') GROUP BY a.id ) a WHERE a.qf > 0",
+    "title": "总欠费冻结信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_a_rcvbl_flow",
+      "m_a_rcvbl_flow_arc",
+      "m_a_rcved_flow",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有用电客户的电源信息，包括用户编号、用户名称、受电点编号、电源点编号、电源类型、供电电压、供电容量、电源相数、运行方式、保护方式、保护类型、变电站、线路、台区、电源性质、进线方式、进线杆号、低压接线箱号、产权分界点、电源备注，并按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联：m_c_cons 与 ac_org 通过 org_no 关联，且 ac_org.id 以 @org 开头（即资中代征供电单位及其下属）。2. m_c_cons 与 m_c_ps 通过 cons_id 关联。3. m_c_ps 通过 subs_id、line_id、tg_id 分别左连接 m_g_subs、m_g_line、m_g_tg。4. 多个 m_p_code 左连接用于翻译枚举值，每个连接条件包括 take_effect_flag=1 和对应的 code_type。5. 筛选条件：a.status_code in ('0','1','2','3')，表示用户状态为正常或运行中。6. 排序：按供电单位名称和用户编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "电源信息",
+      "供电单位",
+      "用户编号",
+      "电源类型",
+      "供电容量",
+      "保护方式",
+      "进线方式",
+      "电源相数",
+      "变电站"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.sp_id 受电点编号,b.ps_no 电源点编号,p1.name 电源类型,p2.name 供电电压,\nb.ps_cap 供电容量,p3.name 电源相数,p4.name 运行方式,p5.name 保护方式,p6.name 保护类型,c.subs_name 变电站,d.line_name 线路,e.tg_name 台区,\np7.name 电源性质,p8.name 进线方式,b.linein_pole_no 进线杆号,b.lv_box_no 低压接线箱号,p9.name 产权分界点,b.remark 电源备注\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_ps b on a.id=b.cons_id \nleft join m_g_subs c on b.subs_id=c.id \nleft join m_g_line d on b.line_id=d.id \nleft join m_g_tg e on b.tg_id=e.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='pstypecode' and p1.value=b.type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='psVoltCode' and p2.value=b.ps_volt \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='phasecode' and p3.value=b.phase_code \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='runmode' and p4.value=b.run_mode \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='psProtectMode' and p5.value=b.protect_mode \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='protectmode' and p6.value=b.relay_protect_mode \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='psattr' and p7.value=b.ps_attr \nleft join m_p_code p8 on p8.take_effect_flag=1 and p8.code_type='lineinmode' and p8.value=b.linein_mode \nleft join m_p_code p9 on p9.take_effect_flag=1 and p9.code_type='prpoint' and p9.value=b.pr_point \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_ps",
+      "m_g_line",
+      "m_g_subs",
+      "m_g_tg",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有状态为正常、暂停、销户或拆表的用电客户及其计量点、电能表信息，包括供电单位名称、用户编号、用户名称、计量点编号、电能表标识、资产编号、条形码、出厂编号、出厂日期、电流、电压、制造单位、型号、类别、类型、接线方式、是否参考表、综合倍率、安装日期、安装位置，并按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联逻辑：m_c_cons 与 ac_org 通过 org_no 关联，且 org_no 以 @org 参数开头；m_c_cons 与 m_c_mp 通过 cons_id 关联，且计量点类型为 '01'（用电客户），状态为 '01'（正常）或 '02'（暂停）；m_c_mp 与 m_c_meter 通过 mp_id 和 cons_id 关联；m_c_meter 与 m_d_meter 通过 id 关联。2. 枚举值翻译：通过 m_p_code 表将代码值翻译为名称，包括电流（meterRcSort）、电压（meterVolt）、制造单位（meterFacturer）、型号（meterModelNo）、类别（meterSort）、类型（meterTypeCode）、接线方式（wiringMode）。3. 状态码含义：a.status_code in ('0','1','2','3') 分别对应正常、暂停、销户、拆表。4. 特殊计算：c.ref_meter_flag 为 1 时显示 '是'，否则 '否'。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用电客户",
+      "计量点",
+      "电能表",
+      "资产编号",
+      "条形码",
+      "出厂日期",
+      "综合倍率",
+      "接线方式"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 供电单位, a.cons_no 用户编号, a.cons_name 用户名称, b.mp_no 计量点编号, c.id 电能表标识, c.asset_no 资产编号,\nc.bar_code 条形码, c.made_no 出厂编号, d.made_date 出厂日期, p1.name 电流, p2.name 电压, p3.name 制造单位, p4.name 型号, p5.name 类别,\np6.name 类型, p7.name 接线方式, (case c.ref_meter_flag when 1 then '是' else '否' end) 是否参考表, c.t_factor 综合倍率,\nc.inst_date 安装日期, c.inst_loc 安装位置\nfrom m_c_cons a\njoin ac_org o on o.id=a.org_no and o.id like concat(@org,'%')\njoin m_c_mp b on b.cons_id=a.id and b.type_code='01' and b.status_code in ('01','02')\njoin m_c_meter c on c.mp_id=b.id and c.cons_id=a.id\njoin m_d_meter d on d.id=c.id\nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='meterRcSort' and p1.value=d.rated_current \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='meterVolt' and p2.value=d.volt_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='meterFacturer' and p3.value=d.manufacturer \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='meterModelNo' and p4.value=d.model_code \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='meterSort' and p5.value=d.sort_code \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='meterTypeCode' and p6.value=d.type_code \nleft join m_p_code p7 on p7.take_effect_flag=1 and p7.code_type='wiringMode' and p7.value=d.wiring_mode \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_mp",
+      "m_d_meter",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2026年1月供电单位编号为5100102及其下属单位的用户电费信息，包括用户编号、用户名称、用户分类、用电地址、计量点编号、计量点分类、出厂编号、电费年月、抄表日期、示数类型、上次示数、本次示数、综合倍率、上次抄见电量、本次抄见电量、抄表方式、抄表状态、台区名称、线路名称、抄表段编号、抄表段名称，且要求计量点类型为结算计量点（01）、示数类型为有功（12）、抄表计划状态为已完成（10），按供电单位、用户编号、用户名称排序。",
+    "business_rules": "1. 表关联：m_e_cons_snap_arc（电费快照）与m_r_data_arc（抄表数据）通过a.id=b.calc_id关联；m_r_data_arc与m_c_mp（计量点）通过b.mp_id=c.id左关联；m_c_mp与m_g_tg（台区）通过c.tg_id=tq.id左关联；m_c_mp与m_g_line（线路）通过c.line_id=line.id左关联；m_e_cons_snap_arc与m_p_code（代码表）通过a.cons_sort_code=p1.value且p1.code_type='custSortCode'左关联获取用户分类名称；m_r_data_arc与m_p_code通过b.read_type_code=p2.value且p2.code_type='readTypeCode'左关联获取示数类型名称；m_r_data_arc与m_p_code通过b.actual_mode=cd.value且cd.code_type='mrModeCode'左关联获取抄表方式名称；m_r_data_arc与m_p_code通过b.mr_status_code=cd.value且cd.code_type='mrStatusCode'左关联获取抄表状态名称；m_e_cons_snap_arc与m_r_sect通过a.mr_sect_no=id左关联获取抄表段名称；m_e_cons_snap_arc与ac_org通过a.org_no=id左关联获取单位名称。2. 筛选条件：a.org_no like '5100102%'（供电单位以5100102开头）；a.ym=202601（电费年月为2026年1月）；存在抄表计划且计划状态为'10'（已完成）；c.type_code='01'（计量点类型为结算）；b.read_type_code='12'（示数类型为有功）。3. 排序：按a.org_no, a.cons_no, a.cons_name升序。4. 字段计算：抄表日期格式化为'%Y-%m-%d'。",
+    "search_keywords": [
+      "用户电费查询",
+      "抄表示数",
+      "计量点",
+      "台区",
+      "线路",
+      "抄表段",
+      "电费年月",
+      "供电单位",
+      "结算计量点",
+      "有功示数"
+    ],
+    "complexity": "complex",
+    "sql": "select (select name from ac_org where id=a.org_no limit 1) 单位名称, a.cons_no 用户编号, a.cons_name 用户名称, p1.`name` 用户分类, a.elec_addr 用电地址, b.mp_id 计量点编号, p2.`name` 计量点分类, b.made_no 出厂编号, a.ym 电费年月, date_format(b.this_ymd,'%Y-%m-%d') 抄表日期, (select name from m_p_code m where m.code_type ='readTypeCode' and m.value=b.read_type_code limit 1) 示数类型, b.last_mr_num 上次示数, b.this_read 本次示数, b.t_factor 综合倍率, b.last_mr_pq 上次抄见电量, b.this_read_pq 本次抄见电量, (select name from m_p_code cd where cd.code_type='mrModeCode' and cd.value=b.actual_mode limit 1) 抄表方式, (select name from m_p_code cd where cd.code_type='mrStatusCode' and value=b.mr_status_code limit 1) 抄表状态, tq.tg_name 台区名称, line.line_name 线路名称, a.mr_sect_no 抄表段编号, (select name from m_r_sect where id=a.mr_sect_no limit 1) 抄表段名称 from m_e_cons_snap_arc a join m_r_data_arc b on a.id=b.calc_id left join m_c_mp c on c.id=b.mp_id left join m_g_tg tq on tq.id=c.tg_id left join m_g_line line on line.id=c.line_id left join m_p_code p1 on p1.code_type='custSortCode' and p1.`value`=a.cons_sort_code left join m_p_code p2 on p2.code_type='mpSortCode' and p2.`value`=c.type_code where a.org_no like concat(5100102, '%') and a.ym=202601 and exists (select 1 from m_r_plan_arc where app_no=a.app_code and plan_status='10') and c.type_code='01' and b.read_type_code='12' order by a.org_no,a.cons_no,a.cons_name",
+    "title": "用户8月份抄表示数查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_mp",
+      "m_e_cons_snap_arc",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_data_arc",
+      "m_r_plan_arc",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询单位编码、单位名称、用户编号、用户名称、用户状态、用电分类、用电类别、行业分类、合同容量、运行容量、定价策略类型、基本电费计算方式、核定值、功率因数考核方式、变压器标识、变压器名称、变压器状态、变压器容量、实际启用时间、实际停用时间、设备恢复时间、立户日期，筛选条件：单位编码以指定编码开头，用户状态不为'9'，合同容量大于等于315，按单位编码排序。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过org_no关联，与m_c_sp通过cons_id关联，与m_g_tran通过cons_id关联；m_c_sp与m_c_cons_prc_tactic通过sp_id关联；多个m_p_code表分别用于翻译状态码、用电分类、用电类别、行业分类、定价策略类型、基本电费计算方式、功率因数考核方式。2. 枚举值翻译：p20.code_type='statusCode'对应用户状态，p22.code_type='custSortCode'对应用电分类，p23.code_type='elecTypeCode'对应用电类别，p25.code_type='tradeCode'对应行业分类，p1.code_type='prcTacticType'对应定价策略类型，p2.code_type='baCalcMode'对应基本电费计算方式，p3.code_type='pfEvalMode'对应功率因数考核方式。3. 状态码含义：a.status_code<>'9'表示排除已注销或删除的用户。4. 特殊计算：left函数截取日期字符串前10位；ifnull(t.plan_resume_date,'')将空值转为空字符串。5. 筛选条件：a.org_no like concat(@org_no,'%')实现单位编码前缀匹配；a.contract_cap>=315筛选合同容量大于等于315的用户。",
+    "search_keywords": [
+      "用户",
+      "变压器",
+      "合同容量",
+      "运行容量",
+      "核定值",
+      "单位",
+      "状态",
+      "用电分类",
+      "用电类别",
+      "行业分类"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o1.`name` 单位名称,a.cons_no 用户编号,a.cons_name 用户名称,p20.`name` 用户状态,p22.`name` 用电分类,p23.`name` 用电类别 ,p25.`name` 行业分类,a.contract_cap 合同容量,a.run_cap 运行容量 ,p1.`name` 定价策略类型,p2.`name` 基本电费计算方式,e.dmd_spec_value 核定值,p3.`name` 功率因数考核方式 ,t.id 变压器标识,t.tran_name 变压器名称,t.chg_remark 变压器状态,t.plate_cap 变压器容量,left(t.actual_start_date,10) 实际启用时间, left(t.actual_stop_use_date,10) 实际停用时间,ifnull(t.plan_resume_date,'') 设备恢复时间 ,left(a.build_date,10) 立户日期 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id left join m_g_tran t on a.id=t.cons_id left join m_p_code p1 on p1.code_type='prcTacticType' and p1.`value`=e.type_code left join m_p_code p2 on p2.code_type='baCalcMode' and p2.`value`=e.ba_calc_mode left join m_p_code p3 on p3.code_type='pfEvalMode' and p3.`value`=e.pf_eval_mode left join m_p_code p20 on p20.code_type='statusCode' and p20.`value`=a.status_code left join m_p_code p22 on p22.code_type='custSortCode' and p22.`value`=a.cons_sort_code left join m_p_code p23 on p23.code_type='elecTypeCode' and p23.`value`=a.elec_type_code left join m_p_code p25 on p25.code_type='tradeCode' and p25.`value`=a.trade_code where a.org_no like concat(@org_no,'%') and a.status_code<>'9' and a.contract_cap>=315 order by a.org_no",
+    "title": "用户和变压器时间查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc_tactic",
+      "m_c_sp",
+      "m_g_tran",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询单位编号以5100102开头的所有关口计量点（计量点分类为'02'关口）的详细信息，包括单位名称、计量点编号、计量名称、计量点分类、计量点状态、线路、台区、抄表段、出厂编号、综合倍率、示数、最后抄表日期、考核单元名称、考核单元分类、计量点标志，并按单位编号、线路、台区、计量点ID、状态排序。",
+    "business_rules": "1. 单位名称：从ac_org表根据mp.org_no关联获取name。2. 计量点分类：根据mp.type_code关联m_p_code表，code_type='mpSortCode'。3. 计量点状态：mp.status_code映射为'01'->'设立','02'->'在用','03'->'停用','04'->'撤销'，其他为'其他'。4. 线路：从m_g_line表根据mp.line_id关联获取line_name。5. 台区：从m_g_tg表根据mp.tg_id关联获取tg_name。6. 抄表段：从m_r_sect表根据mp.mr_sect_no关联，拼接id和name。7. 出厂编号和综合倍率：从m_c_meter表根据mp.id关联。8. 示数和最后抄表日期：从m_c_meter_read表根据me.id关联，且read_type_code='11'（有功总正）。9. 考核单元名称和分类：通过m_g_io_mp表关联m_g_chkunit，iomp.io_id映射为'1'->'入口计量','0'->'出口计量'。10. 筛选条件：mp.org_no LIKE '5100102%'，mp.type_code='02'（关口）。11. 排序：mp.org_no, line.line_name, tq.tg_name, mp.id, mp.status_code。",
+    "search_keywords": [
+      "关口表",
+      "计量点",
+      "关口计量点",
+      "综合倍率",
+      "示数",
+      "考核单元",
+      "线路",
+      "台区",
+      "抄表段",
+      "出厂编号"
+    ],
+    "complexity": "complex",
+    "sql": "select (select name from ac_org where id=mp.org_no LIMIT 1) 单位名称, mp.mp_no 计量点编号, mp.mp_name 计量名称, (SELECT name from m_p_code cd where cd.code_type='mpSortCode' and cd.value=mp.type_code) 计量点分类, (case mp.status_code when '01' then '设立' when '02' then '在用' when '03' then '停用' when '04' then '撤销' else '其他' end) 计量点状态, line.line_name 线路, tq.tg_name 台区, (SELECT CONCAT_WS( '|', id, NAME ) FROM m_r_sect r WHERE r.id = mp.mr_sect_no ) 抄表段, me.made_no 出厂编号, me.t_factor 综合倍率, m_read.mr_read 示数, date_format(m_read.mr_date,'%Y-%m-%d') 最后抄表日期, ch.chkunit_name 考核单元名称, (SELECT name from m_p_code cd where cd.code_type='chkunitSort' and cd.value=ch.chkunit_type_code) 考核单元分类, (case iomp.io_id when '1' then '入口计量' when '0' then '出口计量' end) 计量点标志 from m_c_mp mp left join m_c_meter me on mp.id=me.mp_id left join m_c_meter_read m_read on me.id=m_read.meter_id and m_read.read_type_code='11' left join m_g_tg tq on tq.id=mp.tg_id left join m_g_line line on line.id=mp.line_id left join m_g_io_mp iomp on mp.id=iomp.mp_id left join m_g_chkunit ch on iomp.chkunit_id=ch.id where mp.org_no LIKE concat(5100102, '%') and mp.type_code in ('02') ORDER BY mp.org_no,line.line_name,tq.tg_name,mp.id,mp.status_code",
+    "title": "关口表信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_meter",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_g_chkunit",
+      "m_g_io_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询单位代码以'5100434'开头的抄表段信息，包括单位名称、抄表段编号、抄表段名称、抄表事件类型、抄表方式、抄表例日、抄表周期、上次抄表月份，以及各操作环节（数据准备员、抄表员、复核员、电费计算员、电费审核发行员、收费员）的人员代码，按单位名称和抄表段编号排序。",
+    "business_rules": "1. 主表m_r_sect关联ac_org获取单位名称，关联条件为a.org_no=o.id。2. 关联m_r_plan_day时需过滤effect_flag=1（生效记录）。3. 通过左连接子查询从m_r_oper_activity按抄表段编号分组，使用case when按act_code提取各环节操作员（act_code含义：00计划制定员、01数据准备员、03抄表员、05复核员、07电费计算员、08电费审核发行员、21收费员）。4. 代码表m_p_code用于翻译event_type（code_type='mrEventType'）、mr_mode_code（code_type='mrmodecode'）、period_code（code_type='periodcode'），需过滤take_effect_flag=1。5. 筛选条件：a.org_no like concat(@org,'%')，其中@org='5100434'；a.effect_flag=1。6. 排序：按单位名称和抄表段编号升序。",
+    "search_keywords": [
+      "抄表段",
+      "抄表计划",
+      "抄表例日",
+      "抄表周期",
+      "抄表事件类型",
+      "抄表方式",
+      "操作环节",
+      "人员代码",
+      "单位",
+      "资中代征"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 单位,a.id 抄表段编号,a.name 抄表段名称,p1.name 抄表事件类型,p2.name 抄表方式,mr_day 抄表例日,p3.name 抄表周期,latest_mr_mon 上次抄表月份,\n数据准备员,抄表员,复核员,电费计算员,电费审核发行员,收费员\nfrom m_r_sect a \njoin ac_org o on a.org_no=o.id \njoin m_r_plan_day b on a.id=b.mr_sect_no and b.effect_flag=1 \nleft join (select mr_sect_no\n,max(case when act_code='00' then operator_no end) 计划制定员\n,max(case when act_code='01' then operator_no end) 数据准备员\n,max(case when act_code='03' then operator_no end) 抄表员\n,max(case when act_code='05' then operator_no end) 复核员\n,max(case when act_code='07' then operator_no end) 电费计算员\n,max(case when act_code='08' then operator_no end) 电费审核发行员\n,max(case when act_code='21' then operator_no end) 收费员\nfrom m_r_oper_activity group by mr_sect_no) c on a.id=c.mr_sect_no \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='mrEventType' and p1.value=b.event_type \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='mrmodecode' and p2.value=b.mr_mode_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='periodcode' and p3.value=b.period_code \nwhere a.org_no like concat(@org,'%') and a.effect_flag=1\norder by 单位,抄表段编号\nset @org:='5100434'",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_p_code",
+      "m_r_oper_activity",
+      "m_r_plan_day",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询供电所为5100120的315千伏安及以上大用户的详细信息，包括供电所名称、用户编号、用户名称、供电电压、用户电话、执行电价、线损（变损）电量、台区名称、公专变、变压器标识、变压器运行状态、表计编号、有功总示数、无功总示数、倍率、电表型号、计量方式、费控类型、合同容量、运行容量、计量装置运行情况、接线情况、铅封、安全隐患、其他问题、24年全年用电量、24年全年用户均价、24年基本电费。",
+    "business_rules": "1. 用户表m_c_cons与临时表tmp_prc.xls_cons_cap315通过用户编号cons_no关联，筛选容量315及以上的大用户。2. 组织机构表ac_org与临时表tmp_prc.xls_org通过org_no关联，且过滤org_no以'5100120'开头（左7位匹配）且po.id='5100120'，即供电所为5100120。3. 计量点m_c_mp的type_code='01'（用电客户），status_code in ('01','02')（运行或暂停）。4. 电价关联：m_c_mp的tariff_id关联m_c_cons_prc的id，再通过prc_code和org_no关联m_e_cat_prc，同时m_e_cat_prc的para_vn关联m_e_bill_para_ver，过滤版本类型为1（电价）、当前有效且已发布。5. 电能表通过m_c_meter_mp_rela关联计量点，左连接避免无表计的用户丢失。6. 字段中'用户电话'、'xbsdl'、'tg.tg_name'、'p1.name'、'p6.name'、'mr11.mr_read'、'mr21.mr_read'、'p2.name'、'p3.name'、'p4.name'、'p5.name'、'24年全年用电量'、'24年全年总电费'、'24年基本电费'等未在表结构中定义，可能来自其他表或计算，但SQL中未完全体现，需补充。7. 变压器标识concat(tran.id,'')，tran表未在FROM中，可能遗漏。8. 用户均价计算：round(ifnull(24年全年总电费,0)/ifnull(24年全年用电量,0),2)。",
+    "search_keywords": [
+      "315千伏安",
+      "大用户",
+      "供电所",
+      "用户编号",
+      "执行电价",
+      "台区名称",
+      "公专变",
+      "变压器运行状态",
+      "有功总示数",
+      "无功总示数"
+    ],
+    "complexity": "complex",
+    "sql": "select distinct o.name 供电所,cons.cons_no 用户编号,cons.cons_name 用户名称,p4.name 供电电压,用户电话,eprc.cat_prc_name 执行电价,xbsdl `线损（变损）电量`,tg.tg_name 台区名称,p1.name 公专变,concat(tran.id,'') 变压器标识,p6.name 变压器运行状态,cm.made_no 表计编号,mr11.mr_read 有功总示数,mr21.mr_read 无功总示数,cm.t_factor 倍率,p5.name 电表型号,p2.name 计量方式,p3.name 费控类型,contract_cap 合同容量,run_cap 运行容量,'' 计量装置运行情况,'' 接线情况,'' 铅封,'' 安全隐患,'' 其他问题,24年全年用电量,round(ifnull(24年全年总电费,0)/ifnull(24年全年用电量,0),2) 24年全年用户均价,24年基本电费 from m_c_cons cons join tmp_prc.xls_cons_cap315 xcons on xcons.cons_no=cons.cons_no join ac_org o on cons.org_no=o.id join tmp_prc.xls_org po on left(o.id,7)=po.id and po.id='5100120' join m_c_mp mp on cons.id=mp.cons_id and mp.type_code='01' and mp.status_code in ('01','02') join m_c_cons_prc cprc on mp.tariff_id=cprc.id join m_e_cat_prc eprc on cprc.prc_code=eprc.prc_code and po.id=eprc.org_no join m_e_bill_para_ver epara on eprc.para_vn=epara.id and epara.par_ver_type='1' and par_bgn_date<=now() and par_end_date>=now() and release_flag='1' left join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id left join m_c_meter cm on cmmr.meter_id=cm.id",
+    "title": "315及以上大用户信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_mp",
+      "m_e_bill_para_ver",
+      "m_e_cat_prc",
+      "tmp_prc.xls_cons_cap315",
+      "tmp_prc.xls_org"
+    ]
+  },
+  {
+    "question": "查询指定供电公司（ID为5100102）下属所有供电所（组织机构类型为0且等级为3）的用户信息，包括用户编号、用户名称、所属供电所名称、抄表段编号、抄表段名称、线路编号、线路名称、台区编号、台区名称，以及用户的账户余额（预收余额减去2026年2月1日之后的预收金额）。",
+    "business_rules": "1. 组织机构表ac_org通过id_path字段实现层级查询，使用CONCAT和LIKE匹配子节点。2. 用户表m_c_cons通过org_no关联ac_org，筛选条件为type=0且level=3的供电所。3. 计量点表m_c_mp按cons_id分组，取每个用户的一个计量点（GROUP BY cons_id），再关联线路和台区。4. 账户余额计算：预收余额（m_a_acct_bal.prepay_bal）减去2026年2月1日之后的预收金额（m_a_prepay_flow.prepay_amt之和），若为空则取0。5. 使用LEFT JOIN确保用户信息完整。",
+    "search_keywords": [
+      "用户余额",
+      "冻结",
+      "预收余额",
+      "预收金额",
+      "供电所",
+      "抄表段",
+      "线路",
+      "台区",
+      "组织机构",
+      "层级查询"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT * FROM ( ( SELECT ac.name, sect.name mrSectName, sect.id mrSectNo, mg.line_no lineNo, mg.line_name lineName, mt.tg_no tgNo, mt.tg_name tgName, mcc.cons_no userNo, mcc.cons_name userName, mcc.ctl_mode ctlMode FROM m_c_cons mcc join ac_org ac on mcc.org_no=ac.id LEFT JOIN m_r_sect sect ON sect.id = mcc.mr_sect_no LEFT JOIN ( SELECT cons_id, line_id, tg_id FROM m_c_mp GROUP BY cons_id) m ON mcc.id = m.cons_id LEFT JOIN m_g_line mg ON mg.id = m.line_id LEFT JOIN m_g_tg mt ON mt.id = m.tg_id WHERE mcc.org_no IN ( SELECT a.id FROM ac_org a WHERE a.id_path LIKE ( SELECT CONCAT(ao.id_path, '%') FROM ac_org ao WHERE ao.id = '5100102' ) AND a.type = 0 AND a.level = 3) )mc LEFT JOIN ( SELECT consNo, IFNULL(prepay_bal, 0) - IFNULL(prepay_amt, 0) accountBalance FROM ( ( SELECT mab.cons_no consNo, mab.prepay_bal FROM m_a_acct_bal mab) c LEFT JOIN ( SELECT map.cons_no, sum(IFNULL(map.prepay_amt, 0)) prepay_amt FROM m_a_prepay_flow MAP WHERE map.prepay_date > \"20260201\" GROUP BY map.cons_no)d ON c.consNo = d.cons_no ) )md ON mc.userNo = md.consNo )",
+    "title": "用户余额冻结新",
+    "tables_used": [
+      "ac_org",
+      "m_a_acct_bal",
+      "m_a_prepay_flow",
+      "m_c_cons",
+      "m_c_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有用电客户的受电点信息，包括用户编号、用户名称、受电点编号、受电点名称、电源联锁方式、受电点类型、电源联锁装置位置、电源切换方式、电源数目、自备电源闭锁方式、有无自备电源、自备电源容量、受电点备注，并按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联逻辑：m_c_cons（用户）通过org_no关联ac_org（组织机构），通过id关联m_c_sp（受电点）；m_c_sp中的代码字段（interlock_mode, type_code, ps_switch_mode, ps_num_code, lock_mode, spare_power_flag）通过m_p_code表翻译为名称，关联条件为take_effect_flag=1且code_type匹配对应代码类型。2. 筛选条件：ac_org.id以@org参数开头（即指定供电单位及其下级）；m_c_cons.status_code在('0','1','2','3')中，表示正常、暂停、销户等有效状态。3. 排序：按供电单位名称和用户编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "受电点",
+      "电源联锁",
+      "自备电源",
+      "用户编号",
+      "供电单位",
+      "代码翻译",
+      "m_c_sp",
+      "m_p_code"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.id 受电点编号,b.sp_name 受电点名称,p1.name 电源联锁方式,p2.name 受电点类型,b.equip_loc 电源联锁装置位置,\np3.name 电源切换方式,p4.name 电源数目,p5.name 自备电源闭锁方式,p6.name 有无自备电源,b.spare_power_cap 自备电源容量,b.sp_remark 受电点备注\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_sp b on a.id=b.cons_id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='interlockmode' and p1.value=b.interlock_mode \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='spTypeCode' and p2.value=b.type_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='psswitchmode' and p3.value=b.ps_switch_mode \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='psnumcode' and p4.value=b.ps_num_code \nleft join m_p_code p5 on p5.take_effect_flag=1 and p5.code_type='psLockMode' and p5.value=b.lock_mode \nleft join m_p_code p6 on p6.take_effect_flag=1 and p6.code_type='sparePowerFlag' and p6.value=b.spare_power_flag \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_sp",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2021年8月29日至2021年9月29日期间，单位代码以'5100120'开头且非卡表用户（ctl_mode不为'01'）的缴费记录，显示单位名称、户号、户名、缴费月份、缴费时间、收费金额、预收金额、实收电费、实收违约金、电费账期。",
+    "business_rules": "1. 表关联：m_c_cons（用户）与m_a_pay_flow（缴费流水）通过cons_no关联；m_a_pay_flow与m_a_prepay_flow（预收流水）通过id=charge_id关联；m_a_pay_flow与m_a_rcved_flow（实收流水）通过id=charge_id左关联。2. 筛选条件：缴费时间在'2021-08-29 00:00:00'到'2021-09-29 00:00:00'之间；用户所属单位org_no以'5100120'开头；排除ctl_mode='01'（卡表用户）。3. 字段含义：charge_ym为缴费月份，charge_date为缴费时间，rcv_amt为收费金额，prepay_amt为预收金额，this_rcved_amt为实收电费，this_penalty为实收违约金，rcvbl_ym为电费账期。4. 子查询：单位名称从ac_org表根据org_no获取。",
+    "search_keywords": [
+      "缴费记录",
+      "电费",
+      "预收",
+      "实收",
+      "违约金",
+      "户号",
+      "户名",
+      "供电单位",
+      "时间范围",
+      "非卡表"
+    ],
+    "complexity": "medium",
+    "sql": "select (select name from ac_org where id=a.org_no) 单位,a.cons_no 户号,a.cons_name 户名,b.charge_ym 缴费月份,b.charge_date 缴费时间,b.rcv_amt 收费金额,c.prepay_amt 预收金额,d.this_rcved_amt 实收电费,d.this_penalty 实收违约金,d.rcvbl_ym 电费账期 from m_c_cons a join m_a_pay_flow b on a.cons_no=b.cons_no and charge_date>='2021-08-29 00:00:00' and charge_date<'2021-09-29 00:00:00' join m_a_prepay_flow c on b.id=c.charge_id left join m_a_rcved_flow d on b.id=d.charge_id where a.org_no like '5100120%' and ifnull(a.ctl_mode,'')<>'01' select (select name from ac_org where id=a.org_no) 单位,a.cons_no 户号,a.cons_name 户名,b.charge_ym 缴费月份,b.charge_date 缴费时间,b.rcv_amt 收费金额,c.prepay_amt 预收金额,d.this_rcved_amt 实收电费,d.this_penalty 实收违约金,d.rcvbl_ym 电费账期 from m_c_cons a join m_a_pay_flow b on a.cons_no=b.cons_no and charge_date>='2018-08-29 00:00:00' and charge_date<'2022-02-18 00:00:00' join m_a_prepay_flow c on b.id=c.charge_id left join m_a_rcved_flow d on b.id=d.charge_id where a.org_no like '5100120%' and ifnull(a.ctl_mode,'')<>'01' and a.cons_no in (012002000612,012002044198,)",
+    "title": "333",
+    "tables_used": [
+      "ac_org",
+      "m_a_pay_flow",
+      "m_a_prepay_flow",
+      "m_a_rcved_flow",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询资中代征的供电单位、用户编号、用户名称、受电点编号、计量点编号、电价行业类别、用电类别、电价编号、电价名称、是否峰谷标志、功率因数标准、固定力率、是否执行水期，筛选条件：用户状态为0、1、2、3，计量点类型为01（用电客户），计量点状态为01或02，电价版本为当前版本，供电单位ID以@org开头。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过org_no关联，m_c_cons与m_c_mp通过id=cons_id关联，m_c_mp与m_c_cons_prc通过tariff_id=id关联，m_c_cons_prc与m_e_cat_prc通过prc_code关联，m_p_code作为代码表左连接。2. 枚举值翻译：ts_flag=1表示'是'，否则'否'；fe_flag=1表示'是'，否则'否'；mp.type_code='01'表示用电客户；mp.status_code in ('01','02')表示正常或暂停；a.status_code in ('0','1','2','3')表示正常、暂停、销户等。3. 特殊逻辑：c.para_vn=f_get_curver_para_vn(1, @org)获取当前电价版本。4. 代码表：p1.code_type='tradecode'翻译行业类别，p2.code_type='electypecode'翻译用电类别，p3.code_type='pfstdcode'翻译功率因数标准。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "计量点编号",
+      "电价名称",
+      "功率因数标准",
+      "固定力率",
+      "用电类别",
+      "电价行业类别"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.sp_id 受电点编号,mp_no 计量点编号,p1.name 电价行业类别,p2.name 用电类别,c.prc_code 电价编号,\nc.cat_prc_name 电价名称,(case ts_flag when 1 then '是' else '否' end) 是否峰谷标志,p3.name 功率因数标准,b.fix_ratio 固定力率,\n(case fe_flag when 1 then '是' else '否' end) 是否执行水期\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp mp on a.id=mp.cons_id and mp.type_code='01' and mp.status_code in ('01','02') \njoin m_c_cons_prc b on mp.tariff_id=b.id \njoin m_e_cat_prc c on b.prc_code=c.prc_code and c.para_vn=f_get_curver_para_vn(1, @org) \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='tradecode' and p1.value=b.trade_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='electypecode' and p2.value=c.elec_type_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='pfstdcode' and p3.value=b.pf_std_code \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_mp",
+      "m_e_cat_prc",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征的购电记录，包括单位、户号、户名、表号、购电次数、充值金额、退补金额、写卡金额、充值时间、操作员、收费渠道、写卡状态、支付方式、购电量、辅助记录、网点设备名称，并按单位、户号、充值时间排序。",
+    "business_rules": "1. 主表m_ps_purchase关联ac_org获取单位名称，关联条件为a.orgid=o.id且o.id以@org开头。2. 左关联ac_user获取操作员姓名，关联条件为a.chargeManId=u.id。3. 左关联m_p_code两次：一次获取收费渠道名称（code_type='payMode'且value=a.chargeChannel），一次获取支付方式名称（code_type='settleMode'且value=a.payType），且take_effect_flag=1。4. 写卡状态根据tradeResult字段翻译：'02'为失败，其他为成功。5. 筛选条件：a.isNew='01'（当前最新交易记录）。6. 排序：单位、户号、充值时间。",
+    "search_keywords": [
+      "资中代征",
+      "购电记录",
+      "购电次数",
+      "充值金额",
+      "退补金额",
+      "写卡金额",
+      "收费渠道",
+      "支付方式",
+      "购电量",
+      "网点设备"
+    ],
+    "complexity": "medium",
+    "sql": "select o.name 单位,a.conscode 户号,a.consname 户名,a.meterCode 表号,a.meterPurchaseNum 购电次数,a.tradeFee 充值金额,a.returnFee 退补金额,\na.iccardFee 写卡金额,a.tradeTime 充值时间,u.user_name 操作员,p1.name 收费渠道,(case a.tradeResult when '02' then '失败' else '成功' end) 写卡状态,\np2.name 支付方式,a.purchaseQuantity 购电量,a.remarks 辅助记录,a.mac 网点设备名称\nfrom m_ps_purchase a \njoin ac_org o on a.orgid=o.id and o.id like concat(@org,'%') \nleft join ac_user u on a.chargeManId=u.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='payMode' and p1.value=a.chargeChannel \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='settleMode' and p2.value=a.payType \nwhere a.isNew='01'\norder by 单位,户号,充值时间\nselect * from m_p_code where code_type='paTypeCode'\nselect * from m_p_code where name='正常电费'\nselect * from m_a_rcvbl_flow where amt_type='0204'\nselect distinct actual_mode from m_r_data\nselect * from m_r_data where org_no like '5100434%' limit 10000\nset @org:='5100105'",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "ac_user",
+      "m_a_rcvbl_flow",
+      "m_p_code",
+      "m_ps_purchase",
+      "m_r_data"
+    ]
+  },
+  {
+    "question": "查询资中代征关系数据，包括供电单位、主用户编号、主用户老编号、主用户名称、主计量点编号、主户表号、子用户编号、子用户名称、子计量点编号、子户表号、计量点关系分类、关系比例值、计量方向，筛选条件：子用户状态为0、1、2、3，主计量点和子计量点类型为01且状态为01或02，供电单位ID以@org开头，关系分类和计量方向代码通过m_p_code翻译为名称，按供电单位和主用户编号排序。",
+    "business_rules": "1. 表关联逻辑：从m_c_cons a（子用户）开始，关联ac_org o获取供电单位名称，关联m_c_mp b获取子计量点，再关联m_c_bill_rela c获取计费关系，然后关联m_c_mp d获取主计量点，再关联m_c_cons e获取主用户信息，左关联m_c_meter f和g分别获取子户和主户表号，左关联m_p_code p1和p2翻译关系分类和计量方向。2. 枚举值翻译：rela_sort_code通过m_p_code表code_type='relasortcode'翻译为name；mp_direction_code通过code_type='mpDirection'翻译为name。3. 状态码含义：m_c_cons.status_code in ('0','1','2','3')表示正常用户；m_c_mp.status_code in ('01','02')表示运行或停运状态。4. 特殊计算：无。5. 筛选条件：子用户状态为0、1、2、3；主计量点和子计量点类型为'01'（用电客户）且状态为'01'或'02'；供电单位ID以@org开头。",
+    "search_keywords": [
+      "资中代征",
+      "主分关系",
+      "计量点关系",
+      "关系比例",
+      "计量方向",
+      "子用户",
+      "主用户",
+      "供电单位",
+      "计费关系",
+      "代征"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,e.cons_no 主用户编号,e.orgn_cons_no 主用户老编号,e.cons_name 主用户名称,d.mp_no 主计量点编号,g.made_no 主户表号,a.cons_no 子用户编号,\na.cons_name 子用户名称,b.mp_no 子计量点编号,f.made_no 子户表号,p1.name 计量点关系分类,c.rela_ratio 关系比例值,p2.name 计量方向\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp b on a.id=b.cons_id and b.type_code='01' and b.status_code in ('01','02') \njoin m_c_bill_rela c on b.id=c.mp_id \njoin m_c_mp d on c.rela_mp_id=d.id and d.type_code='01' and d.status_code in ('01','02')\njoin m_c_cons e on d.cons_id=e.id\nleft join m_c_meter f on b.id=f.mp_id \nleft join m_c_meter g on d.id=g.mp_id\nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='relasortcode' and p1.value=c.rela_sort_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='mpDirection' and p2.value=c.mp_direction_code \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,主用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_bill_rela",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_mp",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有采集点的详细信息，包括单位名称、变电站名称、台区名称、采集点类别、采集点编号、采集点名称、终端编号、终端类型、通讯规约和冻结方式。",
+    "business_rules": "1. 采集点主表m_r_cp通过org_no关联ac_org，且ac_org.id以'5100434'开头，表示资中代征单位及其下级。2. 采集点与终端运行信息通过cp_no关联m_r_tmnl_run。3. 终端运行信息与终端资产通过id关联m_d_lc_equip。4. 采集点与通讯参数通过cp_no关联m_r_cp_comm_para。5. 变电站、台区、代码表使用左连接，可能为空。6. 代码表m_p_code需take_effect_flag=1，并通过code_type和value翻译枚举值：cpType对应采集点类别，lcTypeCode对应终端类型，commProtocolVer对应通讯规约，freezemode对应冻结方式。",
+    "search_keywords": [
+      "资中代征",
+      "采集点",
+      "终端",
+      "通讯规约",
+      "冻结方式",
+      "台区",
+      "变电站",
+      "代码翻译",
+      "供电单位"
+    ],
+    "complexity": "complex",
+    "sql": "select o.name 单位,subs_name 变电站,tg_name 台区,p1.name 采集点类别,a.cp_no 采集点编号,a.name 采集点名称,d.made_no 终端编号,p2.name 终端类型,\np3.name 通讯规约,p4.name 冻结方式\nfrom m_r_cp a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_r_tmnl_run b on a.cp_no=b.cp_no \njoin m_d_lc_equip d on b.id=d.id \njoin m_r_cp_comm_para e on a.cp_no=e.cp_no \nleft join m_g_subs subs on a.subs_id=subs.id \nleft join m_g_tg tg on a.tg_id=tg.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='cpType' and p1.value=a.cp_type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='lcTypeCode' and p2.value=b.terminal_type_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='commProtocolVer' and p3.value=b.protocol_code \nleft join m_p_code p4 on p4.take_effect_flag=1 and p4.code_type='freezemode' and p4.value=b.freeze_mode \norder by 单位,变电站,台区\nset @org:='5100434'",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_d_lc_equip",
+      "m_g_subs",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_cp",
+      "m_r_cp_comm_para",
+      "m_r_tmnl_run"
+    ]
+  },
+  {
+    "question": "查询发电用户信息，包括单位编号、单位名称、发电用户编号、发电用户名称、月份、合同容量、发电量消纳方式、发电量、表号、综合倍率、示数类型、起度、止度、上网电量、自用电量、应付金额、结算电费、补贴电费、实付金额、实付结算电费、实付补贴电费、欠费金额、结清标志、发行日期。筛选条件：计量点用途类型为'1102'（发电上网计量点）。",
+    "business_rules": "1. 主表m_e_gc_snap_arc（发电客户快照）与m_a_fs_pay_info（电费支付信息）通过a.id=b.calc_id关联。2. 子查询中，m_e_gc_snap_arc与m_e_consprc_tactic_snap_arc（用户定价策略快照）通过a.id=b.calc_id关联，再与m_e_mp_para_snap_arc（计量点参数快照）通过b.id=c.prc_tactic_snap_id关联，且c.usage_type_code='1102'（发电上网计量点）。3. 字段含义：t_gra_pq为发电量，t_pur_pq为上网电量，self_pq为自用电量，pay_amt为应付金额，pay_pur_amt为结算电费，pay_gra_amt为补贴电费，paied_pur_amt为实付结算电费，paied_gra_amt为实付补贴电费，owe_amt为欠费金额。4. 结清标志p2.name来源于m_a_fs_pay_info的settle_flag字段（01已结清，02未结清），但SQL中未明确关联，推测p2为另一张字典表。5. 发电量消纳方式p1.name来源于子查询中的usage_type_code，但SQL中未关联字典表，实际需补充。",
+    "search_keywords": [
+      "发电用户",
+      "上网电量",
+      "发电量",
+      "电费支付",
+      "计量点",
+      "合同容量",
+      "综合倍率",
+      "示数类型",
+      "欠费金额",
+      "结清标志"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编号,o.`name` 单位名称,a.gc_no 发电用户编号,a.gc_name 发电用户名称 ,a.ym 月份,a.contract_cap 合同容量,p1.`name` 发电量消纳方式 ,b.t_gra_pq 发电量,t1.made_no 表号,t1.t_factor 综合倍率,t1.read_type_name 示数类型,t1.last_mr_num 起度,t1.this_read 止度 ,b.t_pur_pq 上网电量,b.self_pq 自用电量,b.pay_amt 应付金额,b.pay_pur_amt 结算电费,b.pay_gra_amt 补贴电费 ,(b.paied_pur_amt+b.paied_gra_amt) 实付金额,b.paied_pur_amt 实付结算电费,b.paied_gra_amt 实付补贴电费,b.owe_amt 欠费金额 ,p2.`name` 结清标志,date_format(a.send_date,'%Y%m%d') 发行日期 from m_e_gc_snap_arc a join m_a_fs_pay_info b on a.id=b.calc_id left join ( select a.id calc_id,a.org_no,a.gc_no,a.gc_name,a.ym,c.mp_id,c.usage_type_code ,d.meter_id,d.made_no,d.t_factor,d.read_type_code,p1.`name` read_type_name,d.last_mr_num,d.this_read,d.src_code from m_e_gc_snap_arc a join m_e_consprc_tactic_snap_arc b on a.id=b.calc_id join m_e_mp_para_snap_arc c on b.id=c.prc_tactic_snap_id and c.usage_type_code='1102'",
+    "title": "发电用户信息查询",
+    "tables_used": [
+      "m_a_fs_pay_info",
+      "m_e_consprc_tactic_snap_arc",
+      "m_e_gc_snap_arc",
+      "m_e_mp_para_snap_arc"
+    ]
+  },
+  {
+    "question": "查询2022年5月资中地区各供电单位的用户编号、用户名称、计量点编号、表计编号、电费年月、抄表计划编号、示数段、抄见位数、综合倍率、上次抄见示数、上次抄见电量、本次抄见示数、本次抄见电量、上次抄表日期、本次抄表日期、抄表方式，筛选条件：用户状态为0、1、2、3，计量点类型为01且状态为01或02，按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联逻辑：m_c_cons与ac_org通过org_no关联，且org_no需匹配@org参数（模糊匹配）；m_c_cons与m_c_mp通过cons_id关联；m_c_mp与m_c_meter通过mp_id和cons_id关联；m_r_data_arc与m_c_mp和m_c_meter分别通过mp_id和meter_id关联。2. 枚举值翻译：m_c_mp.type_code='01'表示用电客户；m_c_mp.status_code in ('01','02')表示正常或暂停；m_r_data_arc.read_type_code通过m_p_code.code_type='readtypecode'翻译为示数段名称；m_r_data_arc.actual_mode通过m_p_code.code_type='mrModeCode'翻译为抄表方式名称。3. 状态码含义：a.status_code in ('0','1','2','3')表示用户状态为正常、暂停、销户等。4. 特殊计算：本次抄见电量= (本次示数-上次示数)×综合倍率，但SQL中直接存储了计算后的值。5. 筛选条件：电费年月固定为202205。",
+    "search_keywords": [
+      "资中",
+      "代征",
+      "抄表",
+      "用户",
+      "计量点",
+      "抄见电量",
+      "综合倍率",
+      "示数",
+      "电费年月",
+      "供电单位"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.mp_no 计量点编号,c.made_no 表计编号,d.amt_ym 电费年月,d.app_no 抄表计划编号,p1.name 示数段,\nd.mr_digit 抄见位数,d.t_factor 综合倍率,last_mr_num 上次抄见示数,last_mr_pq 上次抄见电量,this_read 本次抄见示数,this_read_pq 本次抄见电量,\nlast_mr_date 上次抄表日期,this_ymd 本次抄表日期,p2.name 抄表方式\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp b on a.id=b.cons_id and b.type_code='01' and b.status_code in ('01','02') \njoin m_c_meter c on b.id=c.mp_id and a.id=c.cons_id \njoin m_r_data_arc d on b.id=d.mp_id and c.id=d.meter_id and d.amt_ym=202205 \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='readtypecode' and p1.value=d.read_type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='mrModeCode' and p2.value=d.actual_mode \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_mp",
+      "m_p_code",
+      "m_r_data_arc"
+    ]
+  },
+  {
+    "question": "查询资中代征的供电单位、用户编号、用户名称、收费日期、收费类型、收费金额、收费人员账号、收费人员名称、收费方式、结算方式、票据号码、收款单位，要求用户状态为正常或注销等（0,1,2,3），收费金额不为0，且供电单位ID以指定组织编码开头，按供电单位、用户编号、收费日期排序。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过org_no关联，且ac_org.id以@org开头（即指定组织及其下级）。2. m_c_cons与m_a_pay_flow通过cons_no关联，且rcv_amt不为0。3. 左连接ac_user、ac_org、m_p_code（分别用于收费人员、收款单位、收费类型/收费方式/结算方式的名称翻译）。4. 枚举值翻译：收费类型取自m_p_code中code_type='chargeType'且生效的记录；收费方式取自code_type='paymode'；结算方式取自code_type='settlemode'。5. 状态码：a.status_code in ('0','1','2','3')，对应正常、注销等状态。6. 排序：按供电单位、用户编号、收费日期升序。",
+    "search_keywords": [
+      "资中代征",
+      "收费明细",
+      "供电单位",
+      "用户编号",
+      "收费类型",
+      "收费金额",
+      "收费方式",
+      "结算方式",
+      "票据号码",
+      "收款单位"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,charge_date 收费日期,p1.name 收费类型,rcv_amt 收费金额,charge_emp_no 收费人员账号,\nu.user_name 收费人员名称,p2.name 收费方式,p3.name 结算方式,b.settle_note_no 票据号码,o1.name 收款单位\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_a_pay_flow b on a.cons_no=b.cons_no and rcv_amt<>0 \nleft join ac_user u on b.charge_emp_no=u.id \nleft join ac_org o1 on b.rcv_org_no=o1.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='chargeType' and p1.value=b.type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='paymode' and p2.value=b.pay_mode \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='settlemode' and p3.value=b.settle_mode \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号,收费日期",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "ac_user",
+      "m_a_pay_flow",
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询供电所为'510010233%'开头的用户余额冻结信息，包括供电所名称、抄表段名称、抄表段编号、线路编号、线路名称、台区编号、台区名称、用户编号、用户名称、档案费控类型（从代码表翻译）、预购余额。",
+    "business_rules": "1. 主表m_c_cons通过org_no关联ac_org获取供电所名称，通过mr_sect_no关联m_r_sect获取抄表段信息。2. 通过子查询从m_c_mp按cons_id分组获取每个用户对应的线路和台区，再关联m_g_line和m_g_tg获取线路和台区名称。3. 档案费控类型通过子查询从m_p_code表翻译，code_type='ctlMode'，value对应mcc.ctl_mode。4. 筛选条件：mcc.org_no like '510010233%'。",
+    "search_keywords": [
+      "用户余额冻结",
+      "供电所",
+      "抄表段",
+      "线路",
+      "台区",
+      "预购余额",
+      "费控类型",
+      "组织机构",
+      "计量点"
+    ],
+    "complexity": "medium",
+    "sql": "select acname 供电所, mrSectName 抄表段名称, mrSectNo 抄表段编号, lineNo 线路编号, lineName 线路名称, tgNo 台区编号, tgName 台区名称, userNo 用户编号, userName 用户名称, (select name from m_p_code where code_type ='ctlMode' and value = ctlMode) 档案费控类型, accountBalance 预购余额 from ( ( select ac.`name` acname, sect.name mrSectName, sect.id mrSectNo, mg.line_no lineNo, mg.line_name lineName, mt.tg_no tgNo, mt.tg_name tgName, mcc.cons_no userNo, mcc.cons_name userName, mcc.ctl_mode ctlMode from m_c_cons mcc join ac_org ac on mcc.org_no=ac.id left join m_r_sect sect on sect.id = mcc.mr_sect_no left join ( select cons_id, line_id, tg_id from m_c_mp group by cons_id) m on mcc.id = m.cons_id left join m_g_line mg on mg.id = m.line_id left join m_g_tg mt on mt.id = m.tg_id where 1 = 1 and mcc.org_no like '510010233%'",
+    "title": "用户余额冻结查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_mp",
+      "m_g_line",
+      "m_g_tg",
+      "m_p_code",
+      "m_r_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征的供电单位、用户编号、用户名称、应收年月、实收年月、实收日期、应收总金额、本次实收金额、应收违约金、本次实收违约金、本次电费结清标志，按供电单位、用户编号、应收年月排序。",
+    "business_rules": "1. 用户表(m_c_cons)通过org_no关联组织机构表(ac_org)，且org_no需匹配传入的@org参数（模糊匹配）。2. 实收流水表(m_a_rcved_flow)通过cons_no关联用户表。3. 应收金额从应收流水表(m_a_rcvbl_flow)及其归档表(m_a_rcvbl_flow_arc)中获取，通过rcvbl_amt_id关联实收流水表，且应收流水表需过滤org_no匹配@org。4. 本次电费结清标志通过代码表(m_p_code)翻译，code_type='amtSettleFlag'，value对应实收流水的settle_flag，且take_effect_flag=1。5. 结果按供电单位、用户编号、应收年月排序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "应收年月",
+      "实收年月",
+      "实收日期",
+      "应收总金额",
+      "本次实收金额",
+      "应收违约金",
+      "本次实收违约金",
+      "本次电费结清标志"
+    ],
+    "complexity": "complex",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.rcvbl_ym 应收年月,b.rcved_ym 实收年月,b.rcved_date 实收日期,c.rcvbl_amt 应收总金额,\nb.this_rcved_amt 本次实收金额,rcvbl_penalty 应收违约金,this_penalty 本次实收违约金,p3.name 本次电费结清标志\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_a_rcved_flow b on a.cons_no=b.cons_no \njoin (\nselect id rcvbl_amt_id,rcvbl_amt from m_a_rcvbl_flow where org_no like concat(@org,'%') and id not in (select id from m_a_rcvbl_flow_arc where org_no like concat(@org,'%'))\nunion all\nselect id rcvbl_amt_id,rcvbl_amt from m_a_rcvbl_flow_arc where org_no like concat(@org,'%')\n) c on b.rcvbl_amt_id=c.rcvbl_amt_id\nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='amtSettleFlag' and p3.value=b.settle_flag\norder by 供电单位,用户编号,应收年月",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_a_rcvbl_flow",
+      "m_a_rcvbl_flow_arc",
+      "m_a_rcved_flow",
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2026年1月单位编码以'5100102'开头的用户发行电量电费信息，包括单位编码、单位名称、户号、户名、费控类型、用电类别、电压等级、电价编码、电价名称、电量、电费，并按户号、电价编码、费控类型分组汇总。",
+    "business_rules": "1. 主表m_e_cons_snap_arc（用户快照）与m_e_cons_prc_amt_arc（用户电价电费）通过a.id=b.calc_id关联，获取电费明细。2. 通过a.org_no关联ac_org获取单位名称。3. 通过b.para_vn和b.prc_code左关联m_e_cat_prc获取电价名称。4. 通过m_p_code表翻译代码：a.trade_type_code对应'tradeCode'分类得到行业类别（但未在select中使用），b.elec_type_code对应'elecTypeCode'分类得到用电类别，a.volt_code对应'psVoltCode'分类得到电压等级，a.ctl_mode对应'ctlMode'分类得到费控类型。5. 筛选条件：a.org_no like '5100102%'（单位编码前缀），a.ym=202601（电费年月）。6. 分组：a.cons_no, b.prc_code, a.ctl_mode。7. 汇总：sum(b.t_settle_pq)电量，sum(t_amt)电费。",
+    "search_keywords": [
+      "用户发行电量电费",
+      "电价名称",
+      "电价编码",
+      "户号",
+      "户名",
+      "电压等级",
+      "用电类别",
+      "费控类型",
+      "单位编码",
+      "电费年月"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o.`name` 单位名称,a.cons_no 户号,a.cons_name 户名 ,p4.`name` 费控类型,p2.`name` `用电类别`,p3.name 电压等级,b.prc_code 电价编码,c.cat_prc_name 电价名称 ,sum(b.t_settle_pq) 电量,sum(t_amt) 电费 from m_e_cons_snap_arc a join m_e_cons_prc_amt_arc b on a.id=b.calc_id join ac_org o on a.org_no=o.id left join m_e_cat_prc c on b.para_vn=c.para_vn and b.prc_code=c.prc_code left join m_p_code p1 on p1.code_type='tradeCode' and p1.`value`=a.trade_type_code left join m_p_code p2 on p2.code_type='elecTypeCode' and p2.`value`=b.elec_type_code left join m_p_code p3 on p3.code_type='psVoltCode' and p3.`value`=a.volt_code left join m_p_code p4 on p4.code_type='ctlMode' and p4.`value`=a.ctl_mode where a.org_no like '5100102%' and a.ym=202601 group by a.cons_no,b.prc_code,a.ctl_mode",
+    "title": "用户发行电量电费信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_e_cat_prc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有状态正常的用电客户（状态码0,1,2,3）的计量点信息，包括供电单位名称、用户编号、用户名称、计量点编号、表计编号、示数段名称、示数位数、最近一次示数、最近一次抄表日期、计量点用途名称，并按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联：m_c_cons 通过 org_no 关联 ac_org 获取供电单位名称，且 ac_org.id 以 @org 开头（@org 为传入参数）。2. m_c_mp 关联条件：type_code='01'（用电客户计量点），status_code in ('01','02')（正常状态）。3. m_c_meter 通过 mp_id 和 cons_id 关联。4. m_c_meter_read 通过 mp_id 和 meter_id 关联。5. 左连接 m_p_code 两次：一次用于翻译 read_type_code 为示数段名称（code_type='readtypecode'），一次用于翻译 usage_code 为计量点用途名称（code_type='usageTypeCode'）。6. 过滤条件：a.status_code in ('0','1','2','3') 表示用户状态正常。7. 排序：按供电单位名称和用户编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "计量点编号",
+      "表计编号",
+      "示数段",
+      "示数位数",
+      "最近一次示数",
+      "最近一次抄表日期",
+      "计量点用途"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.mp_no 计量点编号,c.made_no 表计编号,p1.name 示数段,d.mr_digit 示数位数,d.mr_read 最近一次示数,\nd.mr_date 最近一次抄表日期,p2.name 计量点用途\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_mp b on a.id=b.cons_id and b.type_code='01' and b.status_code in ('01','02') \njoin m_c_meter c on b.id=c.mp_id and a.id=c.cons_id \njoin m_c_meter_read d on b.id=d.mp_id and c.id=d.meter_id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='readtypecode' and p1.value=d.read_type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='usageTypeCode' and p2.value=d.usage_code \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_meter_read",
+      "m_c_mp",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询管理单位为5100102开头的、短信模板为outageNotice且组织机构为510、发送状态为成功的短信发送记录，显示管理单位、户号、户名、短信类别、短信状态、接收号码、生成时间、发送时间、短信内容和发送人，时间范围在2025-01-01到2026-01-01之间。",
+    "business_rules": "1. 表关联：m_c_cons左连接ac_org（通过cons.org_no=ac.id），左连接m_st_sms_send_record（通过ms.rela_id=cons.id），左连接m_st_message_template（通过ms.template_code=mt.code），左连接ac_user（通过ms.create_user=user.login_name）。2. 枚举值翻译：ms.send_status='00'翻译为'发送成功'，其他为'发送失败'。3. 筛选条件：cons.org_no LIKE '5100102%'，ms.generate_time BETWEEN '2025-01-01 00:00:00' AND '2026-01-01 00:00:00'，mt.code='outageNotice'，mt.org_no=510，ms.send_status='00'。",
+    "search_keywords": [
+      "短信发送",
+      "发送记录",
+      "短信查询",
+      "户号",
+      "户名",
+      "管理单位",
+      "短信模板",
+      "outageNotice",
+      "发送状态",
+      "发送成功"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT ac.name 管理单位,cons.cons_no 户号,cons.cons_name 户名,mt.`name` 短信类别,CASE ms.send_status WHEN '00' THEN '发送成功' ELSE '发送失败' END 短信状态,ms.sms_phone 接收号码,ms.generate_time 生成时间,ms.send_time 发送时间,ms.sms_content 短信内容, user.user_name 发送人 FROM `m_c_cons` cons LEFT JOIN ac_org ac ON ac.id=cons.org_no LEFT JOIN m_st_sms_send_record ms ON ms.rela_id=cons.id LEFT JOIN m_st_message_template mt ON mt.`code`=ms.template_code LEFT JOIN ac_user `user` ON `user`.login_name=ms.create_user WHERE cons.org_no LIKE '5100102%' AND ms.generate_time BETWEEN '2025-01-01 00:00:00' AND '2026-01-01 00:00:00' AND mt.`code`='outageNotice' AND mt.org_no=510 AND ms.send_status='00'",
+    "title": "界面发送短信查询",
+    "tables_used": [
+      "ac_org",
+      "ac_user",
+      "m_c_cons",
+      "m_st_message_template",
+      "m_st_sms_send_record"
+    ]
+  },
+  {
+    "question": "查询单位编码为510010233及其下级单位的用户，在指定年月范围内的发行电量排名，显示户号、户名、总电量、总电费，按总电量降序取前100名；同时查询这些用户的详细信息，包括供电单位、用户编号、用户名称、用户状态、用电类别、供电电压、立户日期，以及202601和202602两个月的电量和电费，并计算202602电量相对于202601电量的浮动百分比。",
+    "business_rules": "1. 表关联：m_e_cons_snap_arc（快照表）与m_e_cons_prc_amt_arc（电量电费明细表）通过a.id=b.calc_id关联；m_e_cons_snap_arc与ac_org通过a.org_no=o.id关联；m_c_cons与ac_org通过cons.org_no=o.id关联。2. 单位过滤：org_no like '510010233%'，即查询该编码及其下级单位。3. 年月过滤：a.ym BETWEEN {开始年月} AND {截止年月}。4. 排序与限制：按总电量降序，取前100名。5. 字段翻译：用户状态、用电类别、供电电压需从代码表翻译为名称（p2.name, p1.name, p3.name），但SQL中未明确关联代码表，实际需补充。6. 计算逻辑：本月电量对比上月浮动百分比 = (202602电量-202601电量)/202602电量*100，保留两位小数。7. 综合查询：第一个子查询为排名，第二个子查询为详细信息，但SQL中两个select语句未合并，可能为两个独立查询。",
+    "search_keywords": [
+      "发行电量",
+      "排名",
+      "用户",
+      "电量",
+      "电费",
+      "供电单位",
+      "用户状态",
+      "用电类别",
+      "供电电压",
+      "浮动百分比"
+    ],
+    "complexity": "complex",
+    "sql": "select a.org_no 单位编码,o.`name` 单位名称,a.cons_no 户号,a.cons_name 户名 ,sum(b.t_settle_pq) 总电量,sum(t_amt) 总电费 from m_e_cons_snap_arc a join m_e_cons_prc_amt_arc b on a.id=b.calc_id join ac_org o on a.org_no=o.id where a.org_no like concat(510010233,'%') and a.ym BETWEEN {开始年月} AND {截止年月} group by a.cons_no ORDER BY `电量` DESC LIMIT 100 综合查询用电量前100名 select distinct o.name 供电单位,cons.cons_no 用户编号,cons.cons_name 用户名称,p2.name 用户状态,p1.name 用电类别,p3.name 供电电压, left(cons.build_date,10) 立户日期, 202601电量,202601电费,202602电量,202602电费,ROUND((202602电量-202601电量)/202602电量*100,2) 本月电量对比上月浮动百分比 from m_c_cons cons join ac_org o on cons.org_no=o.id and o.id like '510010233%'",
+    "title": "发行电量排名",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc"
+    ]
+  },
+  {
+    "question": "查询供电单位编码以'5100102'开头的所有用电客户的供电单位名称、电网户号、户名、用电地址、证件类型、证件号码、开户日期、联系方式（多个手机号用逗号分隔）和用电类型。",
+    "business_rules": "1. 主表m_c_cons通过org_no关联ac_org获取供电单位名称。2. 通过m_c_cons_cert_rela和m_c_cert关联获取证件信息，证件类型通过m_p_code（code_type='certType'）翻译。3. 通过m_c_cons_contact_rela和m_c_contact关联获取联系方式，多个联系方式用GROUP_CONCAT合并。4. 用电类型通过m_p_code（code_type='elecTypeCode'）翻译。5. 筛选条件：a.org_no like '5100102%'。6. 分组：按a.cons_no和c.id分组，避免重复。7. 排序：按a.cons_no升序。",
+    "search_keywords": [
+      "证件信息",
+      "用电客户",
+      "供电单位",
+      "电网户号",
+      "户名",
+      "地址",
+      "证件号码",
+      "联系方式",
+      "用电类型",
+      "开户日期"
+    ],
+    "complexity": "complex",
+    "sql": "select ac.name 供电单位,a.cons_no 电网户号,a.cons_name 户名,a.elec_addr 地址,p2.`name` 证件类型,c.cert_no 证件号码,left(a.build_date,10) 开户日期,GROUP_CONCAT(ct.mobile)联系方式 ,p1.`name` 用电类型 from m_c_cons a join ac_org ac on ac.id=a.org_no left join m_c_cons_cert_rela b on a.id=b.cons_id left join m_c_cert c on b.cert_id=c.id left join m_c_cons_contact_rela bc on a.id=bc.cons_id left join m_c_contact ct on bc.contact_id=ct.id left join m_p_code p1 on p1.code_type='elecTypeCode' and p1.`value`=a.elec_type_code left join m_p_code p2 on p2.code_type='certType' and p2.`value`=c.cert_type_code where a.org_no like '5100102%' group by a.cons_no,c.id order by a.cons_no",
+    "title": "证件信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cert",
+      "m_c_cons",
+      "m_c_cons_cert_rela",
+      "m_c_cons_contact_rela",
+      "m_c_contact",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有状态正常（0-3）的用电客户的基本信息，包括用户编号、用户名称、定价策略类型、基本电费计算方式、核定值、功率因数考核方式，并按供电单位和用户编号排序。",
+    "business_rules": "1. 表关联：m_c_cons 通过 org_no 关联 ac_org 的 id，且 ac_org.id 以 @org 参数开头（用于过滤指定供电单位及其下级）。2. 状态过滤：m_c_cons.status_code 只取 '0','1','2','3'，表示正常状态。3. 枚举值翻译：通过 m_p_code 表翻译 type_code（定价策略类型）、ba_calc_mode（基本电费计算方式）、pf_eval_mode（功率因数考核方式），关联条件为 take_effect_flag=1 且 code_type 对应。4. 排序：按供电单位名称和用户编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户信息",
+      "定价策略",
+      "基本电费计算方式",
+      "核定值",
+      "功率因数考核",
+      "用电客户",
+      "状态正常"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,p1.name 定价策略类型,p2.name 基本电费计算方式,b.dmd_spec_value 核定值,p3.name 功率因数考核方式\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_cons_prc_tactic b on a.id=b.cons_id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='prcTacticType' and p1.value=b.type_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='bacalcmode' and p2.value=b.ba_calc_mode \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='pfevalmode' and p3.value=b.pf_eval_mode \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc_tactic",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询供电单位代码以'5100102'开头的、用户状态为'9'（销户）的用户，其用户编号、用户名称、用户状态、表号、表计状态，以及单位名称。",
+    "business_rules": "1. 用户状态码'9'表示销户。2. 表计状态码通过m_p_code表翻译，code_type='meterStatus'。3. 用户状态通过m_p_code表翻译，code_type='statuscode'。4. 关联路径：m_c_cons -> m_c_sp (通过cons_id) -> m_c_mp (通过sp_id, 且mp.type_code='01'表示用电客户计量点) -> m_c_meter_mp_rela (通过mp_id) -> m_c_meter (通过meter_id) -> m_d_meter (通过id)。5. 单位名称通过ac_org关联，条件a.org_no like '5100102%'。",
+    "search_keywords": [
+      "销户",
+      "运行表计",
+      "用户状态",
+      "表计状态",
+      "用户编号",
+      "表号",
+      "单位名称",
+      "供电单位",
+      "计量点",
+      "用电客户"
+    ],
+    "complexity": "complex",
+    "sql": "select o1.name 单位名称,a.cons_no 用户编号,a.cons_name 用户名称,p21.name 用户状态,cm.made_no 表号,p22.name 表计状态 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' join m_c_meter_mp_rela cmmr on mp.id=cmmr.mp_id join m_c_meter cm on cmmr.meter_id=cm.id join m_d_meter mt on mt.id=cm.id left join m_p_code p21 on p21.code_type='statuscode' and p21.`value`=a.status_code left join m_p_code p22 on p22.code_type='meterStatus' and p22.`value`=mt.cur_status_code where a.org_no like '5100102%' and a.status_code='9'",
+    "title": "查询销户存在运行表计",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_meter",
+      "m_c_meter_mp_rela",
+      "m_c_mp",
+      "m_c_sp",
+      "m_d_meter",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征单位下所有台区的详细信息，包括单位名称、线路编号、线路名称、台区编号、台区名称、台区状态、公专变标志、容量和安装地址，要求台区状态和公专变标志显示为中文名称。",
+    "business_rules": "1. 台区表(m_g_tg)通过org_no关联组织机构表(ac_org)的id，且组织机构ID需以@org开头。2. 台区与线路通过m_g_line_tg_rela关联，且只取rela_flag=1的当前生效关系。3. 台区状态(run_status_code)通过m_p_code表翻译，code_type='runStatusCode'。4. 公专变标志(pub_priv_flag)通过m_p_code表翻译，code_type='pubprivflag'。5. 使用distinct去重。",
+    "search_keywords": [
+      "资中代征",
+      "台区",
+      "线路",
+      "公专变",
+      "台区状态",
+      "容量",
+      "安装地址",
+      "组织机构",
+      "代码翻译"
+    ],
+    "complexity": "medium",
+    "sql": "select distinct o.name 单位,line_no 线路编号,line_name 线路名称,tg_no 台区编号,tg_name 台区名称,p2.name 台区状态,p3.name 公专变标志,tg_cap 容量,a.inst_addr 安装地址\nfrom m_g_tg a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join m_g_line_tg_rela c on a.id=c.tg_id and rela_flag=1 \nleft join m_g_line d on c.line_id=d.id \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='runStatusCode' and p2.value=a.run_status_code \nleft join m_p_code p3 on p3.take_effect_flag=1 and p3.code_type='pubprivflag' and p3.value=a.pub_priv_flag",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_g_line",
+      "m_g_line_tg_rela",
+      "m_g_tg",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2023年12月单位编码以'5100150'开头的各用户各电价的电量电费信息，包括单位编码、单位名称、户号、户名、行业编码、行业名称、电价编码、电价名称、电量、电费。",
+    "business_rules": "1. 表关联：m_e_cons_snap_arc a 与 m_e_cons_prc_amt_arc b 通过 a.id = b.calc_id 关联；a 与 ac_org o 通过 a.org_no = o.id 关联；b 与 m_e_cat_prc c 通过 b.para_vn = c.para_vn 和 b.prc_code = c.prc_code 左连接；a 与 m_p_code p1 通过 p1.code_type='tradeCode' 和 p1.value = a.trade_type_code 左连接。2. 筛选条件：a.org_no like '5100150%' 且 a.ym=202312。3. 分组：按 a.cons_no, b.prc_code 分组。4. 聚合：sum(b.t_settle_pq) 为电量，sum(t_amt) 为电费。5. 行业名称通过代码表翻译。",
+    "search_keywords": [
+      "发行行业",
+      "电价信息",
+      "电量电费",
+      "用户查询",
+      "行业类别",
+      "电价编码",
+      "户号",
+      "电费年月",
+      "单位编码"
+    ],
+    "complexity": "medium",
+    "sql": "select a.org_no 单位编码,o.`name` 单位名称,a.cons_no 户号,a.cons_name 户名 ,a.trade_type_code 行业编码,p1.`name` 行业名称 ,b.prc_code 电价编码,c.cat_prc_name 电价名称 ,sum(b.t_settle_pq) 电量,sum(t_amt) 电费 from m_e_cons_snap_arc a join m_e_cons_prc_amt_arc b on a.id=b.calc_id join ac_org o on a.org_no=o.id left join m_e_cat_prc c on b.para_vn=c.para_vn and b.prc_code=c.prc_code left join m_p_code p1 on p1.code_type='tradeCode' and p1.`value`=a.trade_type_code where a.org_no like '5100150%' and a.ym=202312 group by a.cons_no,b.prc_code",
+    "title": "发行行业类别信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_e_cat_prc",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征单位下所有线路的详细信息，包括单位名称、变电站编号、变电站名称、线路编号、线路名称、线路电压、线路状态和导线长度。",
+    "business_rules": "1. 线路管理单位通过ac_org表关联，且单位ID需以@org参数开头。2. 线路与变电站通过m_g_subs_line_rela表关联，使用left join，可能无对应变电站。3. 线路电压从m_p_code表翻译，code_type='psVoltCode'且take_effect_flag=1。4. 线路状态从m_p_code表翻译，code_type='runStatusCode'且take_effect_flag=1。5. 使用distinct去重。",
+    "search_keywords": [
+      "资中代征",
+      "线路",
+      "变电站",
+      "导线长度",
+      "线路电压",
+      "线路状态",
+      "单位",
+      "代码翻译"
+    ],
+    "complexity": "medium",
+    "sql": "select distinct o.name 单位,subs_no 变电站编号,subs_name 变电站名称,line_no 线路编号,line_name 线路名称,p1.name 线路电压,p2.name 线路状态,wire_len 导线长度\nfrom m_g_line a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join m_g_subs_line_rela b on a.id=b.line_id \nleft join m_g_subs c on b.subs_id=c.id \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='psVoltCode' and p1.value=a.volt_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='runStatusCode' and p2.value=a.run_status_code",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_g_line",
+      "m_g_subs",
+      "m_g_subs_line_rela",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2025年全年各月电量和电费，展示供电单位、用户编号、用户名称、主户号、用户状态、用电类别、供电电压、立户日期，并筛选供电单位ID以'5100102'开头的用户。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过cons.org_no=o.id关联，且o.id like '5100102%'。2. 枚举值翻译：用户状态、用电类别、供电电压分别通过p2.name、p1.name、p3.name获取，但SQL中未定义p1、p2、p3，实际需关联其他字典表。3. 立户日期：使用left(cons.build_date,10)截取前10位。4. 全年电量和电费：按月列出2025年1月至12月的电量和电费字段，但SQL中未定义这些字段的来源，实际需关联其他表。5. 去重：使用distinct。",
+    "search_keywords": [
+      "全年电费",
+      "电量",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "主户号",
+      "用户状态",
+      "用电类别",
+      "供电电压",
+      "立户日期"
+    ],
+    "complexity": "complex",
+    "sql": "select distinct o.name 供电单位,cons_no 用户编号,cons_name 用户名称,cons.tmp_pay_rela_no 主户号,p2.name 用户状态,p1.name 用电类别,p3.name 供电电压, left(cons.build_date,10) 立户日期,2025年1月电量,2025年1月电费,2025年2月电量,2025年2月电费,2025年3月电量,2025年3月电费,2025年4月电量,2025年4月电费,2025年5月电量,2025年5月电费,2025年6月电量,2025年6月电费,2025年7月电量,2025年7月电费,2025年8月电量,2025年8月电费,2025年9月电量,2025年9月电费,2025年10月电量,2025年10月电费,2025年11月电量,2025年11月电费,2025年12月电量,2025年12月电费 from m_c_cons cons join ac_org o on cons.org_no=o.id and o.id like '5100102%'",
+    "title": "全年电费",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询市场化业扩推送记录，显示用户名称、推送时间、流程编号、业务类型、推送内容、用户编号，筛选条件为管理单位（根据输入的组织机构编号模糊匹配），并按管理单位排序。",
+    "business_rules": "1. 关联m_c_cons和ac_org：通过a.org_no=o1.id获取管理单位名称。2. 关联m_s_market_push_log：通过ms.cons_id=a.id获取推送日志。3. 左关联m_s_app_arc：通过app.app_no=ms.app_no获取申请信息。4. 左关联m_p_code：通过p1.value=app.app_type_code且p1.code_type='meterIrProcess'获取业务类型名称。5. 推送状态翻译：ms.status为'1'时显示'成功'，否则显示'失败'。6. 筛选条件：a.org_no like concat(@org_no,'%')，即管理单位编号以输入参数开头。7. 排序：按a.org_no升序。",
+    "search_keywords": [
+      "市场化业扩",
+      "推送查询",
+      "用户名称",
+      "推送时间",
+      "流程编号",
+      "业务类型",
+      "推送内容",
+      "用户编号",
+      "管理单位",
+      "推送状态"
+    ],
+    "complexity": "medium",
+    "sql": "select o1.`name` 管理单位,a.cons_no 用户编号,a.cons_name 用户名称,ms.app_no 流程编号,ms.create_time 推送时间,p1.name 业务类型, (case ms.status when '1' then '成功' else '失败' end) 推送状态,ms.req_content 推送内容 from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_s_market_push_log ms on ms.cons_id=a.id left join m_s_app_arc app on app.app_no=ms.app_no left join m_p_code p1 on p1.value=app.app_type_code and p1.code_type='meterIrProcess' where a.org_no like concat(@org_no,'%') order by a.org_no",
+    "title": "市场化业扩推送查询",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_p_code",
+      "m_s_app_arc",
+      "m_s_market_push_log"
+    ]
+  },
+  {
+    "question": "查询用户编号为'010217000007'的供电所、户号、户名、钱包余额、电费欠费、欠违约金和总欠费信息。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过cons.org_no关联ac_org.id，获取供电所名称；m_c_cons与m_a_rcvbl_flow通过cons.cons_no=m.cons_no左连接，获取应收实收数据；m_a_rcvbl_flow与m_a_acct_bal通过m.cons_no=bal.cons_no左连接，获取钱包余额。2. 计算逻辑：电费欠费=SUM(rcvbl_amt-rcved_amt)；欠违约金=SUM(rcvbl_penalty-rcved_penalty)；总欠费=SUM((rcvbl_amt-rcved_amt)+(rcvbl_penalty-rcved_penalty))。3. 筛选条件：cons.cons_no IN('010217000007')。4. 分组：按m.cons_no分组。",
+    "search_keywords": [
+      "欠费",
+      "电费欠费",
+      "违约金",
+      "钱包余额",
+      "用户编号",
+      "供电所",
+      "户号",
+      "户名",
+      "应收",
+      "实收"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT ac.name 供电所,cons.cons_no 户号,cons.cons_name 户名,bal.prepay_bal 钱包余额,SUM(m.rcvbl_amt-m.rcved_amt) 电费欠费,SUM(m.rcvbl_penalty-m.rcved_penalty) 欠违约金,SUM((m.rcvbl_amt-m.rcved_amt)+(m.rcvbl_penalty-m.rcved_penalty)) 总欠费 FROM `m_c_cons` cons join ac_org ac on ac.id=cons.org_no LEFT JOIN `m_a_rcvbl_flow` m ON cons.cons_no=m.cons_no LEFT JOIN m_a_acct_bal bal ON bal.cons_no=m.cons_no WHERE cons.cons_no IN('010217000007') GROUP BY m.cons_no",
+    "title": "当前欠费信息查询",
+    "tables_used": [
+      "ac_org",
+      "m_a_acct_bal",
+      "m_a_rcvbl_flow",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询资中代征单位下所有变电站的编号、名称、电压等级、运行状态、主变台数、主变容量和地址。",
+    "business_rules": "1. 变电站管理单位通过ac_org表关联，且单位ID需以@org参数开头。2. 电压等级和运行状态通过m_p_code表翻译，分别使用code_type='psVoltCode'和'runStatusCode'，且只取生效记录(take_effect_flag=1)。3. 使用distinct去重。",
+    "search_keywords": [
+      "资中代征",
+      "变电站",
+      "电压等级",
+      "运行状态",
+      "主变容量",
+      "主变台数",
+      "变电站地址",
+      "ac_org",
+      "m_g_subs",
+      "m_p_code"
+    ],
+    "complexity": "medium",
+    "sql": "select distinct o.name 单位,subs_no 变电站编号,subs_name 变电站名称,p1.name 电压等级,p2.name 运行状态,mt_num 主变台数,mt_cap 主变容量,subs_addr 变电站地址\nfrom m_g_subs a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='psVoltCode' and p1.value=a.volt_code \nleft join m_p_code p2 on p2.take_effect_flag=1 and p2.code_type='runStatusCode' and p2.value=a.run_status_code",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_g_subs",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询每个电价码下有多少个用户在执行该电价，要求统计用户数量（去重），筛选条件：组织机构代码以指定值开头，用户状态不为'9'，计量点状态为'01'或'02'。",
+    "business_rules": "1. 表关联：m_c_cons通过org_no关联ac_org获取组织机构信息；m_c_cons通过id关联m_c_sp的cons_id；m_c_sp通过id关联m_c_cons_prc_tactic的sp_id；m_c_sp通过id关联m_c_mp的sp_id；m_c_mp通过tariff_id左关联m_c_cons_prc的id。2. 筛选条件：a.org_no like concat(@org_no,'%')表示组织机构代码以指定值开头；a.status_code<>'9'表示用户状态不为'9'（通常'9'代表注销或删除）；mp.status_code in('01','02')表示计量点状态为运行或停用。3. 统计逻辑：count(distinct a.cons_no)按用户编号去重统计用户数。4. 分组：按consprc.prc_code电价码分组。",
+    "search_keywords": [
+      "电价码",
+      "用户数",
+      "执行电价",
+      "组织机构",
+      "用户状态",
+      "计量点状态",
+      "去重统计",
+      "m_c_cons_prc",
+      "m_c_cons"
+    ],
+    "complexity": "medium",
+    "sql": "select consprc.prc_code 电价码,count(distinct a.cons_no) from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id left join m_c_cons_prc consprc on mp.tariff_id=consprc.id where a.org_no like concat(@org_no,'%') and a.status_code<>'9' and mp.status_code in('01','02') GROUP BY consprc.prc_code",
+    "title": "查询电价码有多少个用户执行",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc",
+      "m_c_cons_prc_tactic",
+      "m_c_mp",
+      "m_c_sp"
+    ]
+  },
+  {
+    "question": "查询组织机构代码为'5100102'的单位在2024年1月至2025年3月期间，参数代码为'AMTYM'的账期值及其生效时间和失效时间。",
+    "business_rules": "1. 表关联：m_p_syspara_value通过org_no与ac_org的code关联，获取组织机构名称。2. 参数筛选：通过子查询从m_p_syspara表中筛选para_code='AMTYM'的id，用于限定m_p_syspara_value的para_id。3. 时间格式化：使用DATE_FORMAT将effect_time和expire_time格式化为'%Y-%m-%d %H:%i:%s'，其中expire_time为空时显示空字符串。4. 值范围：筛选value在202401到202503之间的记录。5. 分组：按value分组，确保每个账期值只显示一条记录。",
+    "search_keywords": [
+      "账期",
+      "参数值",
+      "生效时间",
+      "失效时间",
+      "组织机构",
+      "AMTYM",
+      "时间范围",
+      "分组"
+    ],
+    "complexity": "medium",
+    "sql": "select ac.`name`,sy.`value`,DATE_FORMAT(sy.effect_time, '%Y-%m-%d %H:%i:%s') 生效时间, DATE_FORMAT(ifnull(sy.expire_time,''), '%Y-%m-%d %H:%i:%s') 失效时间 from m_p_syspara_value sy LEFT JOIN ac_org ac ON ac.`code`=sy.org_no where sy.para_id in (select id from m_p_syspara where para_code = 'AMTYM') and sy.org_no='5100102' and sy.`value` BETWEEN 202401 AND 202503 GROUP BY sy.`value`",
+    "title": "账期时间查询",
+    "tables_used": [
+      "ac_org",
+      "m_p_syspara",
+      "m_p_syspara_value"
+    ]
+  },
+  {
+    "question": "查询供电单位以'5100102'开头的用电客户的户号、户名、供电单位名称、城农网标志和票据类型，其中城农网标志从代码表翻译，票据类型从代码表翻译，且客户状态不为9。",
+    "business_rules": "1. 表关联：m_c_cons与ac_org通过org_no关联，与m_p_code通过code_type和value关联，分别翻译rural_cons_code和note_type_code。2. 枚举值翻译：rural_cons_code对应code_type='ruralConsCode'的name，note_type_code对应code_type='notetypecode'的name。3. 状态码含义：status_code='9'表示已销户或无效状态，查询排除该状态。4. 筛选条件：org_no like '5100102%'表示只查询该供电单位及其下属单位。",
+    "search_keywords": [
+      "城农网标志",
+      "票据类型",
+      "供电单位",
+      "户号",
+      "户名",
+      "用电客户",
+      "代码翻译",
+      "状态排除"
+    ],
+    "complexity": "medium",
+    "sql": "select ac.name 供电单位,cons.cons_no 户号,cons.cons_name 户名,p1.name 城农网标志,p2.name 票据类型 from m_c_cons cons join ac_org ac on ac.id=cons.org_no left join m_p_code p1 on p1.code_type='ruralConsCode' and p1.`value`=cons.rural_cons_code left join m_p_code p2 on p2.code_type='notetypecode' and p2.`value`=cons.note_type_code where cons.org_no like '5100102%' and cons.status_code<>'9'",
+    "title": "城农网标志",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询所有计量点级别为空的计量点信息，包括供电所名称、户号、计量点编号、计量点名称、电费计算方式，且计量点类型为用电客户。",
+    "business_rules": "1. 表关联：m_c_cons（用户）通过org_no关联ac_org（组织机构）获取供电所名称；通过id关联m_c_sp（受电点）的cons_id；m_c_sp通过id关联m_c_cons_prc_tactic（定价策略）的sp_id；m_c_sp通过id关联m_c_mp（计量点）的sp_id，且计量点类型type_code='01'（用电客户）。2. 电费计算方式：通过m_p_code表翻译，code_type='calcMode'，value对应mp.calc_mode。3. 筛选条件：mp.mp_level IS NULL，即计量点级别为空。",
+    "search_keywords": [
+      "计量点",
+      "无级别",
+      "供电所",
+      "户号",
+      "电费计算方式",
+      "用电客户",
+      "计量点名称",
+      "计量点编号"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT o1.name 供电所,a.cons_no 户号,mp.mp_no 计量点编号,mp.mp_name 计量点名称,p1.name 电费计算方式,mp.mp_level from m_c_cons a join ac_org o1 on a.org_no=o1.id join m_c_sp c on a.id=c.cons_id join m_c_cons_prc_tactic e on c.id=e.sp_id join m_c_mp mp on c.id=mp.sp_id and mp.type_code='01' left join m_p_code p1 on p1.code_type='calcMode' and p1.`value`=mp.calc_mode WHERE mp.mp_level IS NULL",
+    "title": "计量点无级别数",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_prc_tactic",
+      "m_c_mp",
+      "m_c_sp",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询资中代征供电所下所有状态为正常（0、1、2、3）的用户的预收余额信息，包括用户编号、用户名称、余额、余额类型，并按供电单位和用户编号排序。",
+    "business_rules": "1. 用户表m_c_cons通过org_no关联组织机构表ac_org，且ac_org的id以@org参数开头（即只查询指定供电所及其下级）。2. 用户表m_c_cons通过cons_no关联账户余额表m_a_acct_bal。3. 余额类型通过码表m_p_code翻译，条件为take_effect_flag=1且code_type='prepayCode'，value对应b.bal_type。4. 用户状态status_code只取'0','1','2','3'（正常状态）。5. 结果按供电单位名称和用户编号排序。",
+    "search_keywords": [
+      "资中代征",
+      "预收余额",
+      "用户编号",
+      "用户名称",
+      "余额类型",
+      "供电单位",
+      "用户状态",
+      "码表翻译"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,b.prepay_bal 余额,p1.name 余额类型\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_a_acct_bal b on a.cons_no=b.cons_no \nleft join m_p_code p1 on p1.take_effect_flag=1 and p1.code_type='prepayCode' and p1.value=b.bal_type \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_a_acct_bal",
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询2026年2月县间交易中，某供电公司（ID为5100118）及其下级所有单位中，deal_obj为2（其他县公司）的趸购结算电量和金额，按deal_obj分组，金额和电量分别以万元为单位显示。",
+    "business_rules": "1. 表关联：m_e_bulkpur_pq的org_no字段关联ac_org的id字段，通过ac_org的id_path字段实现层级查询，获取指定单位及其所有下级单位。2. 枚举值：deal_obj=2表示'其他县公司'。3. 计算逻辑：金额t_amt和电量bulkpur_pq分别求和后除以10000，转换为万元单位，并保留两位小数。4. 筛选条件：deal_ym='202602'，且org_no在指定单位及其下级单位中。",
+    "search_keywords": [
+      "县间交易",
+      "趸购结算",
+      "其他县公司",
+      "供电公司",
+      "生产经营",
+      "报表",
+      "2026年2月",
+      "万元",
+      "层级查询",
+      "id_path"
+    ],
+    "complexity": "complex",
+    "sql": "SELECT deal_obj, round(ifnull(sum(t_amt),0)/10000,2) as '36:4.县间交易', round(ifnull(sum(bulkpur_pq),0)/10000,2) as '19:4.县间交易' FROM m_e_bulkpur_pq WHERE deal_ym ='202602' and org_no in (SELECT a.id FROM ac_org a WHERE a.id_path LIKE ( SELECT CONCAT(ao.id_path, '%') FROM ac_org ao WHERE ao.id = '5100118' ) AND a.type = 0) and deal_obj='2' GROUP BY deal_obj",
+    "title": "发供一体（供电）公司生产经营情况报表_新",
+    "tables_used": [
+      "ac_org",
+      "m_e_bulkpur_pq"
+    ]
+  },
+  {
+    "question": "查询指定用户编号列表的供电所、户号、钱包余额、电费欠费、欠违约金和总欠费。",
+    "business_rules": "1. 表关联：m_a_rcvbl_flow 通过 org_no 关联 ac_org 获取供电所名称，通过 cons_no 关联 m_a_acct_bal 获取钱包余额。2. 欠费计算：电费欠费 = rcvbl_amt - rcved_amt；欠违约金 = rcvbl_penalty - rcved_penalty；总欠费 = 电费欠费 + 欠违约金。3. 筛选条件：WHERE m.cons_no IN() 表示用户编号列表需由外部传入。4. 分组：按 cons_no 分组，每个用户一行。",
+    "search_keywords": [
+      "欠费",
+      "余额",
+      "违约金",
+      "供电所",
+      "户号",
+      "电费",
+      "应收",
+      "实收",
+      "用户编号"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT a.`name` 供电所,m.cons_no 户号,bal.prepay_bal 钱包余额,SUM(m.rcvbl_amt-m.rcved_amt) 电费欠费,SUM(m.rcvbl_penalty-m.rcved_penalty) 欠违约金,SUM((m.rcvbl_amt-m.rcved_amt)+(m.rcvbl_penalty-m.rcved_penalty)) 总欠费 FROM `m_a_rcvbl_flow` m JOIN ac_org a ON m.org_no=a.id join m_a_acct_bal bal ON bal.cons_no=m.cons_no WHERE m.cons_no IN() GROUP BY m.cons_no",
+    "title": "当前欠费及余额",
+    "tables_used": [
+      "ac_org",
+      "m_a_acct_bal",
+      "m_a_rcvbl_flow"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下状态为正常、暂停、销户的用电客户的用户编号、用户名称和身份证号码，其中证件类型为身份证。",
+    "business_rules": "1. 关联ac_org表获取供电单位名称，关联条件为m_c_cons.org_no = ac_org.id，且ac_org.id以@org参数开头（@org为资中代征对应的组织机构ID）。2. 关联m_c_cons_cert_rela表获取用户与证件的关系，关联条件为m_c_cons.id = m_c_cons_cert_rela.cons_id。3. 关联m_c_cert表获取证件信息，关联条件为m_c_cons_cert_rela.cert_id = m_c_cert.id，且证件类型编码为'01'（身份证），若为空则视为非身份证。4. 用户状态码status_code取值'0'（正常）、'1'（暂停）、'2'（销户）、'3'（其他有效状态），筛选出这些状态的用户。5. 结果按供电单位名称和用户编号排序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "身份证",
+      "用电客户",
+      "组织机构",
+      "证件类型",
+      "状态码",
+      "正常",
+      "暂停",
+      "销户"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,c.cert_no 身份证\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_cons_cert_rela b on a.id=b.cons_id \njoin m_c_cert c on b.cert_id=c.id and ifnull(c.cert_type_code,'')='01' \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cert",
+      "m_c_cons",
+      "m_c_cons_cert_rela"
+    ]
+  },
+  {
+    "question": "查询资中代征单位下各抄表段的新编号、原编号、名称及用户数，按单位和抄表段排序。",
+    "business_rules": "1. 关联ac_org表时，使用org_no与id关联，并过滤org_no以'5100434'开头的组织机构。2. 左连接tmp_prc.xls_add_sect表，关联字段为mr_sect_no。3. 分组字段包括单位名称、抄表段新编号、抄表段编号、抄表段名称。4. 排序按单位名称和抄表段新编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "抄表段",
+      "用户数",
+      "组织机构",
+      "mr_sect_no",
+      "ac_org",
+      "m_c_cons",
+      "tmp_prc.xls_add_sect"
+    ],
+    "complexity": "medium",
+    "sql": "select * from tmp_prc.xls_add_sect\nselect o.name 单位,e.mr_sect_no 抄表段新编号,抄表段编号,抄表段名称,count(a.id) 用户数\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \nleft join tmp_prc.xls_add_sect on a.mr_sect_no=e.mr_sect_no\ngroup by o.name,e.mr_sect_no,抄表段编号,抄表段名称\norder by 1,2\nset @org:='5100434'",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "tmp_prc.xls_add_sect"
+    ]
+  },
+  {
+    "question": "查询资中代征供电单位下所有状态为正常（0、1、2、3）的用电客户的用户编号、用户名称和联系电话，并按供电单位和用户编号排序。",
+    "business_rules": "1. 关联ac_org表时，使用org_no与ac_org.id关联，并通过like concat(@org,'%')过滤出指定供电单位及其下级单位。2. 关联m_c_cons_contact_rela和m_c_contact获取联系电话，取mobile字段。3. 状态码status_code为'0','1','2','3'表示正常状态。4. 排序按供电单位名称和用户编号升序。",
+    "search_keywords": [
+      "资中代征",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "联系电话",
+      "用电客户",
+      "状态正常",
+      "排序"
+    ],
+    "complexity": "medium",
+    "sql": "select\no.name 供电单位,a.cons_no 用户编号,a.cons_name 用户名称,c.mobile 联系电话\nfrom m_c_cons a \njoin ac_org o on a.org_no=o.id and o.id like concat(@org,'%') \njoin m_c_cons_contact_rela b on a.id=b.cons_id \njoin m_c_contact c on b.contact_id=c.id \nwhere a.status_code in ('0','1','2','3')\norder by 供电单位,用户编号",
+    "title": "资中代征",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons",
+      "m_c_cons_contact_rela",
+      "m_c_contact"
+    ]
+  },
+  {
+    "question": "查询供电单位编号以'5100105'开头的、状态不为已注销（status_code不等于9）且有关联户（tmp_pay_rela_no不为空）的用电客户，显示其主户号、户号、户名以及档案票据类型（通过note_type_code关联代码表m_p_code，代码分类为'noteTypeCode'）。",
+    "business_rules": "1. 表关联：m_c_cons（别名cons）左连接m_p_code（别名p1），关联条件为p1.value = cons.note_type_code且p1.code_type = 'noteTypeCode'，用于翻译note_type_code为名称。2. 筛选条件：cons.tmp_pay_rela_no不为空（表示该户为关联户中的子户）；cons.org_no以'5100105'开头（限定供电单位）；cons.status_code不等于9（9表示已注销，排除已注销用户）。3. 输出字段：tmp_pay_rela_no作为主户号，cons_no作为户号，cons_name作为户名，p1.name作为档案票据类型。",
+    "search_keywords": [
+      "关联户",
+      "主户号",
+      "户号",
+      "户名",
+      "档案票据类型",
+      "供电单位",
+      "状态码",
+      "代码表",
+      "note_type_code",
+      "tmp_pay_rela_no"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT cons.tmp_pay_rela_no 主户号,cons.cons_no 户号,cons.cons_name 户名,p1.`name` 档案票据类型 FROM `m_c_cons` cons LEFT JOIN m_p_code p1 ON p1.`value`=cons.note_type_code AND p1.code_type='noteTypeCode' WHERE cons.tmp_pay_rela_no is not null and cons.org_no like'5100105%' and cons.status_code<>9",
+    "title": "关联户查询",
+    "tables_used": [
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询用户编号为'010218316022'、应收年月为'202601'且存在已打印（票据使用状态为'01'）的电费发票或电费收据（票据类型为'0101'或'0102'）的应收电费流水记录。",
+    "business_rules": "1. 表关联：m_a_inv.rcvbl_amt_id = m_a_rcvbl_flow_arc.id，即发票记录关联到应收流水。2. 票据使用状态：'01'表示已打印。3. 票据类型：'0101'表示电费发票，'0102'表示电费收据。4. 筛选条件：用户编号cons_no='010218316022'，应收年月rcvbl_ym='202601'。",
+    "search_keywords": [
+      "大小发票打印",
+      "电费发票",
+      "电费收据",
+      "已打印",
+      "应收流水",
+      "用户编号",
+      "应收年月",
+      "票据状态",
+      "票据类型"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT * FROM m_a_rcvbl_flow_arc flow WHERE flow.cons_no = '010218316022' AND rcvbl_ym = '202601' AND EXISTS (select 1 from m_a_inv inv where inv.rcvbl_amt_id = flow.id and inv.note_use_state ='01' AND inv.note_type_code in('0101','0102'))",
+    "title": "大小发票打印查询",
+    "tables_used": [
+      "m_a_inv",
+      "m_a_rcvbl_flow_arc"
+    ]
+  },
+  {
+    "question": "查询用户编号为'010218316022'、应收年月为'202601'且存在已打印的电费发票或电费收据的应收电费流水记录。",
+    "business_rules": "1. 表关联：m_a_rcvbl_flow与m_a_inv通过m_a_inv.rcvbl_amt_id = m_a_rcvbl_flow.id关联。2. 枚举值：m_a_inv.note_use_state='01'表示已打印；m_a_inv.note_type_code in('0101','0102')表示电费发票和电费收据。3. 筛选条件：cons_no='010218316022'，rcvbl_ym='202601'。",
+    "search_keywords": [
+      "大小发票打印",
+      "电费发票",
+      "电费收据",
+      "已打印",
+      "用户编号",
+      "应收年月",
+      "应收电费流水",
+      "票据状态"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT * FROM m_a_rcvbl_flow flow WHERE flow.cons_no = '010218316022' AND rcvbl_ym = '202601' AND EXISTS (select 1 from m_a_inv inv where inv.rcvbl_amt_id = flow.id and inv.note_use_state ='01' AND inv.note_type_code in('0101','0102'))",
+    "title": "大小发票打印查询",
+    "tables_used": [
+      "m_a_inv",
+      "m_a_rcvbl_flow"
+    ]
+  },
+  {
+    "question": "查询供电单位编码以'5100108'开头的用户中，2025年2月到7月抄表电量连续为0的用户信息，包括供电单位、用户编号、用户名称、用户状态、用电类别、供电电压、立户日期、2025年2到7月电量、2025年2到7月电费。",
+    "business_rules": "1. 表关联：m_c_cons通过org_no关联ac_org的id，且ac_org.id以'5100108'开头，表示特定供电单位。2. 字段翻译：cons_name为用户名称，cons_no为用户编号，cons.build_date为立户日期，p1.name为用电类别，p2.name为用户状态，p3.name为供电电压。3. 电量电费字段：SQL中直接写为'2025年2到7月电量'和'2025年2到7月电费'，实际应为计算字段，但此处未展示计算逻辑。4. 去重：使用distinct避免重复记录。",
+    "search_keywords": [
+      "抄表电量连续为0",
+      "2-7月",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "用户状态",
+      "用电类别",
+      "供电电压",
+      "立户日期",
+      "电量电费"
+    ],
+    "complexity": "complex",
+    "sql": "select distinct o.name 供电单位,cons_no 用户编号,cons_name 用户名称,p2.name 用户状态,p1.name 用电类别,p3.name 供电电压, left(cons.build_date,10) 立户日期,2025年2到7月电量,2025年2到7月电费 from m_c_cons cons join ac_org o on cons.org_no=o.id and o.id like '5100108%'",
+    "title": "查询2-7月抄表电量连续为0",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询5-7月份发行电量电费信息，包括供电单位、用户编号、用户名称、用户状态、用电类别、供电电压、立户日期，以及2025年8月的电量和电费，其中供电单位ID以'5100102'开头。",
+    "business_rules": "1. 表关联：m_c_cons通过org_no关联ac_org的id，且ac_org.id以'5100102'开头。2. 字段翻译：cons_sort_code对应用户状态（01高压，02低压非居民，03低压居民），但SQL中使用了p2.name，推测p2是关联表，但未在表结构中给出，实际可能为字典表。3. 用电类别：elec_type_code对应p1.name，供电电压：volt_code对应p3.name，均需关联字典表。4. 立户日期：取build_date的前10位（yyyy-MM-dd）。5. 2025年8月电量、电费字段未在表结构中给出，可能来自其他表或计算字段。6. 使用distinct去重。",
+    "search_keywords": [
+      "发行电量",
+      "电费",
+      "用户信息",
+      "供电单位",
+      "用电类别",
+      "供电电压",
+      "立户日期",
+      "5-7月",
+      "2025年8月"
+    ],
+    "complexity": "complex",
+    "sql": "select distinct o.name 供电单位,cons_no 用户编号,cons_name 用户名称,p2.name 用户状态,p1.name 用电类别,p3.name 供电电压, left(cons.build_date,10) 立户日期, 2025年8月电量,2025年8月电费 from m_c_cons cons join ac_org o on cons.org_no=o.id and o.id like '5100102%'",
+    "title": "查询5-7月份发行电量电费信息",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询自有电站的总发电量（含厂用电量）、厂用电量，以及外购电费中的购光伏电费和购国网电量电费，还有县间交易的电量电费。",
+    "business_rules": "1. 自有电站总发电量：管理机构为自有电站的用户，计量点为发电关口。2. 自有电站厂用电量：管理机构为自有电站的用户，计量点为发电关口电量减去上网关口电量。3. 外购电费-购光伏：发电方式为太阳能发电的用户结算电费，包括市场化电费和差价电价。4. 购国网电量电费：购电侧管理机构为购国网的电量电费。5. 县间交易：购电侧管理-电网间结算管理-趸购电量电价录入，交易对象为“县间结算”的电量电费。",
+    "search_keywords": [
+      "自有电站",
+      "总发电量",
+      "厂用电量",
+      "外购电费",
+      "购光伏",
+      "购国网",
+      "县间交易",
+      "发电关口",
+      "上网关口",
+      "太阳能发电"
+    ],
+    "complexity": "complex",
+    "sql": "2:自有电站总发电量(含厂用电量） 查询管理机构为自有电站的用户，且计量点为发电关口的电量。 3:自有电站厂用电量 查询管理机构为自有电站的用户，计量点为发电关口的电量-计量点为上网关口的电量 五：外购电费-购光伏，发电方式为太阳能发电的用户结算电费，市场化电费+差价电价 购国网电量电费：购电侧管理机构为购国网的电量电费 县间交易：功能路径：购电侧管理-电网间结算管理-趸购电量电价录入 录入交易对象为“县间结算”的电量电费",
+    "title": "生产经营报表逻辑",
+    "tables_used": []
+  },
+  {
+    "question": "查询2025年7月各县公司的总发行电量和总电费",
+    "business_rules": "1. 表关联：m_e_cons_snap_arc（电费快照）与 m_e_cons_prc_amt_arc（电价电费明细）通过 a.id = b.calc_id 关联，表示同一笔电费。2. 组织机构关联：ac_org 表通过左连接，关联条件为 left(a.org_no,7) = o1.id，即取用户供电单位编号的前7位与组织机构ID匹配，用于获取县公司名称。3. 筛选条件：a.ym = 202507，表示电费年月为2025年7月。4. 聚合：按 o1.name 分组，汇总 t_settle_pq（总结算电量）和 t_amt（总结算电费）。",
+    "search_keywords": [
+      "县公司",
+      "发行电费",
+      "电量",
+      "电费",
+      "2025年7月",
+      "m_e_cons_snap_arc",
+      "m_e_cons_prc_amt_arc",
+      "ac_org",
+      "org_no",
+      "ym"
+    ],
+    "complexity": "medium",
+    "sql": "select o1.name 县公司,sum(b.t_settle_pq) 电量,sum(t_amt) 电费 from m_e_cons_snap_arc a join m_e_cons_prc_amt_arc b on a.id=b.calc_id left join ac_org o1 on left(a.org_no,7) = o1.id where a.ym=202507 group by o1.name",
+    "title": "查询公司发行电费",
+    "tables_used": [
+      "ac_org",
+      "m_e_cons_prc_amt_arc",
+      "m_e_cons_snap_arc"
+    ]
+  },
+  {
+    "question": "查询关联户（临时缴费关系号为主户号）的户号、户名和档案票据类型，其中档案票据类型从代码表翻译。",
+    "business_rules": "1. 关联户通过m_c_cons.tmp_pay_rela_no字段关联，该字段存储主户的临时缴费关系号，查询时条件为tmp_pay_rela_no='主户号'。2. 档案票据类型字段note_type_code存储在m_c_cons表中，其值通过左连接m_p_code表翻译为名称，关联条件为p1.value=cons.note_type_code且p1.code_type='noteTypeCode'。3. 代码表m_p_code中code_type字段区分不同代码分类，此处使用'noteTypeCode'。",
+    "search_keywords": [
+      "关联户",
+      "临时缴费关系",
+      "档案票据类型",
+      "户名",
+      "户号",
+      "代码翻译",
+      "m_c_cons",
+      "m_p_code"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT cons.cons_no 户号,cons.cons_name 户名,p1.`name` 档案票据类型 FROM `m_c_cons` cons LEFT JOIN m_p_code p1 ON p1.`value`=cons.note_type_code AND p1.code_type='noteTypeCode' WHERE cons.tmp_pay_rela_no='主户号'",
+    "title": "关联户",
+    "tables_used": [
+      "m_c_cons",
+      "m_p_code"
+    ]
+  },
+  {
+    "question": "查询供电单位代码以'5100102'开头的用户中，2025年8月有电量或电费记录的用户编号、用户名称、供电单位、2025年8月电量、2025年8月电费，并去重。",
+    "business_rules": "1. 表关联：m_c_cons通过org_no关联ac_org的id，且ac_org的id以'5100102'开头（即供电单位代码前缀匹配）。2. 字段含义：cons_no为用户编号，cons_name为用户名称，o.name为供电单位名称。3. 注释部分（联系方式、电价号）被忽略，实际SQL中未查询。4. 2025年8月电量、2025年8月电费字段在表结构中未定义，可能为计算字段或视图字段，需注意。5. 使用distinct去重。",
+    "search_keywords": [
+      "多月未抄表",
+      "用户信息",
+      "供电单位",
+      "用户编号",
+      "用户名称",
+      "2025年8月电量",
+      "2025年8月电费",
+      "ac_org",
+      "m_c_cons"
+    ],
+    "complexity": "medium",
+    "sql": "select distinct o.name 供电单位,cons_no 用户编号,cons_name 用户名称,/*cont.mobile 联系方式,prc_code 电价号,*/ 2025年8月电量,2025年8月电费 from m_c_cons cons join ac_org o on cons.org_no=o.id and o.id like '5100102%'",
+    "title": "查询多月未抄表用户信息",
+    "tables_used": [
+      "ac_org",
+      "m_c_cons"
+    ]
+  },
+  {
+    "question": "查询线损去除考核表明细用户，包括计量点编号、电量、户号、户名和供电单位，筛选条件为计量点不参与线损分摊且线损不计费。",
+    "business_rules": "1. 表关联：m_e_mp_para_snap_arc 与 m_e_mp_pq_arc 通过 mp_id 关联。2. 筛选条件：ll_share_flag = '否' 且 ll_bill_flag = '否'。3. 字段含义：ll_share_flag 表示是否分摊线损，ll_bill_flag 表示分摊的线损是否计费。",
+    "search_keywords": [
+      "线损",
+      "考核表",
+      "明细用户",
+      "计量点",
+      "分摊",
+      "计费",
+      "供电单位",
+      "电量"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT mp.mp_no '计量点编号', SUM(e_mp_pq.settle_apq) '电量', cons.cons_no '户号', cons.cons_name '户名', org.name '供电单位' FROM m_e_mp_para_snap_arc e_mp_para_snap, m_e_mp_pq_arc e_mp_pq,",
+    "title": "线损去除考核表明细用户",
+    "tables_used": [
+      "m_e_mp_para_snap_arc"
+    ]
+  },
+  {
+    "question": "查询业务编码名称为'20260105107714'的流程实例ID、流程定义key和业务编码名称，并按流程实例ID分组。",
+    "business_rules": "1. 表cmo_todo_task中app_no字段用于筛选特定业务编码名称。2. 使用GROUP BY process_instance_id确保每个流程实例只返回一条记录。3. 查询结果包含app_no、process_instance_id、proc_def_key和business_code_name字段。",
+    "search_keywords": [
+      "流程查询",
+      "cmo_todo_task",
+      "app_no",
+      "process_instance_id",
+      "proc_def_key",
+      "business_code_name",
+      "分组",
+      "流程实例"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT a.app_no,a.process_instance_id,a.proc_def_key , a.business_code_name FROM cmo_todo_task a WHERE a.app_no='20260105107714' GROUP BY a.process_instance_id",
+    "title": "流程查询",
+    "tables_used": [
+      "cmo_todo_task"
+    ]
+  },
+  {
+    "question": "查询业务单号'20260104107222'在途流程的申请编号、流程实例ID、流程定义key和业务编码名称，按流程实例ID分组。",
+    "business_rules": "1. 表cmo_todo_task存储待办任务，每条记录代表一个流程环节。2. 按process_instance_id分组，确保每个流程实例只返回一条记录。3. 筛选条件app_no='20260104107222'，即指定业务单号。",
+    "search_keywords": [
+      "在途流程",
+      "流程实例",
+      "业务单号",
+      "待办任务",
+      "流程定义",
+      "分组",
+      "cmo_todo_task"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT a.app_no,a.process_instance_id,a.proc_def_key, a.business_code_name FROM cmo_todo_task a WHERE a.app_no='20260104107222' GROUP BY a.process_instance_id",
+    "title": "查询在途流程",
+    "tables_used": [
+      "cmo_todo_task"
+    ]
+  },
+  {
+    "question": "查询所有角色的编码和名称",
+    "business_rules": "1. 通过ac_role、ac_role_resource、ac_resource三表关联，获取角色对应的资源信息，但最终只返回角色的code和name字段。2. 未使用任何筛选条件，返回所有角色。",
+    "search_keywords": [
+      "角色",
+      "编码",
+      "名称",
+      "权限",
+      "资源",
+      "关联查询"
+    ],
+    "complexity": "simple",
+    "sql": "select a.`code`,a.`name` from ac_role a join ac_role_resource b on a.id = b.role_id join ac_resource c on c.id = b.resource_id",
+    "title": "权限查询",
+    "tables_used": [
+      "ac_resource",
+      "ac_role",
+      "ac_role_resource"
+    ]
+  },
+  {
+    "question": "查询各单位各用户2月至7月的算费电价是否一致，并标记电价一致的记录。",
+    "business_rules": "1. 比较2月至7月共6个月的电价字段是否完全相同，若完全相同则标记为'一致'，否则不一致。2. 使用CASE WHEN判断base字段是否为NULL，若为NULL则输出'一致'，但此逻辑可能不完整，实际应比较所有月份电价。3. 涉及单位编码、单位名称、户号、户名等基本信息。",
+    "search_keywords": [
+      "电价",
+      "算费",
+      "一致性",
+      "月份",
+      "单位",
+      "户号",
+      "户名",
+      "快照",
+      "2月",
+      "7月"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT 单位编码, 单位名称, 户号, 户名, `2月电价`, `3月电价`, `4月电价`, `5月电价`, `6月电价`, `7月电价`, CASE WHEN base IS NULL THEN '一致'",
+    "title": "快照2-7月算费电价是否一致",
+    "tables_used": []
+  },
+  {
+    "question": "查询最近6个月（1月至6月）算费电价是否一致，并显示单位编码、单位名称、户号、户名、各月电价及一致性判断结果。",
+    "business_rules": "1. 从快照表中查询最近6个月（1月至6月）的电价字段。2. 通过CASE WHEN判断base字段是否为NULL，若为NULL则电价一致，否则不一致（SQL中未完整，但可推测）。3. 需要关联单位信息表获取单位编码、单位名称。",
+    "search_keywords": [
+      "快照",
+      "最近6个月",
+      "算费电价",
+      "一致性",
+      "单位编码",
+      "户号",
+      "电价",
+      "CASE WHEN",
+      "base字段"
+    ],
+    "complexity": "medium",
+    "sql": "SELECT 单位编码, 单位名称, 户号, 户名, `1月电价`, `2月电价`, `3月电价`, `4月电价`, `5月电价`, `6月电价`, CASE WHEN base IS NULL THEN '一致'",
+    "title": "查询快照最近6个月算费电价是否一致",
+    "tables_used": []
+  },
+  {
+    "question": "查询最近6个月算费电价的单位编码、单位名称、户号和户名",
+    "business_rules": "1. 表a和表o通过org_no关联。2. 表a包含cons_no、cons_name等字段。3. 表o包含name字段。4. 需要筛选最近6个月的算费电价数据。",
+    "search_keywords": [
+      "快照",
+      "最近6个月",
+      "算费电价",
+      "单位编码",
+      "单位名称",
+      "户号",
+      "户名"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT a.org_no AS 单位编码, o.`name` AS 单位名称, a.cons_no AS 户号, a.cons_name AS 户名,",
+    "title": "查询快照最近6个月算费电价",
+    "tables_used": []
+  },
+  {
+    "question": "将客户ID为1360559149400320的关联户编号（tmp_pay_rela_no）清空。",
+    "business_rules": "1. 表m_c_cons存储客户信息，字段tmp_pay_rela_no表示关联户编号。2. 该操作将指定客户的关联户编号置空，用于解除关联关系。",
+    "search_keywords": [
+      "关联户",
+      "清空关联户编号",
+      "解除关联",
+      "客户",
+      "m_c_cons",
+      "tmp_pay_rela_no",
+      "更新"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT m_c_cons SET tmp_pay_rela_no=null WHERE id=1360559149400320",
+    "title": "关联户",
+    "tables_used": []
+  },
+  {
+    "question": "查询应收电费标识为'1551000076621737'的票据信息",
+    "business_rules": "1. rcvbl_amt_id字段表示应收电费标识，用于关联应收电费记录。2. 该查询仅筛选单个应收电费标识，无其他条件。",
+    "search_keywords": [
+      "应收电费标识",
+      "票据查询",
+      "m_a_inv",
+      "发票打印",
+      "rcvbl_amt_id"
+    ],
+    "complexity": "simple",
+    "sql": "SELECT * FROM m_a_inv where rcvbl_amt_id='1551000076621737'",
+    "title": "大小发票打印查询",
+    "tables_used": [
+      "m_a_inv"
+    ]
+  },
+  {
+    "question": "查询用电客户编号为'010225024179'的客户信息",
+    "business_rules": "1. cons_no字段为用电客户的外部标识，引用国家电网公司营销管理代码类集:5110.1用电客户编号规则。2. 该查询为单表简单筛选，无关联其他表。",
+    "search_keywords": [
+      "用电客户编号",
+      "客户信息",
+      "cons_no",
+      "m_c_cons",
+      "查询"
+    ],
+    "complexity": "simple",
+    "sql": "select * from m_c_cons WHERE cons_no =\"010225024179\"",
+    "title": "市场化标识字段",
+    "tables_used": [
+      "m_c_cons"
+    ]
+  }
+]

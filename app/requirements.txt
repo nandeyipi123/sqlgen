@@ -1,0 +1,22 @@
+# --- Web 交互前端 ---
+streamlit>=1.32.0
+
+# --- Agent 核心与状态机 ---
+langchain>=0.1.13
+langchain-openai>=0.1.1
+langgraph>=0.0.30
+
+# --- RAG 检索与向量数据库 ---
+langchain-chroma>=0.1.0
+langchain-ollama>=0.1.0
+langchain-community>=0.0.29
+rank_bm25>=0.2.2
+
+# --- 数据库连接与处理 ---
+pymysql>=1.1.0
+pandas>=2.2.1
+openpyxl>=3.1.2
+
+# --- 辅助工具 ---
+thefuzz>=0.22.1
+python-dotenv>=1.0.1

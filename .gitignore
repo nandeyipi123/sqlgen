@@ -1,0 +1,27 @@
+# 环境变量（含 API Key）
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ChromaDB 向量库二进制（运行时生成，不入库）
+*.sqlite3
+*.bin
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 媒体文件
+*.mp4
+*.mp3
