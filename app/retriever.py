@@ -7,13 +7,27 @@ from langchain_classic.retrievers import EnsembleRetriever
 from config import OLLAMA_BASE_URL, JSON_SCHEMA_PATH, CHROMA_DB_PATH, FEW_SHOT_DB_PATH
 
 
+# ============================================================
+# Schema JSON 缓存 (避免每次检索重复加载 373KB 文件)
+# ============================================================
+_SCHEMA_CACHE = None
+
+
+def _load_schema():
+    """加载 Schema JSON，模块级缓存"""
+    global _SCHEMA_CACHE
+    if _SCHEMA_CACHE is None:
+        with open(JSON_SCHEMA_PATH, 'r', encoding='utf-8') as f:
+            _SCHEMA_CACHE = json.load(f)
+    return _SCHEMA_CACHE
+
+
 def get_exact_ddls(table_names_list):
     """
     根据 Planner 规划出的表名集合，去 JSON 里精准提取毫无杂质的 DDL
     返回: (拼装好的上下文字符串, 成功找到的表名列表)
     """
-    with open(JSON_SCHEMA_PATH, 'r', encoding='utf-8') as f:
-        schema_data = json.load(f)
+    schema_data = _load_schema()
 
     exact_docs = []
     found_tables = []
@@ -45,10 +59,8 @@ def init_ensemble_retriever():
     )
     chroma_retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 
-    # B. BM25 关键词检索
-    with open(JSON_SCHEMA_PATH, 'r', encoding='utf-8') as f:
-        schema_data = json.load(f)
-
+    # B. BM25 关键词检索 (复用缓存的 Schema)
+    schema_data = _load_schema()
     documents = []
     for table in schema_data:
         table_name = table.get("table_name", "unknown_table")

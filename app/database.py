@@ -2,6 +2,9 @@ import pymysql
 import pandas as pd
 import re
 from config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+from logger import get_logger
+
+_log = get_logger(__name__)
 
 def extract_and_clean_sql(text):
     """提取纯净 SQL，只做 org_no 的安全隔离替换，不强制加 LIMIT"""
@@ -18,9 +21,6 @@ def extract_and_clean_sql(text):
     # 保留数据隔离规则
     raw_sql = re.sub(r"org_no\s*=\s*'([^']+)'", r"org_no LIKE '\1%'", raw_sql, flags=re.IGNORECASE)
     return raw_sql
-
-
-import pymysql  # 确保顶部有引入
 
 
 def get_explain_plan(sql_query):
@@ -53,21 +53,24 @@ def get_explain_plan(sql_query):
         return plan_str, None
 
     except pymysql.err.ProgrammingError as e:
-        # 【模型可修复】：表不存在、字段写错、语法错误
+        _log.warning("SQL 语法/字段错误: %s", e)
         return None, f"SQL_ERROR: SQL 语法或字段错误: {str(e)}"
     except pymysql.err.OperationalError as e:
-        # 【模型不可修复】：网络断开、密码错误、连接拒绝
+        _log.error("数据库连接/网络异常: %s", e)
         return None, f"SYS_ERROR: 数据库连接/网络异常: {str(e)}"
     except Exception as e:
-        # 【模型不可修复】：兜底其他未知崩溃
-        return None, f"SYS_ERROR: 数据库系统未知异常: {str(e)}"
+        _log.exception("数据库系统未知异常")
 
 
-def execute_export_sql(sql_query):
+def execute_export_sql(sql_query, max_rows=50000):
     """
     【专为大数据导出设计的底层通道】
     不再做 AI 拦截，强制将数据库超时时间拉长至 1200 秒 (20分钟)
+    默认上限 50000 行，防止 OOM。
     """
+    # 安全限制：无 LIMIT 时自动追加
+    if "limit" not in sql_query.lower():
+        sql_query = sql_query.rstrip().rstrip(';') + f" LIMIT {max_rows}"
     try:
         connection = pymysql.connect(
             host=DB_HOST, port=DB_PORT, user=DB_USER,
@@ -86,4 +89,5 @@ def execute_export_sql(sql_query):
         return pd.DataFrame(result), None
 
     except Exception as e:
+        _log.exception("数据库导出执行异常")
         return None, f"数据库导出执行异常: {str(e)}"

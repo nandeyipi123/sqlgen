@@ -1,12 +1,17 @@
+from functools import lru_cache
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL
 
-def get_llm(model_name, temperature):
+
+@lru_cache(maxsize=4)
+def get_llm(model_name: str, temperature: float) -> ChatOpenAI:
+    """创建 LLM 实例（按模型名+温度缓存，避免重复创建连接池）"""
     return ChatOpenAI(
         model=model_name, api_key=DEEPSEEK_API_KEY,
-        base_url=DEEPSEEK_BASE_URL, temperature=temperature, streaming=True,max_retries=3,timeout=120
+        base_url=DEEPSEEK_BASE_URL, temperature=temperature,
+        streaming=True, max_retries=3, timeout=120
     )
 
 def get_planner_chain(llm):
@@ -15,7 +20,7 @@ def get_planner_chain(llm):
         你的任务是根据用户的【查询需求】和【历史参考案例】，推断出完成该查询需要用到哪些底层数据库表。
         【历史参考案例】：\n{few_shot_context}\n
         【你的输出要求 (极为严格)】：
-        请严格只输出一个 Python 列表格式的表名集合，例如：['m_c_cons', 'ac_org']。绝对不要输出任何文字。"""),
+        请严格只输出一个 JSON 对象，格式为：{{"tables": ["m_c_cons", "ac_org"]}}。绝对不要输出任何文字、代码块标记或注释。"""),
         ("human", "用户需求：{question}")
     ])
     return prompt | llm | StrOutputParser()

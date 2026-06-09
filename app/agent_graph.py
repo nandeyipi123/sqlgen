@@ -1,12 +1,14 @@
 from typing import TypedDict, List, Optional, Literal
 import re
-import ast
 import json
 from langgraph.graph import StateGraph, END
 
 from retriever import init_ensemble_retriever, init_few_shot_retriever, get_exact_ddls
 from agent import get_llm, get_sql_fix_chain, get_planner_chain, get_coder_chain, get_reviewer_chain
 from database import extract_and_clean_sql, get_explain_plan
+from logger import get_logger
+
+_log = get_logger(__name__)
 
 
 # ================= 1. 定义简化后的状态 =================
@@ -39,10 +41,15 @@ def retrieve_and_plan_node(state: AgentState) -> dict:
     planner_response = planner_chain.invoke({"few_shot_context": few_shot_context, "question": question})
 
     try:
-        match = re.search(r"\[(.*?)\]", planner_response, re.DOTALL)
-        required_tables = ast.literal_eval("[" + match.group(1) + "]") if match else re.findall(r'[a-zA-Z_0-9]+',
-                                                                                                planner_response)
+        # 用 JSON 解析：先提取花括号内容，再 json.loads
+        json_match = re.search(r"\{.*\}", planner_response, re.DOTALL)
+        if json_match:
+            parsed = json.loads(json_match.group(0), strict=False)
+            required_tables = parsed.get("tables", [])
+        else:
+            required_tables = []
     except Exception:
+        _log.warning("Planner 输出解析失败，回退到混合检索; 原始响应: %s", planner_response[:200])
         required_tables = []
 
     exact_schema_context, found_tables = get_exact_ddls(required_tables)
@@ -87,8 +94,9 @@ def dba_reviewer_node(state: AgentState) -> dict:
     reviewer_response = reviewer_chain.invoke({"sql": current_sql, "explain_plan": explain_plan})
 
     try:
-        clean_json_str = reviewer_response.strip().strip('`').removeprefix('json').strip()
-        review_result = json.loads(clean_json_str, strict=False)
+        # 稳健清除 markdown 代码块标记 (```json ... ``` 或 ``` ... ```)
+        clean = re.sub(r'```[\w]*\s*', '', reviewer_response).strip()
+        review_result = json.loads(clean, strict=False)
     except Exception:
         review_result = {"status": "PASS"}
 

@@ -1,10 +1,13 @@
 import streamlit as st
 import io
+import os
+import socket
 import pandas as pd
 from retriever import init_ensemble_retriever, init_few_shot_retriever
 from agent import get_llm
 from agent_graph import sql_agent_graph
 from database import execute_export_sql
+from config import OLLAMA_BASE_URL, CHROMA_DB_PATH, FEW_SHOT_DB_PATH, DB_HOST, DB_PORT
 
 # ================= 1. 页面与全局配置 =================
 st.set_page_config(page_title="DeepSeek SQL Copilot", page_icon="⚡", layout="wide")
@@ -23,6 +26,39 @@ def load_few_shot_retriever():
 @st.cache_resource
 def load_llm(model_name, temp):
     return get_llm(model_name, temp)
+
+
+@st.cache_resource
+def health_check() -> dict:
+    """启动时校验所有关键依赖，失败项列入 errors 列表"""
+    errors = []
+
+    # 1. Ollama 连通性
+    try:
+        from langchain_ollama import OllamaEmbeddings
+        embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
+        _ = embeddings.embed_query("health_check")
+    except Exception as e:
+        errors.append(f"❌ Ollama 不可用 ({OLLAMA_BASE_URL}): {e}")
+
+    # 2. Schema 向量库完整性
+    schema_db = os.path.join(CHROMA_DB_PATH, "chroma.sqlite3")
+    if not os.path.exists(schema_db):
+        errors.append(f"❌ Schema 向量库缺失: {schema_db}")
+
+    # 3. Few-Shot 向量库完整性
+    fewshot_db = os.path.join(FEW_SHOT_DB_PATH, "chroma.sqlite3")
+    if not os.path.exists(fewshot_db):
+        errors.append(f"❌ Few-Shot 向量库缺失: {fewshot_db}")
+
+    # 4. 数据库 TCP 可达性
+    try:
+        sock = socket.create_connection((DB_HOST, DB_PORT), timeout=5)
+        sock.close()
+    except Exception as e:
+        errors.append(f"❌ 数据库不可达 ({DB_HOST}:{DB_PORT}): {e}")
+
+    return {"errors": errors}
 
 
 # ================= 2. 侧边栏 =================
@@ -53,6 +89,17 @@ with st.sidebar:
         # 这里绝对不能写 st.stop()，否则会阻止下方聊天界面的渲染，导致白屏。
         st.toast("🛑 已强行中断当前任务！您可以继续提问。")  # 弹出一条友好的小提示
         pass  # 直接放行，让代码继续往下跑，把聊天记录和输入框正常渲染出来
+
+# ================= 2.5 健康检查面板 =================
+with st.sidebar:
+    st.divider()
+    with st.expander("🔧 系统健康检查", expanded=False):
+        hc = health_check()
+        if not hc["errors"]:
+            st.success("✅ 所有依赖正常")
+        else:
+            for err in hc["errors"]:
+                st.error(err)
 
 # ================= 3. 主界面初始化 =================
 st.title("⚡ 智能 SQL 生成AI ")
