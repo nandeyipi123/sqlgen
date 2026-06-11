@@ -34,7 +34,7 @@ def get_explain_plan(sql_query):
             password=DB_PASSWORD, database=DB_NAME,
             cursorclass=pymysql.cursors.DictCursor,
             connect_timeout=5,
-            read_timeout=15
+            read_timeout=30
         )
         with connection.cursor() as cursor:
             cursor.execute(explain_sql)

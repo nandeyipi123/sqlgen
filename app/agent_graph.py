@@ -120,15 +120,15 @@ def fixer_node(state: AgentState) -> dict:
 
 # ================= 3. 定义流转逻辑 =================
 def route_after_review(state: AgentState) -> Literal["fixer", "__end__"]:
-    """核心：只要 DBA (EXPLAIN) 放行，或者发生系统级崩溃，直接结束"""
+    """核心：有错误且未达上限 → Fixer；否则结束"""
     error_msg = state.get("error_msg")
 
     if error_msg:
-        # 🛡️ 拦截器：如果是系统环境级错误，大模型修不了，立刻终止 Graph 循环！
-        if "SYS_ERROR" in error_msg:
+        # SYS_ERROR（连接断开/超时）：给 Fixer 一次机会简化 SQL，第二次再放弃
+        if "SYS_ERROR" in error_msg and state["loop_count"] >= 1:
             return "__end__"
 
-        # 如果是业务级的 SQL_ERROR 或 性能 FAIL，且循环次数未达上限，则交给 Fixer 重写
+        # 已达修复上限（3 次）
         if state["loop_count"] >= 3:
             return "__end__"
         return "fixer"
