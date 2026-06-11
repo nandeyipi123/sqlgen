@@ -32,9 +32,10 @@ def retrieve_and_plan_node(state: AgentState) -> dict:
     few_shot_retriever = init_few_shot_retriever()
     fs_docs = few_shot_retriever.invoke(question)
 
-    # 1. 拼 few_shot_context（给 Coder 用）+ 直接合并表名
+    # 1. 拼 few_shot_context + 统计表频次
     few_shot_context = ""
-    required_tables = []
+    table_freq = {}          # 表名 → 出现次数
+    case_tables = []         # 每条案例的表列表
     for i, doc in enumerate(fs_docs):
         tables_str = doc.metadata.get("tables_used", "[]")
         few_shot_context += (
@@ -43,16 +44,25 @@ def retrieve_and_plan_node(state: AgentState) -> dict:
             f"业务规则: {doc.metadata.get('business_rules')}\n"
             f"正确SQL: {doc.metadata.get('sql')}\n"
         )
-        # 解析 tables_used JSON 并去重合并
         try:
-            for t in json.loads(tables_str):
-                if t not in required_tables:
-                    required_tables.append(t)
+            tables = json.loads(tables_str)
         except Exception:
-            pass
+            tables = []
+        case_tables.append(tables)
+        for t in tables:
+            table_freq[t] = table_freq.get(t, 0) + 1
 
-    _log.info("检索合并: %d 个案例 → %d 张表: %s",
-              len(fs_docs), len(required_tables), required_tables)
+    # 2. 合并表名: 案例1全收 + 案例2~5只收出现≥2次的
+    required_tables = []
+    for i, tables in enumerate(case_tables):
+        for t in tables:
+            if t not in required_tables:
+                if i == 0 or table_freq.get(t, 0) >= 2:
+                    required_tables.append(t)
+
+    _log.info("检索合并(方案A): %d 案例 → %d 张表 (频次: %s)",
+              len(fs_docs), len(required_tables),
+              {t: table_freq.get(t, 0) for t in required_tables})
 
     # 2. 精准取 DDL
     exact_schema_context, found_tables = get_exact_ddls(required_tables)
