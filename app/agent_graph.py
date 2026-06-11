@@ -34,7 +34,13 @@ def retrieve_and_plan_node(state: AgentState) -> dict:
     fs_docs = few_shot_retriever.invoke(question)
     few_shot_context = ""
     for i, doc in enumerate(fs_docs):
-        few_shot_context += f"\n--- 案例 {i + 1} ---\n业务规则: {doc.metadata.get('business_rules')}\n正确SQL: {doc.metadata.get('sql')}\n"
+        tables = doc.metadata.get('tables_used', '[]')
+        few_shot_context += (
+            f"\n--- 案例 {i + 1} ---\n"
+            f"涉及表: {tables}\n"
+            f"业务规则: {doc.metadata.get('business_rules')}\n"
+            f"正确SQL: {doc.metadata.get('sql')}\n"
+        )
 
     llm = get_llm(model_name, temperature)
     planner_chain = get_planner_chain(llm)
