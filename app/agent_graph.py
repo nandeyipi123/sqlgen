@@ -27,39 +27,39 @@ class AgentState(TypedDict):
 
 # ================= 2. 节点定义 =================
 def retrieve_and_plan_node(state: AgentState) -> dict:
+    """检索案例 → 合并表名去重 → 取 DDL（不再调 Planner LLM）"""
     question = state["question"]
-    model_name = state.get("model_name", "deepseek-v4-flash")
-    temperature = state.get("temperature", 0.1)
     few_shot_retriever = init_few_shot_retriever()
     fs_docs = few_shot_retriever.invoke(question)
+
+    # 1. 拼 few_shot_context（给 Coder 用）+ 直接合并表名
     few_shot_context = ""
+    required_tables = []
     for i, doc in enumerate(fs_docs):
-        tables = doc.metadata.get('tables_used', '[]')
+        tables_str = doc.metadata.get("tables_used", "[]")
         few_shot_context += (
             f"\n--- 案例 {i + 1} ---\n"
-            f"涉及表: {tables}\n"
+            f"涉及表: {tables_str}\n"
             f"业务规则: {doc.metadata.get('business_rules')}\n"
             f"正确SQL: {doc.metadata.get('sql')}\n"
         )
+        # 解析 tables_used JSON 并去重合并
+        try:
+            for t in json.loads(tables_str):
+                if t not in required_tables:
+                    required_tables.append(t)
+        except Exception:
+            pass
 
-    llm = get_llm(model_name, temperature)
-    planner_chain = get_planner_chain(llm)
-    planner_response = planner_chain.invoke({"few_shot_context": few_shot_context, "question": question})
+    _log.info("检索合并: %d 个案例 → %d 张表: %s",
+              len(fs_docs), len(required_tables), required_tables)
 
-    try:
-        # 用 JSON 解析：先提取花括号内容，再 json.loads
-        json_match = re.search(r"\{.*\}", planner_response, re.DOTALL)
-        if json_match:
-            parsed = json.loads(json_match.group(0), strict=False)
-            required_tables = parsed.get("tables", [])
-        else:
-            required_tables = []
-    except Exception:
-        _log.warning("Planner 输出解析失败，回退到混合检索; 原始响应: %s", planner_response[:200])
-        required_tables = []
-
+    # 2. 精准取 DDL
     exact_schema_context, found_tables = get_exact_ddls(required_tables)
-    if not found_tables:
+
+    # 3. 兜底：合并后表太少 → 混合检索补充
+    if len(found_tables) < 3:
+        _log.info("表太少(%d)，触发混合检索补充", len(found_tables))
         retriever = init_ensemble_retriever()
         retrieved_docs = retriever.invoke(question)
         exact_schema_context = "\n\n".join([doc.page_content for doc in retrieved_docs])
