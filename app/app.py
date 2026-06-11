@@ -28,9 +28,9 @@ def load_llm(model_name, temp):
     return get_llm(model_name, temp)
 
 
-@st.cache_resource
+@st.cache_data(ttl=30)  # 30 秒自动过期，避免错误状态被永久缓存
 def health_check() -> dict:
-    """启动时校验所有关键依赖，失败项列入 errors 列表"""
+    """校验所有关键依赖，失败项列入 errors 列表（最多缓存 30 秒）"""
     errors = []
 
     # 1. Ollama 连通性
@@ -93,7 +93,13 @@ with st.sidebar:
 # ================= 2.5 健康检查面板 =================
 with st.sidebar:
     st.divider()
-    with st.expander("🔧 系统健康检查", expanded=False):
+    st.caption("🔧 系统健康检查")
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        if st.button("🔄", key="hc_refresh", help="重新检查", use_container_width=True):
+            health_check.clear()
+            st.rerun()
+    with st.expander("详情", expanded=False):
         hc = health_check()
         if not hc["errors"]:
             st.success("✅ 所有依赖正常")
@@ -247,25 +253,29 @@ if user_query := st.chat_input("输入查询需求，或在查出结果后输入
                                     expanded=False)
 
         # D. 最终结果判定与渲染
-        if final_output_state.get("error_msg") and final_output_state.get("loop_count") >= 3:
-            err_msg = f"❌ 经历了 {final_output_state['loop_count']} 次震荡修复后仍未完全成功，最终错误：{final_output_state['error_msg']}"
+        if final_output_state.get("error_msg"):
+            # 任何错误（语法错误/性能FAIL/SYS_ERROR）都应该告知用户
+            err_msg = f"❌ SQL 生成遇到问题：{final_output_state['error_msg']}"
             st.error(err_msg)
-            # 🛡️ 【修复点 3】：失败时也将日志细节打包绑定存入历史
             st.session_state.messages.append({"role": "assistant", "content": err_msg, "logs": current_logs})
         else:
             final_sql = final_output_state.get("sql")
-            loop_count = final_output_state.get('loop_count', 1)
+            if not final_sql:
+                st.error("SQL generation failed: could not extract valid SQL")
+                st.session_state.messages.append({"role": "assistant", "content": "SQL generation failed", "logs": current_logs})
+            else:
+                loop_count = final_output_state.get("loop_count", 1)
+                st.session_state.last_successful_sql = final_sql
+                success_msg = (
+                    f"**High-quality SQL generated! ({loop_count} rounds)**\n\n"
+                    "Copy to execute, or reply 'export' to download as Excel:"
+                )
+                st.markdown(success_msg)
+                st.code(final_sql, language="sql")
 
-            st.session_state.last_successful_sql = final_sql
-
-            success_msg = f"✅ **高可用 SQL 生成完毕！(共经历 {loop_count} 轮打磨)**\n\n您可以直接复制执行，或者回复 **“导出”** 让后台帮您下载为 Excel 文件："
-            st.markdown(success_msg)
-            st.code(final_sql, language="sql")
-
-            # 🛡️ 【修复点 4】：成功时将日志细节打包绑定存入历史
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": success_msg,
-                "final_sql": final_sql,
-                "logs": current_logs
-            })
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": success_msg,
+                    "final_sql": final_sql,
+                    "logs": current_logs
+                })

@@ -98,7 +98,8 @@ def dba_reviewer_node(state: AgentState) -> dict:
         clean = re.sub(r'```[\w]*\s*', '', reviewer_response).strip()
         review_result = json.loads(clean, strict=False)
     except Exception:
-        review_result = {"status": "PASS"}
+        _log.warning("Reviewer JSON 解析失败，默认 FAIL; 原始响应: %s", reviewer_response[:300])
+        review_result = {"status": "FAIL", "reason": "Reviewer 响应格式异常，无法解析审查结果", "suggestion": "请检查 SQL 语法和表结构"}
 
     if review_result.get("status") == "FAIL":
         return {"error_msg": f"性能审查失败！原因：{review_result.get('reason')}。建议：{review_result.get('suggestion')}"}
