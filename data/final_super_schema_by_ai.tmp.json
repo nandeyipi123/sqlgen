@@ -145,23 +145,23 @@
       },
       {
         "field_name": "create_user",
-        "comment": ""
+        "comment": "创建人"
       },
       {
         "field_name": "update_user",
-        "comment": ""
+        "comment": "更新人"
       },
       {
         "field_name": "create_time",
-        "comment": ""
+        "comment": "创建时间"
       },
       {
         "field_name": "update_time",
-        "comment": ""
+        "comment": "更新时间"
       },
       {
         "field_name": "icon",
-        "comment": ""
+        "comment": "图标"
       },
       {
         "field_name": "on_blur_icon",
@@ -189,7 +189,7 @@
       },
       {
         "field_name": "kjwz",
-        "comment": ""
+        "comment": "扩展字段"
       },
       {
         "field_name": "sys_id",
@@ -1340,6 +1340,59 @@
     ]
   },
   {
+    "table_name": "m_a_multi_person",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录外部唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户户号"
+      },
+      {
+        "field_name": "begin_month",
+        "comment": "生效月份起"
+      },
+      {
+        "field_name": "end_month",
+        "comment": "生效月份止"
+      },
+      {
+        "field_name": "apply_population",
+        "comment": "申请人数"
+      },
+      {
+        "field_name": "effect_population",
+        "comment": "生效人数"
+      },
+      {
+        "field_name": "level_raise_pq",
+        "comment": "月一阶梯电量提升值"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志：0未生效 1生效"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建人"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新人"
+      }
+    ]
+  },
+  {
     "table_name": "m_a_note_info",
     "fields": [
       {
@@ -1352,7 +1405,7 @@
       },
       {
         "field_name": "org_no",
-        "comment": "机构编号"
+        "comment": ""
       },
       {
         "field_name": "sell_no",
@@ -1653,7 +1706,7 @@
       },
       {
         "field_name": "rcved_date",
-        "comment": "null"
+        "comment": null
       },
       {
         "field_name": "stat_no",
@@ -2201,7 +2254,7 @@
       },
       {
         "field_name": "org_no",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "pay_mode",
@@ -2265,7 +2318,7 @@
       },
       {
         "field_name": "acct_no",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "owe_amt",
@@ -2301,7 +2354,7 @@
       },
       {
         "field_name": "opr_id",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "sp_id",
@@ -2313,23 +2366,23 @@
       },
       {
         "field_name": "remind_sect_no",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "sent_num",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "last_chg",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "this_chg",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "relate_no",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "bank_code",
@@ -2381,7 +2434,7 @@
       },
       {
         "field_name": "file_name",
-        "comment": "无注释"
+        "comment": ""
       },
       {
         "field_name": "cons_sort_code",
@@ -2523,6 +2576,252 @@
       {
         "field_name": "card_type",
         "comment": "表示卡表类型: 01:正常欠费 02:单费率卡表 03:复费率卡表 04:网络卡表"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_transit",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "transit_no",
+        "comment": "收费在途明细的关联批号，引用自在途明细"
+      },
+      {
+        "field_name": "transit_name",
+        "comment": "收费在途名称，自定义名称：如工行第3期代扣在途、张三200712第三抄表段走收在途等。"
+      },
+      {
+        "field_name": "pay_mode",
+        "comment": "在途缴费方式，引用引用国家电网公司营销管理代码类集:5110.105 收费方式分类与代码：托收、代扣、走收。"
+      },
+      {
+        "field_name": "transit_num",
+        "comment": "在途总笔数，收费在途明细的总和。"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "在途总金额:在途总金额，收费在途明细中应收总和。"
+      },
+      {
+        "field_name": "t_rcved_num",
+        "comment": "在途收费明细中收回成功的总笔数。"
+      },
+      {
+        "field_name": "t_rcved_amt",
+        "comment": "在途收回总金额:在途收费明细中收回成功的总金额。"
+      },
+      {
+        "field_name": "pd_file_name",
+        "comment": "代扣文件名称，代扣接口标准约定的文件名格式。"
+      },
+      {
+        "field_name": "deduct_file_name",
+        "comment": "代扣文件名称，返回在途收费文件时按照代扣接口标准制定。"
+      },
+      {
+        "field_name": "bank_code",
+        "comment": "代扣、电子托收的银行"
+      },
+      {
+        "field_name": "transit_status",
+        "comment": "数据在途状态，如：数据已经生成、已经处理完毕、走收在途等。"
+      },
+      {
+        "field_name": "tg_id",
+        "comment": "用电客户所属台区，用于描述属性归属"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "用电客户所属抄表段，用于描述属性归属"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "用电客户所属的供电所，用于描述属性归属。"
+      },
+      {
+        "field_name": "initiator_no",
+        "comment": "在途收费的发起人员"
+      },
+      {
+        "field_name": "initiate_date",
+        "comment": "在途收费的发起日期"
+      },
+      {
+        "field_name": "entry_emp_no",
+        "comment": "在途收费入账人员"
+      },
+      {
+        "field_name": "entry_date",
+        "comment": "在途收费入账日期"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "transit_id",
+        "comment": "收费在途标识:本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "use_emp_no",
+        "comment": "领用人"
+      },
+      {
+        "field_name": "use_date",
+        "comment": "领用时间"
+      },
+      {
+        "field_name": "remind_sect_no",
+        "comment": "催费段编号"
+      },
+      {
+        "field_name": "ischg",
+        "comment": "是否调尾:01 否;02 是"
+      },
+      {
+        "field_name": "conf_id",
+        "comment": "银行帐号标识"
+      },
+      {
+        "field_name": "get_file_date",
+        "comment": "银行文本获取时间"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_transit_det",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "rcvbl_amt_id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "charge_id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "transit_id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "note_id",
+        "comment": "本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "org_no",
+        "comment": ""
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号，用于描述属性归属，选自用电客户用户编号。"
+      },
+      {
+        "field_name": "transit_ym",
+        "comment": "在途年月"
+      },
+      {
+        "field_name": "transit_amt",
+        "comment": "在途电费金额:在途电费金额＝应收记录欠费金额。"
+      },
+      {
+        "field_name": "transit_penalty",
+        "comment": "在途违约金:在途违约金＝发送在途时产生的违约金。"
+      },
+      {
+        "field_name": "transit_last_chg",
+        "comment": "在途上次调尾:发送在途时上次调尾金额。"
+      },
+      {
+        "field_name": "transit_this_chg",
+        "comment": "在途本次调尾:生成在途时产生的本次调尾金额。"
+      },
+      {
+        "field_name": "t_transit_amt",
+        "comment": "在途应收合计金额:发送在途时的欠费与违约金的合计值。"
+      },
+      {
+        "field_name": "rcved_amt",
+        "comment": "实际收款金额:在途返回时，实际收到金额。"
+      },
+      {
+        "field_name": "rcved_status_code",
+        "comment": "在途实际收款情况：全额入账，部分入账， 余额不足，无此帐号、账号销户 、非结算帐户不能扣款、托收成功、托收失败、走收成功、走收失败、走收票据退还。"
+      },
+      {
+        "field_name": "bank_code",
+        "comment": "代扣、电子托收的银行"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "det_id",
+        "comment": "在途电费明细标识:本实体记录唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "bank_serial",
+        "comment": "银行交易流水号"
+      },
+      {
+        "field_name": "old_bank_serial",
+        "comment": "代扣冲正原银行交易流水号"
+      },
+      {
+        "field_name": "agreement_id",
+        "comment": "托收协议标识"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号"
+      },
+      {
+        "field_name": "rcvbl_ym",
+        "comment": "应收年月"
+      },
+      {
+        "field_name": "tmp_col3",
+        "comment": ""
+      },
+      {
+        "field_name": "remark",
+        "comment": "备注"
+      },
+      {
+        "field_name": "oper_date",
+        "comment": "操作日期"
       }
     ]
   },
@@ -2726,7 +3025,7 @@
       },
       {
         "field_name": "cons_sort_code",
-        "comment": "用户一种常用的分类方式，方便用户的管理\n            01 高压，02 低压非居民，03 低压居民"
+        "comment": "用户一种常用的分类方式，方便用户的管理 枚举值: 01=高压, 02=低压非居民, 03=低压居民"
       },
       {
         "field_name": "elec_addr",
@@ -2734,11 +3033,11 @@
       },
       {
         "field_name": "trade_code",
-        "comment": "用电客户的行业分类代码\n            引用国标GB/T 4754-2002"
+        "comment": "用电客户的行业分类代码 引用国标GB/T 4754-2002"
       },
       {
         "field_name": "elec_type_code",
-        "comment": "用电客户的用电类别分类\n            引用国家电网公司营销管理代码类集:5110.4 用电类别\n            大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 枚举值: 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
       },
       {
         "field_name": "contract_cap",
@@ -2750,15 +3049,15 @@
       },
       {
         "field_name": "shift_no",
-        "comment": "用电客户的生产班次分类\n            引用国家电网公司营销管理代码类集:5110.6用电客户生产班次代码\n            单班，二班，三班，连续生产"
+        "comment": "用电客户的生产班次分类 引用国家电网公司营销管理代码类集:5110.6用电客户生产班次代码 枚举值: 单班，二班，三班，连续生产"
       },
       {
         "field_name": "lode_attr_code",
-        "comment": "负荷的重要程度分类\n            引用国家电网公司营销管理代码类集:5110.44负荷类别分类与代码\n            一类，二类，三类"
+        "comment": "负荷的重要程度分类 引用国家电网公司营销管理代码类集:5110.44负荷类别分类与代码 枚举值: 一类，二类，三类"
       },
       {
         "field_name": "volt_code",
-        "comment": "用电客户的供电电压等级代码，多路电源时取电压等级最高的供电电压等级代码\n            引用《国家电网公司信息分类与代码体系－综合代码类集－电压等级代码表》"
+        "comment": "用电客户的供电电压等级代码，多路电源时取电压等级最高的供电电压等级代码 引用《国家电网公司信息分类与代码体系－综合代码类集－电压等级代码表》"
       },
       {
         "field_name": "hec_industry_code",
@@ -2790,11 +3089,11 @@
       },
       {
         "field_name": "settle_mode",
-        "comment": "用于区分是否分期结算\n            01 分期结算，02 抄表结算"
+        "comment": "用于区分是否分期结算 枚举值: 01=分期结算，02=抄表结算"
       },
       {
         "field_name": "status_code",
-        "comment": "用电客户的状态说明，说明客户是否处于业扩变更中或已销户\n            引用国家电网公司营销管理代码类集:5110.9 客户状态标志代码\n            正常用电客户，当前新装客户，当前变更客户，已销户客户"
+        "comment": "用电客户的状态说明，说明客户是否处于业扩变更中或已销户 引用国家电网公司营销管理代码类集:5110.9 客户状态标志代码 枚举值: 正常用电客户，当前新装客户，当前变更客户，已销户客户"
       },
       {
         "field_name": "org_no",
@@ -2822,7 +3121,7 @@
       },
       {
         "field_name": "transfer_code",
-        "comment": "标识客户是否是转供相关客户，如果涉及转供，是属于转供户还是被转供户\n            引用国家电网公司营销管理代码类集:5110.35 转供标志分类与代码\n            无转供，转供户，被转供户"
+        "comment": "标识客户是否是转供相关客户，如果涉及转供，是属于转供户还是被转供户 引用国家电网公司营销管理代码类集:5110.35 转供标志分类与代码 枚举值: 无转供，转供户，被转供户"
       },
       {
         "field_name": "mr_sect_no",
@@ -2830,15 +3129,15 @@
       },
       {
         "field_name": "note_type_code",
-        "comment": "用电客户每月电费默认打印的票据类型\n            引用国家电网公司营销管理代码类集:5110.107票据类型\n            普通发票，增值税发票，收据，无"
+        "comment": "用电客户每月电费默认打印的票据类型 引用国家电网公司营销管理代码类集:5110.107票据类型 枚举值: 普通发票，增值税发票，收据，无"
       },
       {
         "field_name": "tmp_flag",
-        "comment": "表示是否是临时用电的用电客户，且属于哪种临时用电\n            01 装表临时用电，02 无表临时用电，03 非临时用电"
+        "comment": "表示是否是临时用电的用电客户，且属于哪种临时用电 枚举值: 01=装表临时用电，02=无表临时用电，03=非临时用电"
       },
       {
         "field_name": "tmp_trade_code",
-        "comment": "临时用电用户分类(为营商环境添加),01铁路、02公路、03桥梁、04公园、05绿道、06轨道交通、07农业水利排灌"
+        "comment": "临时用电用户分类(为营商环境添加),枚举值: 01=铁路、02=公路、03=桥梁、04=公园、05=绿道、06=轨道交通、07=农业水利排灌"
       },
       {
         "field_name": "tmp_date",
@@ -2890,15 +3189,15 @@
       },
       {
         "field_name": "busi_scale",
-        "comment": "企业规模：busiScale 01空，02大型企业、03中型企业、04小微企业、05其他"
+        "comment": "企业规模：busiScale 枚举值: 01=空，02=大型企业、03=中型企业、04=小微企业、05=其他"
       },
       {
         "field_name": "market_prop_sort",
-        "comment": "市场化用户分类：01\t批发用户\r\n02\t零售用户\r\n0301\t普通代购用户\r\n0302\t正当退市转代购用户\r\n0303\t无正当理由退市转代购用户\r\n0304\t有燃煤自发电代购用户\r\n0305\t高耗能代购用户"
+        "comment": "市场化用户分类：枚举值: 01=批发用户, 02=零售用户, 0301=普通代购用户, 0302=正当退市转代购用户, 0303=无正当理由退市转代购用户, 0304=有燃煤自发电代购用户, 0305=高耗能代购用户"
       },
       {
         "field_name": "enterprise_property",
-        "comment": "企业性质：01 国有经济组织、02 集体经济组织、03 民营经济组织、04 外资经济组织、05 混合所有制经济组织、06 非经济组织"
+        "comment": "企业性质：枚举值: 01=国有经济组织、02=集体经济组织、03=民营经济组织、04=外资经济组织、05=混合所有制经济组织、06=非经济组织"
       },
       {
         "field_name": "ac_charging_pile_num",
@@ -3902,19 +4201,19 @@
       },
       {
         "field_name": "create_time",
-        "comment": "创建时间"
+        "comment": ""
       },
       {
         "field_name": "create_user",
-        "comment": "创建人"
+        "comment": ""
       },
       {
         "field_name": "update_time",
-        "comment": "更新时间"
+        "comment": ""
       },
       {
         "field_name": "update_user",
-        "comment": "更新人"
+        "comment": ""
       },
       {
         "field_name": "pq_ratio",
@@ -4388,6 +4687,152 @@
       {
         "field_name": "ymd",
         "comment": "年月日"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_market_actual_variety_init",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "user_id",
+        "comment": "用户市场主体 ID"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "用户名称"
+      },
+      {
+        "field_name": "seller_id",
+        "comment": "售电公司 ID,如果是批发用户传输 null"
+      },
+      {
+        "field_name": "seller_name",
+        "comment": "售电公司名称,如果是批发用户传输 null"
+      },
+      {
+        "field_name": "tr_type_name",
+        "comment": "实际交易品种,按每年实际品种传输中文品种名称"
+      },
+      {
+        "field_name": "year",
+        "comment": "交易年份"
+      },
+      {
+        "field_name": "month",
+        "comment": "交易月份"
+      },
+      {
+        "field_name": "type",
+        "comment": "状态： 0 新增 1 变更 2 删除"
+      },
+      {
+        "field_name": "timestamp",
+        "comment": "当前时间"
+      },
+      {
+        "field_name": "appKey",
+        "comment": "市场主体接入交易平台后，为每个应用分配的appKey"
+      },
+      {
+        "field_name": "sign",
+        "comment": "以上参数的签名"
+      },
+      {
+        "field_name": "create_time",
+        "comment": ""
+      },
+      {
+        "field_name": "create_user",
+        "comment": ""
+      },
+      {
+        "field_name": "update_time",
+        "comment": ""
+      },
+      {
+        "field_name": "update_user",
+        "comment": ""
+      },
+      {
+        "field_name": "cons_status",
+        "comment": "户号状态 0失效1有效"
+      },
+      {
+        "field_name": "remarks",
+        "comment": "备注"
+      },
+      {
+        "field_name": "ymd",
+        "comment": "年月日"
+      }
+    ]
+  },
+  {
+    "table_name": "m_c_market_user_unbind_log",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "id"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "工单编号"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "组织机构编码"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "用户名称"
+      },
+      {
+        "field_name": "batch_no",
+        "comment": "批次号，对应着m_s_market_push_log的id"
+      },
+      {
+        "field_name": "unbind_time",
+        "comment": "解绑时间"
+      },
+      {
+        "field_name": "unbind_type",
+        "comment": "解绑类型  0 过户解绑   1 销户解绑   2 改类解绑   3 其他解绑"
+      },
+      {
+        "field_name": "unbind_result",
+        "comment": "解绑原因"
+      },
+      {
+        "field_name": "create_user",
+        "comment": ""
+      },
+      {
+        "field_name": "update_user",
+        "comment": ""
+      },
+      {
+        "field_name": "create_time",
+        "comment": ""
+      },
+      {
+        "field_name": "update_time",
+        "comment": ""
+      },
+      {
+        "field_name": "participant_id",
+        "comment": "市场主体ID"
       }
     ]
   },
@@ -5138,6 +5583,47 @@
     ]
   },
   {
+    "table_name": "m_c_payment_rela",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "支付关系唯一标识,产生规则为流水号"
+      },
+      {
+        "field_name": "acct_id",
+        "comment": "账户标识:本实体记录的唯一标识"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用户标识:本实体记录的唯一标识"
+      },
+      {
+        "field_name": "pay_agreement_no",
+        "comment": "确定支付关系的收费协议的编号，如多户使用一个帐户付费签署的收费协议的编号。"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "供电单位编码，一般是指的用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      }
+    ]
+  },
+  {
     "table_name": "m_c_ps",
     "fields": [
       {
@@ -5279,7 +5765,7 @@
       },
       {
         "field_name": "interlock_mode",
-        "comment": "电源之间的联锁方式 01 电气联锁、02 机械联锁、03 机械和电子联锁"
+        "comment": "电源之间的联锁方式 枚举值: 01=电气联锁、02=机械联锁、03=机械和电子联锁"
       },
       {
         "field_name": "equip_loc",
@@ -5287,7 +5773,7 @@
       },
       {
         "field_name": "ps_switch_mode",
-        "comment": "电源之间的切换方式 01 手动、02 自动"
+        "comment": "电源之间的切换方式 枚举值: 01=手动、02=自动"
       },
       {
         "field_name": "sp_remark",
@@ -6332,6 +6818,449 @@
     ]
   },
   {
+    "table_name": "m_e_Cons_Prc_Amt_Arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "用户电价电费标识"
+      },
+      {
+        "field_name": "app_code",
+        "comment": "申请编号"
+      },
+      {
+        "field_name": "t_ssu_pq",
+        "comment": "自发自用电量，由内部消耗的电量"
+      },
+      {
+        "field_name": "t_ssu_pl_amt",
+        "comment": "总自发自用代征电费，自发自用各项代征费用之和。"
+      },
+      {
+        "field_name": "prc_snap_id",
+        "comment": "用户电价快照的唯一标识"
+      },
+      {
+        "field_name": "calc_id",
+        "comment": "标识为一笔电费"
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月，如200801"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "prc_code",
+        "comment": "电价码"
+      },
+      {
+        "field_name": "para_vn",
+        "comment": "(无注释)"
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "trade_type_code",
+        "comment": "行业类别，目前使用国民经济行业分类与代码 （GB/T 4754－2002）"
+      },
+      {
+        "field_name": "level_num",
+        "comment": "用于描述阶梯电价，非阶梯电价此值为1"
+      },
+      {
+        "field_name": "t_settle_pq",
+        "comment": "总结算电量:该电价码该级数各时段结算电量合计值"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "总结算电费:该电价码该级数各时段电度电费、力率电费、基本电费的合计值"
+      },
+      {
+        "field_name": "t_cat_kwh_amt",
+        "comment": "总目录电度电费:该电价码该级数各时段目录电度电费合计值"
+      },
+      {
+        "field_name": "t_pl_amt",
+        "comment": "总代征电费:该电价码该级数各项代征电费合计值"
+      },
+      {
+        "field_name": "level_inc_pq",
+        "comment": "阶梯递增电量：执行阶梯电价的用户计算时,记录阶梯递增的电量"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "amt_type",
+        "comment": "市场化交易电费为1；市场化交易正偏差电费为2；传统营销电费为0；默认值为0。"
+      },
+      {
+        "field_name": "deal_pq",
+        "comment": "竞价成交总电量。"
+      },
+      {
+        "field_name": "deal_amt",
+        "comment": "总交易电费"
+      },
+      {
+        "field_name": "lc_pq",
+        "comment": "总长协电量"
+      },
+      {
+        "field_name": "lc_amt",
+        "comment": "总长协电费"
+      },
+      {
+        "field_name": "t_trans_dist_pq",
+        "comment": "用户电量有负偏差电量，总输配电量为用户实际用电量；否则为用户合同电量。"
+      },
+      {
+        "field_name": "t_trans_dist_amt",
+        "comment": "总输配电费"
+      },
+      {
+        "field_name": "t_posi_dev_pq",
+        "comment": "用户正偏差电量"
+      },
+      {
+        "field_name": "t_posi_dev_amt",
+        "comment": "总正偏差电费"
+      },
+      {
+        "field_name": "t_negt_dev_pq",
+        "comment": "总负偏差电量"
+      },
+      {
+        "field_name": "t_negt_dev_amt",
+        "comment": "总负偏差电费"
+      },
+      {
+        "field_name": "t_posi_dev_check_pq",
+        "comment": "总正偏差考核电量"
+      },
+      {
+        "field_name": "t_posi_dev_check_amt",
+        "comment": "总正偏差考核电费"
+      },
+      {
+        "field_name": "t_negt_dev_check_pq",
+        "comment": "总负偏差考核电量，随机存放到一个参与交易的目录电价下"
+      },
+      {
+        "field_name": "t_negt_dev_check_amt",
+        "comment": "总负偏差考核电费"
+      },
+      {
+        "field_name": "t_ol_ll_pq_amt",
+        "comment": "上网环节线损电费"
+      },
+      {
+        "field_name": "t_sys_op_amt",
+        "comment": "系统运行电费"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_Cons_Snap_Arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "标识为一笔电费"
+      },
+      {
+        "field_name": "app_code",
+        "comment": ""
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月，如200801"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用电客户的内部唯一标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "veri_rslt",
+        "comment": "对电费计算结果的正确与否的判断结果，分为:正确、疑问、错误等"
+      },
+      {
+        "field_name": "veri_remark",
+        "comment": "可以对某笔电费输入简短审核说明"
+      },
+      {
+        "field_name": "calc_date",
+        "comment": "电费计算的日期"
+      },
+      {
+        "field_name": "send_date",
+        "comment": "电费发行的日期"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户的外部标识 引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "用户的名称，一般等于客户实体中的客户名称，但也允许附加上一些非自然的信息。如 XXX（东城），便于通过用户名称直接识别。"
+      },
+      {
+        "field_name": "cons_sort_code",
+        "comment": "用户一种常用的分类方式，方便用户的管理 01 高压，02 低压非居民，03 低压居民"
+      },
+      {
+        "field_name": "elec_addr",
+        "comment": "用电客户的用电地址"
+      },
+      {
+        "field_name": "trade_type_code",
+        "comment": "用电客户的行业分类代码 引用国标GB/T 4754-2002"
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "volt_code",
+        "comment": "用电客户的供电电压等级代码，多路电源时取电压等级最高的供电电压等级代码 引用《国家电网公司信息分类与代码体系－综合代码类集－电压等级代码表》"
+      },
+      {
+        "field_name": "hec_trade_code",
+        "comment": "依据国家最新的高耗能行业划分"
+      },
+      {
+        "field_name": "create_date",
+        "comment": "电子用户档案的首次建立日期"
+      },
+      {
+        "field_name": "poweron_date",
+        "comment": "用户的首次送电日期"
+      },
+      {
+        "field_name": "cancel_date",
+        "comment": "销户业务信息归档的日期"
+      },
+      {
+        "field_name": "status_code",
+        "comment": "用电客户的状态说明，说明客户是否处于业扩变更中或已销户 引用国家电网公司营销管理代码类集:5110.9 客户状态标志代码 正常用电客户，当前新装客户，当前变更客户，已销户客户"
+      },
+      {
+        "field_name": "busi_region_no",
+        "comment": "营业户序号"
+      },
+      {
+        "field_name": "transfer_flag",
+        "comment": "标识客户是否是转供相关客户，如果涉及转供，是属于转供户还是被转供户 引用国家电网公司营销管理代码类集:5110.35 转供标志分类与代码 无转供，转供户，被转供户"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "gp_code",
+        "comment": "标识该笔电费是分次结算第几期，默认为正常的电费计算。 0.电费计算 1.第一期 2.第二期 3.第三期"
+      },
+      {
+        "field_name": "calc_mark",
+        "comment": "计算备注"
+      },
+      {
+        "field_name": "shift_no",
+        "comment": "生产班次"
+      },
+      {
+        "field_name": "contract_cap",
+        "comment": "合同容量:合同约定的本用户的容量"
+      },
+      {
+        "field_name": "run_cap",
+        "comment": "运行容量"
+      },
+      {
+        "field_name": "cons_market_type",
+        "comment": "用户市场化类型(空或者00为传统用户，不参与市场化交易；01 批发用户 02 零售用户 0301 普通代购用户 0302 正当退市转代购用户 0303 无正当理由退市转代购用户 0304 有燃煤自发电代购用户 0305 高耗能代购用户。默认为空或者00)"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "market_user_no",
+        "comment": "市场化客户编号"
+      },
+      {
+        "field_name": "company_no",
+        "comment": "代理售电公司编号"
+      },
+      {
+        "field_name": "rural_cons_code",
+        "comment": "城农网标志：用于区分是否为农网用电客户"
+      },
+      {
+        "field_name": "ctl_mode",
+        "comment": "费控类型（01-本地费控，02-本地量控，03-无，04-中心费控）。在现场勘查环节录入该信息。后付费用户选择03，费控用户选择01或是04"
+      },
+      {
+        "field_name": "verify_date",
+        "comment": "电费审核日期"
+      },
+      {
+        "field_name": "busi_scale",
+        "comment": "企业规模：busiScale 01空，02大型企业、03中型企业、04小微企业、05其他"
+      },
+      {
+        "field_name": "note_type_code",
+        "comment": "用电客户每月电费默认打印的票据类型 引用国家电网公司营销管理代码类集:5110.107票据类型 普通发票，增值税发票，收据，无"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_Consprc_Snap_Arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "用户电价快照的唯一标识"
+      },
+      {
+        "field_name": "prc_tactic_snap_id",
+        "comment": "用户定价策略快照的唯一标识"
+      },
+      {
+        "field_name": "prc_id",
+        "comment": "用户电价的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "calc_id",
+        "comment": "标识为一笔电费"
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月，如200801"
+      },
+      {
+        "field_name": "sp_id",
+        "comment": "受电点的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "pf_std_code",
+        "comment": "引用国家电网公司营销管理代码类集:5110.27 功率因数考核标准代码, 0  不考核 1  考核标准0.8 2  考核标准0.85 3 考核标准0.9"
+      },
+      {
+        "field_name": "pf_apq",
+        "comment": "参与计算实际功率因数的有功电量,为一级计量点有功抄见电量+分摊损耗+参与实际功率因数计算的退补有功电量"
+      },
+      {
+        "field_name": "pf_rpq",
+        "comment": "参与计算实际功率因数的无功电量,为一级计量点无功抄见电量+分摊损耗+参与实际功率因数计算的退补无功电量"
+      },
+      {
+        "field_name": "actual_pf",
+        "comment": "实际功率因数:根据有功、无功电量计算出的实际功率因数,数值为0~1的数值，保留两位小数"
+      },
+      {
+        "field_name": "fix_pf",
+        "comment": "固定力率:执行固定力率的用电客户的固定力率数值"
+      },
+      {
+        "field_name": "trade_type_code",
+        "comment": "行业类别，目前使用国民经济行业分类与代码 （GB/T 4754－2002）"
+      },
+      {
+        "field_name": "prc_code",
+        "comment": "电价码"
+      },
+      {
+        "field_name": "ts_flag",
+        "comment": "是否执行峰谷标志：是、否，当此标志为否时，即使用户安装分时表，执行的电价也是分时电价，计费时仍按照基准时段的单价计费"
+      },
+      {
+        "field_name": "fe_flag",
+        "comment": "是否执行丰、平、枯水期标志，1：是，0：否"
+      },
+      {
+        "field_name": "rela_app_no",
+        "comment": "产生快照时，描述该信息的数据产生来源，如果来源是客户变更，此指产生客户变更信息的流程申请编号，来源于当前的客户模型的，此编号可不填写"
+      },
+      {
+        "field_name": "data_src",
+        "comment": "标识数据来源是客户变更或者当前的客户档案"
+      },
+      {
+        "field_name": "chg_date",
+        "comment": "当数据来源是客户变更时的变更日期"
+      },
+      {
+        "field_name": "ps_org_no",
+        "comment": "供电单位的唯一编号"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "reward_price",
+        "comment": "奖励单价"
+      },
+      {
+        "field_name": "punish_price",
+        "comment": "惩罚单价"
+      }
+    ]
+  },
+  {
     "table_name": "m_e_add_pl_prc",
     "fields": [
       {
@@ -7033,6 +7962,167 @@
     ]
   },
   {
+    "table_name": "m_e_cons_prc_amt",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "用户电价电费标识"
+      },
+      {
+        "field_name": "prc_snap_id",
+        "comment": "用户电价快照的唯一标识"
+      },
+      {
+        "field_name": "calc_id",
+        "comment": "标识为一笔电费"
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月，如200801"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "amt_type",
+        "comment": "市场化交易电费为1；市场化交易正偏差电费为2；传统营销电费为0；默认值为0。"
+      },
+      {
+        "field_name": "prc_code",
+        "comment": "电价码"
+      },
+      {
+        "field_name": "para_vn",
+        "comment": ""
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "trade_type_code",
+        "comment": "行业类别，目前使用国民经济行业分类与代码 （GB/T 4754－2002）"
+      },
+      {
+        "field_name": "level_num",
+        "comment": "用于描述阶梯电价，非阶梯电价此值为1"
+      },
+      {
+        "field_name": "t_settle_pq",
+        "comment": "该电价码该级数各时段结算电量合计值（不包含负偏差电量）"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "若为市场化交易用户，为总结算电费:该电价码该级数各时段交易电费、输配和输配代征电费、偏差电费、力率电费、基本电费的合计值；否则，总结算电费:该电价码该级数各时段电度电费、力率电费、基本电费的合计值"
+      },
+      {
+        "field_name": "t_cat_kwh_amt",
+        "comment": "该电价码该级数各时段目录电度电费合计值"
+      },
+      {
+        "field_name": "deal_pq",
+        "comment": "竞价成交总电量。"
+      },
+      {
+        "field_name": "deal_amt",
+        "comment": "总竞价交易电费"
+      },
+      {
+        "field_name": "lc_pq",
+        "comment": "总长协电量"
+      },
+      {
+        "field_name": "lc_amt",
+        "comment": "总长协电费"
+      },
+      {
+        "field_name": "t_trans_dist_pq",
+        "comment": "用户电量有负偏差电量，总输配电量为用户实际用电量；否则为用户合同电量。"
+      },
+      {
+        "field_name": "t_trans_dist_amt",
+        "comment": "输配电费"
+      },
+      {
+        "field_name": "t_posi_dev_pq",
+        "comment": "用户正偏差电量 用户正偏差电量，为用户实际用电量-合同电量。"
+      },
+      {
+        "field_name": "t_posi_dev_amt",
+        "comment": "总正偏差电费"
+      },
+      {
+        "field_name": "t_negt_dev_pq",
+        "comment": "总负偏差电量"
+      },
+      {
+        "field_name": "t_negt_dev_amt",
+        "comment": "总负偏差电费"
+      },
+      {
+        "field_name": "t_posi_dev_check_pq",
+        "comment": "总正偏差考核电量"
+      },
+      {
+        "field_name": "t_posi_dev_check_amt",
+        "comment": "总正偏差考核电费"
+      },
+      {
+        "field_name": "t_negt_dev_check_pq",
+        "comment": "总负偏差考核电量，随机存放到一个参与交易的目录电价下"
+      },
+      {
+        "field_name": "t_negt_dev_check_amt",
+        "comment": "总负偏差考核电费"
+      },
+      {
+        "field_name": "t_pl_amt",
+        "comment": "该电价码该级数各项代征电费合计值"
+      },
+      {
+        "field_name": "level_inc_pq",
+        "comment": "执行阶梯电价的用户计算时,记录阶梯递增的电量"
+      },
+      {
+        "field_name": "app_code",
+        "comment": "申请编号:申请编号，各业务流程的唯一标识。传统为计划申请编号，清算为清算计划申请编号"
+      },
+      {
+        "field_name": "t_ssu_pq",
+        "comment": "自发自用电量，由内部消耗的电量"
+      },
+      {
+        "field_name": "t_ssu_pl_amt",
+        "comment": "总自发自用代征电费，自发自用各项代征费用之和。"
+      },
+      {
+        "field_name": "create_time",
+        "comment": ""
+      },
+      {
+        "field_name": "create_user",
+        "comment": ""
+      },
+      {
+        "field_name": "update_time",
+        "comment": ""
+      },
+      {
+        "field_name": "update_user",
+        "comment": ""
+      },
+      {
+        "field_name": "t_ol_ll_pq_amt",
+        "comment": "上网环节线损电费"
+      },
+      {
+        "field_name": "t_sys_op_amt",
+        "comment": "系统运行电费"
+      }
+    ]
+  },
+  {
     "table_name": "m_e_cons_prc_amt_arc",
     "fields": [
       {
@@ -7190,6 +8280,175 @@
       {
         "field_name": "t_sys_op_amt",
         "comment": "系统运行电费"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cons_snap",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "标识为一笔电费"
+      },
+      {
+        "field_name": "app_code",
+        "comment": ""
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月，如200801"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用电客户的内部唯一标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "veri_rslt",
+        "comment": "对电费计算结果的正确与否的判断结果，分为:正确、疑问、错误等"
+      },
+      {
+        "field_name": "veri_remark",
+        "comment": "可以对某笔电费输入简短审核说明"
+      },
+      {
+        "field_name": "calc_date",
+        "comment": "电费计算的日期"
+      },
+      {
+        "field_name": "send_date",
+        "comment": "电费发行的日期"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户的外部标识 引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "用户的名称，一般等于客户实体中的客户名称，但也允许附加上一些非自然的信息。如 XXX（东城），便于通过用户名称直接识别。"
+      },
+      {
+        "field_name": "cons_sort_code",
+        "comment": "用户一种常用的分类方式，方便用户的管理 01 高压，02 低压非居民，03 低压居民"
+      },
+      {
+        "field_name": "elec_addr",
+        "comment": "用电客户的用电地址"
+      },
+      {
+        "field_name": "trade_type_code",
+        "comment": "用电客户的行业分类代码 引用国标GB/T 4754-2002"
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "volt_code",
+        "comment": "用电客户的供电电压等级代码，多路电源时取电压等级最高的供电电压等级代码 引用《国家电网公司信息分类与代码体系－综合代码类集－电压等级代码表》"
+      },
+      {
+        "field_name": "hec_trade_code",
+        "comment": "依据国家最新的高耗能行业划分"
+      },
+      {
+        "field_name": "create_date",
+        "comment": "电子用户档案的首次建立日期"
+      },
+      {
+        "field_name": "poweron_date",
+        "comment": "用户的首次送电日期"
+      },
+      {
+        "field_name": "cancel_date",
+        "comment": "销户业务信息归档的日期"
+      },
+      {
+        "field_name": "status_code",
+        "comment": "用电客户的状态说明，说明客户是否处于业扩变更中或已销户 引用国家电网公司营销管理代码类集:5110.9 客户状态标志代码 正常用电客户，当前新装客户，当前变更客户，已销户客户"
+      },
+      {
+        "field_name": "busi_region_no",
+        "comment": "营业户序号"
+      },
+      {
+        "field_name": "transfer_flag",
+        "comment": "标识客户是否是转供相关客户，如果涉及转供，是属于转供户还是被转供户 引用国家电网公司营销管理代码类集:5110.35 转供标志分类与代码 无转供，转供户，被转供户"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "gp_code",
+        "comment": "标识该笔电费是分次结算第几期，默认为正常的电费计算。 0.电费计算 1.第一期 2.第二期 3.第三期"
+      },
+      {
+        "field_name": "calc_mark",
+        "comment": ""
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "shift_no",
+        "comment": "生产班次"
+      },
+      {
+        "field_name": "contract_cap",
+        "comment": "合同容量:合同约定的本用户的容量"
+      },
+      {
+        "field_name": "run_cap",
+        "comment": "运行容量"
+      },
+      {
+        "field_name": "market_user_no",
+        "comment": "市场化客户编号"
+      },
+      {
+        "field_name": "company_no",
+        "comment": "代理售电公司编号"
+      },
+      {
+        "field_name": "cons_market_type",
+        "comment": "用户市场化类型(空或者00为传统用户，不参与市场化交易；01 批发用户 02 零售用户 0301 普通代购用户 0302 正当退市转代购用户 0303 无正当理由退市转代购用户 0304 有燃煤自发电代购用户 0305 高耗能代购用户。默认为空或者00)"
+      },
+      {
+        "field_name": "rural_cons_code",
+        "comment": "用于区分是否为农网用电客户，对城乡类别进行分类编码，引用国家电网公司营销管理代码类集5110.104 处理现场分类与代码：01 城市   02 农村  03 特殊边远山区"
+      },
+      {
+        "field_name": "ctl_mode",
+        "comment": "费控类型（01-本地费控，02-本地量控，03-无，04-中心费控）。在现场勘查环节录入该信息。后付费用户选择03，费控用户选择01或是04"
+      },
+      {
+        "field_name": "verify_date",
+        "comment": "电费审核日期"
+      },
+      {
+        "field_name": "busi_scale",
+        "comment": "企业规模：busiScale 01空，02大型企业、03中型企业、04小微企业、05其他"
+      },
+      {
+        "field_name": "note_type_code",
+        "comment": "用电客户每月电费默认打印的票据类型 引用国家电网公司营销管理代码类集:5110.107票据类型 普通发票，增值税发票，收据，无"
       }
     ]
   },
@@ -7565,6 +8824,184 @@
       {
         "field_name": "dmd_start_date",
         "comment": "需量启用日期"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cont_fee",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "主键，序列生成"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "工单编号"
+      },
+      {
+        "field_name": "calc_id",
+        "comment": "电费计算标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "供电单位"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "cont_type",
+        "comment": "类型（01低保或02五保、03协议）"
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月"
+      },
+      {
+        "field_name": "t_settle_pq",
+        "comment": "总电量"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "总电费"
+      },
+      {
+        "field_name": "t_cat_kwh_amt",
+        "comment": "目录电度电费"
+      },
+      {
+        "field_name": "exp_date",
+        "comment": "写入时间"
+      },
+      {
+        "field_name": "this_cont_pq",
+        "comment": "本次优惠电量"
+      },
+      {
+        "field_name": "this_cont_amt",
+        "comment": "本次优惠金额"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志"
+      },
+      {
+        "field_name": "effect_date",
+        "comment": "生效时间"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "trim_flag",
+        "comment": "调整标志 未调整 0，已调整"
+      },
+      {
+        "field_name": "cont_pq",
+        "comment": ""
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cont_fee_arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "主键，序列生成"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "工单编号"
+      },
+      {
+        "field_name": "calc_id",
+        "comment": "电费计算标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "供电单位"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "cont_type",
+        "comment": "类型（01低保或02五保、03协议）"
+      },
+      {
+        "field_name": "ym",
+        "comment": "电费年月"
+      },
+      {
+        "field_name": "t_settle_pq",
+        "comment": "总电量"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "总电费"
+      },
+      {
+        "field_name": "t_cat_kwh_amt",
+        "comment": "目录电度电费"
+      },
+      {
+        "field_name": "exp_date",
+        "comment": "写入时间"
+      },
+      {
+        "field_name": "this_cont_pq",
+        "comment": "本次优惠电量"
+      },
+      {
+        "field_name": "this_cont_amt",
+        "comment": "本次优惠金额"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志"
+      },
+      {
+        "field_name": "effect_date",
+        "comment": "生效时间"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "trim_flag",
+        "comment": "调整标志 未调整 0，已调整"
+      },
+      {
+        "field_name": "cont_pq",
+        "comment": ""
       }
     ]
   },
@@ -8537,6 +9974,51 @@
     ]
   },
   {
+    "table_name": "m_e_price_adjust_tmp",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "电价码"
+      },
+      {
+        "field_name": "adjust_date",
+        "comment": "调整日期"
+      },
+      {
+        "field_name": "adjust_remark",
+        "comment": "调整说明"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位，用于目录电价实体，描述电价的执行单位"
+      },
+      {
+        "field_name": "create_time",
+        "comment": ""
+      },
+      {
+        "field_name": "create_user",
+        "comment": ""
+      },
+      {
+        "field_name": "update_time",
+        "comment": ""
+      },
+      {
+        "field_name": "update_user",
+        "comment": ""
+      },
+      {
+        "field_name": "prc_code",
+        "comment": "电价码"
+      },
+      {
+        "field_name": "remark",
+        "comment": ""
+      }
+    ]
+  },
+  {
     "table_name": "m_g_chkunit",
     "fields": [
       {
@@ -8590,6 +10072,192 @@
       {
         "field_name": "update_user",
         "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_chkunit_comp",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识"
+      },
+      {
+        "field_name": "chkunit_id",
+        "comment": "考核单元标识"
+      },
+      {
+        "field_name": "obj_id",
+        "comment": "关系对象标识"
+      },
+      {
+        "field_name": "obj_type_code",
+        "comment": "组成考核单元的是什么对象,如是线路、台区、电压等级、供电单位等"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_g_ll_stat",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "供电单位综合线损标识"
+      },
+      {
+        "field_name": "stat_id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "chkunit_id",
+        "comment": ""
+      },
+      {
+        "field_name": "org_id",
+        "comment": ""
+      },
+      {
+        "field_name": "l_ppq",
+        "comment": "∑线路考核单元供电量"
+      },
+      {
+        "field_name": "l_spq",
+        "comment": "∑公变台区考核单元供电量+∑专变台区供电量（没有考核表默认"
+      },
+      {
+        "field_name": "l_ll_pq",
+        "comment": "供电量-售电量"
+      },
+      {
+        "field_name": "l_llr",
+        "comment": "有损线损率:（损失电量/合计供电量）*100%"
+      },
+      {
+        "field_name": "l_llr_idx",
+        "comment": "有损线损率指标:有损线损率指标"
+      },
+      {
+        "field_name": "l_idx_diff",
+        "comment": "有损与指标差值:有损与指标差值"
+      },
+      {
+        "field_name": "l_period_llr",
+        "comment": "有损同期线损率:当月的往年同期线损率"
+      },
+      {
+        "field_name": "l_period_diff",
+        "comment": "有损同比差值:有损同比差值"
+      },
+      {
+        "field_name": "l_lm_llr",
+        "comment": "有损上月线损率:有损上月线损率"
+      },
+      {
+        "field_name": "l_chain_diff",
+        "comment": "有损环比差值:有损环比差值"
+      },
+      {
+        "field_name": "nl_ppq",
+        "comment": "无损供电量"
+      },
+      {
+        "field_name": "nl_spq",
+        "comment": "无损售电量"
+      },
+      {
+        "field_name": "nl_ll_pq",
+        "comment": "无损线损电量"
+      },
+      {
+        "field_name": "nl_llr",
+        "comment": "无损线损率:无损线损率"
+      },
+      {
+        "field_name": "g_ppq",
+        "comment": "综合供电量"
+      },
+      {
+        "field_name": "g_spq",
+        "comment": "综合售电量"
+      },
+      {
+        "field_name": "g_ll_pq",
+        "comment": "综合线损电量"
+      },
+      {
+        "field_name": "g_llr",
+        "comment": "综合线损率:综合线损率"
+      },
+      {
+        "field_name": "g_llr_idx",
+        "comment": "综合线损率指标:综合线损率指标"
+      },
+      {
+        "field_name": "g_idx_diff",
+        "comment": "综合与指标差值:综合与指标差值"
+      },
+      {
+        "field_name": "g_period_llr",
+        "comment": "综合同期线损率:综合同期线损率"
+      },
+      {
+        "field_name": "g_period_diff",
+        "comment": "综合同比差值:综合同比差值"
+      },
+      {
+        "field_name": "g_llr_lm",
+        "comment": "综合上月线损率:综合上月线损率"
+      },
+      {
+        "field_name": "g_chain_diff",
+        "comment": "综合环比差值:综合环比差值"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "adj_ppq",
+        "comment": "调整供电量"
+      },
+      {
+        "field_name": "adj_spq",
+        "comment": "调整售电量"
+      },
+      {
+        "field_name": "bulk_ppq",
+        "comment": "趸购供电量"
+      },
+      {
+        "field_name": "bulk_spq",
+        "comment": "趸购售电量"
       }
     ]
   },
@@ -8785,6 +10453,470 @@
     ]
   },
   {
+    "table_name": "m_g_ll_stat",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "stat_sort_code",
+        "comment": "分为台区电量统计、线路电量统计、考核单元电量统计、线损报表统计等，可自行扩充"
+      },
+      {
+        "field_name": "rpt_no",
+        "comment": "当统计类别为“线损报表统计”时，统计报表的编号"
+      },
+      {
+        "field_name": "rpt_name",
+        "comment": "当统计类别为“线损报表统计”时，统计报表的名称"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "报表的统计数据所属供电单位"
+      },
+      {
+        "field_name": "sub_org_flag",
+        "comment": "报表统计时，是否包含当前单位的下级单位"
+      },
+      {
+        "field_name": "period_code",
+        "comment": "报表的考核周期，如年、季、月、日、时间段等，分别代表按年统计、按季统计、按月统计、按日统计、按时间段统计"
+      },
+      {
+        "field_name": "range_obj_sort",
+        "comment": "用于线损统计时统计供电单位下级范围，例如统计某单位的变电站的分压线损，此处填写0（变电站）"
+      },
+      {
+        "field_name": "range_id",
+        "comment": "例如统计某单位的变电站的分压线损，此处填写统计的变电站的标识"
+      },
+      {
+        "field_name": "fore_flag",
+        "comment": "用于区分统计结果是测算线路综合线损率还是根据实际抄表售电量数据统计综合线损率，其值分为1.是、0.否"
+      },
+      {
+        "field_name": "bgn_date",
+        "comment": "年报填写年份，如2007，月报填写具体月份如200808，季报填写年度+季度,如20081"
+      },
+      {
+        "field_name": "end_date",
+        "comment": "年报填写年份，如2007，月报填写具体月份如200808，季报填写年度+季度,如20081"
+      },
+      {
+        "field_name": "gateway_bgn_date",
+        "comment": "采用的开始抄表日期"
+      },
+      {
+        "field_name": "gateway_end_date",
+        "comment": "采用的截至抄表日期"
+      },
+      {
+        "field_name": "auto_stat_flag",
+        "comment": "分为自动和人工，可自行扩充"
+      },
+      {
+        "field_name": "emp_no",
+        "comment": "线损报表统计人代码"
+      },
+      {
+        "field_name": "stat_date",
+        "comment": "线损报表统计时间"
+      },
+      {
+        "field_name": "verifier_no",
+        "comment": "线损报表审核人代码"
+      },
+      {
+        "field_name": "veri_date",
+        "comment": "线损报表审核时间"
+      },
+      {
+        "field_name": "data_status",
+        "comment": "标识该统计数据的状态,如已统计、已审核、统计异常、统计出错等，可根据需要自行设定"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_ll_stat_byvolt",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "分压线损统计数据标识"
+      },
+      {
+        "field_name": "stat_id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "chkunit_id",
+        "comment": ""
+      },
+      {
+        "field_name": "volt_code",
+        "comment": "电压等级"
+      },
+      {
+        "field_name": "l_ppq",
+        "comment": "∑线路考核单元供电量"
+      },
+      {
+        "field_name": "l_spq",
+        "comment": "∑公变台区考核单元供电量+∑专变台区供电量（没有考核表默认"
+      },
+      {
+        "field_name": "l_ll_pq",
+        "comment": "供电量-售电量"
+      },
+      {
+        "field_name": "tp_llr",
+        "comment": "本月线损率:线损电量／供电量×100%"
+      },
+      {
+        "field_name": "llr_plan",
+        "comment": "计划线损率:计划线损率"
+      },
+      {
+        "field_name": "l_period_llr",
+        "comment": "有损同期线损率:当月的往年同期线损率"
+      },
+      {
+        "field_name": "l_lm_llr",
+        "comment": "有损上月线损率:有损上月线损率"
+      },
+      {
+        "field_name": "accu_llr_season",
+        "comment": "季度累计线损率:季度累计线损电量/季度累计供电量×100%"
+      },
+      {
+        "field_name": "annual_accu_llr",
+        "comment": "年累计线损率:年累计线损电量/年累计供电量×100%"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "adj_ppq",
+        "comment": "调整供电量"
+      },
+      {
+        "field_name": "adj_spq",
+        "comment": "调整售电量"
+      },
+      {
+        "field_name": "ppq",
+        "comment": "供电量"
+      },
+      {
+        "field_name": "spq",
+        "comment": "售电量"
+      },
+      {
+        "field_name": "bulk_ppq",
+        "comment": "趸购供电量"
+      },
+      {
+        "field_name": "bulk_spq",
+        "comment": "趸购售电量"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_llr_cmpl",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "线路线损率完成情况标识"
+      },
+      {
+        "field_name": "stat_id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "line_id",
+        "comment": "线路的系统内部唯一标识"
+      },
+      {
+        "field_name": "line_no",
+        "comment": "每条线路在系统中的编码号"
+      },
+      {
+        "field_name": "line_name",
+        "comment": "每条线路的名称"
+      },
+      {
+        "field_name": "read_ppq",
+        "comment": "该条线路抄见的本期示数-上期示数得到的电量"
+      },
+      {
+        "field_name": "adj_ppq",
+        "comment": "根据实际情况手工调整的供电量"
+      },
+      {
+        "field_name": "t_ppq",
+        "comment": "抄见供电量+调整供电量"
+      },
+      {
+        "field_name": "settle_spq",
+        "comment": "线路用电客户售电量"
+      },
+      {
+        "field_name": "adj_sale_pq",
+        "comment": "根据实际情况手工调整的售电量"
+      },
+      {
+        "field_name": "t_spq",
+        "comment": "结算售电量+调整售电量"
+      },
+      {
+        "field_name": "lpq",
+        "comment": "合计供电量-合计售电量"
+      },
+      {
+        "field_name": "l_llr",
+        "comment": "有损线损率:（损失电量/合计供电量）*100%"
+      },
+      {
+        "field_name": "ll_idx",
+        "comment": "线损指标:管理部门下发的线损率考核值"
+      },
+      {
+        "field_name": "idx_diff",
+        "comment": "指标比差异:线损率-线损率指标"
+      },
+      {
+        "field_name": "l_period_llr",
+        "comment": "有损同期线损率:当月的往年同期线损率"
+      },
+      {
+        "field_name": "period_diff",
+        "comment": "同比差异:当月线损率-同期线损率年累计线损率=全年线损电量/全年供电量"
+      },
+      {
+        "field_name": "l_lm_llr",
+        "comment": "有损上月线损率:有损上月线损率"
+      },
+      {
+        "field_name": "chain_diff",
+        "comment": "环比差异:当月线损率-上月线损率年"
+      },
+      {
+        "field_name": "annual_accu_llr",
+        "comment": "年累计线损率:年累计线损电量/年累计供电量×100%"
+      },
+      {
+        "field_name": "accu_period_llr",
+        "comment": "同期累计线损率:同期累计线损率"
+      },
+      {
+        "field_name": "accu_period_diff",
+        "comment": "累计同比差异:累计同比差异"
+      },
+      {
+        "field_name": "fore_flag",
+        "comment": "标识是否预估的线损率数据"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "chkunit_org_no",
+        "comment": "考核单元单位"
+      },
+      {
+        "field_name": "resp_emp_no",
+        "comment": "责任人"
+      },
+      {
+        "field_name": "line_num",
+        "comment": "线路个数"
+      },
+      {
+        "field_name": "bulk_ppq",
+        "comment": "趸购供电量"
+      },
+      {
+        "field_name": "bulk_spq",
+        "comment": "趸购售电量"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_llr_cmpl_highvolt",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "35KV及高压线路线损率完成情况标识"
+      },
+      {
+        "field_name": "stat_id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "line_id",
+        "comment": "35KV及高压线路的系统内部唯一标识"
+      },
+      {
+        "field_name": "line_no",
+        "comment": "每条35KV及高压线路在系统中的编码号"
+      },
+      {
+        "field_name": "line_name",
+        "comment": "每条35KV及高压线路的名称"
+      },
+      {
+        "field_name": "read_ppq",
+        "comment": "该条35KV及高压线路抄见的本期示数-上期示数得到的电量"
+      },
+      {
+        "field_name": "adj_ppq",
+        "comment": "根据实际情况手工调整的供电量"
+      },
+      {
+        "field_name": "t_ppq",
+        "comment": "抄见供电量+调整供电量"
+      },
+      {
+        "field_name": "settle_spq",
+        "comment": "35KV及高压线路用电客户售电量"
+      },
+      {
+        "field_name": "adj_sale_pq",
+        "comment": "根据实际情况手工调整的售电量"
+      },
+      {
+        "field_name": "t_spq",
+        "comment": "结算售电量+调整售电量"
+      },
+      {
+        "field_name": "lpq",
+        "comment": "合计供电量-合计售电量"
+      },
+      {
+        "field_name": "l_llr",
+        "comment": "有损线损率:（损失电量/合计供电量）*100%"
+      },
+      {
+        "field_name": "ll_idx",
+        "comment": "线损指标:管理部门下发的线损率考核值"
+      },
+      {
+        "field_name": "idx_diff",
+        "comment": "指标比差异:线损率-线损率指标"
+      },
+      {
+        "field_name": "l_period_llr",
+        "comment": "有损同期线损率:当月的往年同期线损率"
+      },
+      {
+        "field_name": "period_diff",
+        "comment": "同比差异:当月线损率-同期线损率年累计线损率=全年线损电量/全年供电量"
+      },
+      {
+        "field_name": "l_lm_llr",
+        "comment": "有损上月线损率:有损上月线损率"
+      },
+      {
+        "field_name": "chain_diff",
+        "comment": "环比差异:当月线损率-上月线损率年"
+      },
+      {
+        "field_name": "annual_accu_llr",
+        "comment": "年累计线损率:年累计线损电量/年累计供电量×100%"
+      },
+      {
+        "field_name": "accu_period_llr",
+        "comment": "同期累计线损率:同期累计线损率"
+      },
+      {
+        "field_name": "accu_period_diff",
+        "comment": "累计同比差异:累计同比差异"
+      },
+      {
+        "field_name": "fore_flag",
+        "comment": "标识是否预估的线损率数据"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "chkunit_org_no",
+        "comment": "考核单元单位"
+      },
+      {
+        "field_name": "resp_emp_no",
+        "comment": "责任人"
+      },
+      {
+        "field_name": "line_num",
+        "comment": "35KV及高压线路个数"
+      },
+      {
+        "field_name": "bulk_ppq",
+        "comment": "趸购供电量"
+      },
+      {
+        "field_name": "bulk_spq",
+        "comment": "趸购售电量"
+      }
+    ]
+  },
+  {
     "table_name": "m_g_subs",
     "fields": [
       {
@@ -8960,6 +11092,183 @@
     ]
   },
   {
+    "table_name": "m_g_tg_ll_det",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "台区线损率明细数据标识"
+      },
+      {
+        "field_name": "stat_id",
+        "comment": "报表统计记录的标识"
+      },
+      {
+        "field_name": "tg_id",
+        "comment": "台区标识"
+      },
+      {
+        "field_name": "tg_no",
+        "comment": "台区编码"
+      },
+      {
+        "field_name": "pub_priv_flag",
+        "comment": "公变/专变"
+      },
+      {
+        "field_name": "tg_name",
+        "comment": "台区名称"
+      },
+      {
+        "field_name": "mr_plan_date",
+        "comment": "抄表例日"
+      },
+      {
+        "field_name": "read_ppq",
+        "comment": "该条线路抄见的本期示数-上期示数得到的电量"
+      },
+      {
+        "field_name": "adj_ppq",
+        "comment": "根据实际情况手工调整的供电量"
+      },
+      {
+        "field_name": "t_ppq",
+        "comment": "抄见供电量+调整供电量"
+      },
+      {
+        "field_name": "settle_spq",
+        "comment": "线路用电客户售电量"
+      },
+      {
+        "field_name": "adj_sale_pq",
+        "comment": "根据实际情况手工调整的售电量"
+      },
+      {
+        "field_name": "t_spq",
+        "comment": "结算售电量+调整售电量"
+      },
+      {
+        "field_name": "lpq",
+        "comment": "合计供电量-合计售电量"
+      },
+      {
+        "field_name": "l_llr",
+        "comment": "有损线损率:（损失电量/合计供电量）*100%"
+      },
+      {
+        "field_name": "ll_idx",
+        "comment": "线损指标:管理部门下发的线损率考核值"
+      },
+      {
+        "field_name": "idx_diff",
+        "comment": "指标比差异:线损率-线损率指标"
+      },
+      {
+        "field_name": "l_period_llr",
+        "comment": "有损同期线损率:当月的往年同期线损率"
+      },
+      {
+        "field_name": "period_diff",
+        "comment": "同比差异:当月线损率-同期线损率年累计线损率=全年线损电量/全年供电量"
+      },
+      {
+        "field_name": "l_lm_llr",
+        "comment": "有损上月线损率:有损上月线损率"
+      },
+      {
+        "field_name": "chain_diff",
+        "comment": "环比差异:当月线损率-上月线损率年"
+      },
+      {
+        "field_name": "annual_accu_llr",
+        "comment": "年累计线损率:年累计线损电量/年累计供电量×100%"
+      },
+      {
+        "field_name": "accu_period_llr",
+        "comment": "同期累计线损率:同期累计线损率"
+      },
+      {
+        "field_name": "accu_period_diff",
+        "comment": "累计同比差异:累计同比差异"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "chkunit_org_no",
+        "comment": "考核单元单位"
+      },
+      {
+        "field_name": "resp_emp_no",
+        "comment": "责任人"
+      },
+      {
+        "field_name": "link_flag",
+        "comment": "组合标志:组合标志（是、否）"
+      },
+      {
+        "field_name": "pf",
+        "comment": "功率因素"
+      },
+      {
+        "field_name": "rp_pq",
+        "comment": "无功电量"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号:抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "line_id",
+        "comment": "线路标识"
+      },
+      {
+        "field_name": "tg_num",
+        "comment": "公变台数"
+      },
+      {
+        "field_name": "tran_num",
+        "comment": "变压器个数"
+      },
+      {
+        "field_name": "tg_cap",
+        "comment": "容量:台区容量,为可并列运行的变压器容量之和"
+      },
+      {
+        "field_name": "total_user_num",
+        "comment": "总户数:台区下计费户的退补电量合计"
+      },
+      {
+        "field_name": "rs_pq",
+        "comment": "退补电量:台区下计费户的退补电量合计"
+      },
+      {
+        "field_name": "zero_user_num",
+        "comment": "零度用户数:台区下计费户发行电量为0的个数"
+      },
+      {
+        "field_name": "bulk_ppq",
+        "comment": "趸购供电量"
+      },
+      {
+        "field_name": "bulk_spq",
+        "comment": "趸购售电量"
+      }
+    ]
+  },
+  {
     "table_name": "m_g_tran",
     "fields": [
       {
@@ -8980,11 +11289,11 @@
       },
       {
         "field_name": "type_code",
-        "comment": "区分是变压器还是高压电动机\\n                        01 变压器，02 高压电动机"
+        "comment": "区分是变压器还是高压电动机 枚举值: 01=变压器，02=高压电动机"
       },
       {
         "field_name": "chg_remark",
-        "comment": "设备的变更说明\\n                        01 新装、02 停用、03 启用、04 拆除，05 减容，06 减容恢复"
+        "comment": "设备的变更说明 枚举值: 01=新装、02=停用、03=启用、04=拆除，05=减容，06=减容恢复"
       },
       {
         "field_name": "tran_name",
@@ -9024,7 +11333,7 @@
       },
       {
         "field_name": "run_status_code",
-        "comment": "本次变更前的运行状态\\n                        01 运行、02  停用、03 拆除"
+        "comment": "本次变更前的运行状态 枚举值: 01=运行、02=停用、03=拆除"
       },
       {
         "field_name": "pub_priv_flag",
@@ -9032,11 +11341,11 @@
       },
       {
         "field_name": "chg_cap",
-        "comment": "变动容量:针对以下情况设计\\n                        减容期满后的用户以及新装、增容用户，二年内不得申办减容或暂停。如确需继续办理减容或暂停的，减少或暂停部分容量的基本电费应按百分之五十计算收取\\n                        本属性存储应减少收取的容量，即实际收取的容量等于铭牌容量减去变动容量"
+        "comment": "变动容量:针对以下情况设计 减容期满后的用户以及新装、增容用户，二年内不得申办减容或暂停。如确需继续办理减容或暂停的，减少或暂停部分容量的基本电费应按百分之五十计算收取 本属性存储应减少收取的容量，即实际收取的容量等于铭牌容量减去变动容量"
       },
       {
         "field_name": "due_date",
-        "comment": "针对以下情况设计\\n                        减容期满后的用户以及新装、增容用户，二年内不得申办减容或暂停。如确需继续办理减容或暂停的，减少或暂停部分容量的基本电费应按百分之五十计算收取\\n                        本属性记录继续减容或暂停到期日期，到期日期后变动容量则不生效了，仍按铭牌容量收取基本电费。"
+        "comment": "针对以下情况设计 减容期满后的用户以及新装、增容用户，二年内不得申办减容或暂停。如确需继续办理减容或暂停的，减少或暂停部分容量的基本电费应按百分之五十计算收取 本属性记录继续减容或暂停到期日期，到期日期后变动容量则不生效了，仍按铭牌容量收取基本电费。"
       },
       {
         "field_name": "protect_mode",
@@ -9076,11 +11385,11 @@
       },
       {
         "field_name": "wire_group_code",
-        "comment": "引用国家电网公司营销管理代码类集:5110.42变压器接线组别分类与代码\\n                        01\tYyn0\\n                        02\tYz11\\n                        03\tYd11\\n                        04\tDyn11\\n                        05\tYnd11\\n                        06\tYnyn0d11\\n                        07\tYnyn0yn0\\n                        08\tYna0d11\\n                        09\tYna0yn0\\n                        10\tYd11yn0"
+        "comment": "引用国家电网公司营销管理代码类集:5110.42变压器接线组别分类与代码 枚举值: 01=Yyn0, 02=Yz11, 03=Yd11, 04=Dyn11, 05=Ynd11, 06=Ynyn0d11, 07=Ynyn0yn0, 08=Yna0d11, 09=Yna0yn0, 10=Yd11yn0"
       },
       {
         "field_name": "cool_mode",
-        "comment": "引用 5110.41营销代码标准 第41部分 变压器冷却方式分类与代码\\n                        01\t自然冷却\\n                        02\t风冷\\n                        03\t油浸自冷\\n                        04\t油浸水冷\\n                        05\t强迫油循环水冷\\n                        06\t氢冷\\n                        99\t其它机械"
+        "comment": "引用 5110.41营销代码标准 第41部分 变压器冷却方式分类与代码 枚举值: 01=自然冷却, 02=风冷, 03=油浸自冷, 04=油浸水冷, 05=强迫油循环水冷, 06=氢冷, 99=其它机械"
       },
       {
         "field_name": "rv_hv",
@@ -9124,7 +11433,7 @@
       },
       {
         "field_name": "pr_code",
-        "comment": "设备的产权说明\\n                        01 局属、02 用户"
+        "comment": "设备的产权说明 枚举值: 01=局属、02=用户"
       },
       {
         "field_name": "main_wiring_mode",
@@ -9164,7 +11473,7 @@
       },
       {
         "field_name": "ts_alg_flag",
-        "comment": "引用 5110.30 营销代码标准 第30部分 变损计算方式分类与代码,\\n                        0\t不计算\\n                        1\t按定比\\n                        2\t按定量\\n                        3\t按标准公式\\n                        4\t按标准表"
+        "comment": "引用 5110.30 营销代码标准 第30部分 变损计算方式分类与代码 枚举值: 0=不计算, 1=按定比, 2=按定量, 3=按标准公式, 4=按标准表"
       },
       {
         "field_name": "pdbyq_st_id",
@@ -9185,6 +11494,107 @@
       {
         "field_name": "update_user",
         "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_kb_a_card_classpq",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "卡表分类电量标识"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "申请编号，各业务流程的唯一标识。"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "card_no",
+        "comment": "电卡编号"
+      },
+      {
+        "field_name": "meter_id",
+        "comment": "电能表标识"
+      },
+      {
+        "field_name": "category",
+        "comment": "调整类别"
+      },
+      {
+        "field_name": "effect_type",
+        "comment": "生效类型。  暂时不用，01-写卡并进入余额；02-仅写卡；03-仅进入余额"
+      },
+      {
+        "field_name": "adjustment_pq",
+        "comment": "调整电量(最新一次的调整值)"
+      },
+      {
+        "field_name": "adjustment_amt",
+        "comment": "调整金额(最新一次的调整值)用于多功能复费率表写卡为金额的卡表"
+      },
+      {
+        "field_name": "enter_date",
+        "comment": "录入调整电量的日期"
+      },
+      {
+        "field_name": "opr_id",
+        "comment": "操作流水号:购电记录的主键标识，代表那笔购电记录使用了调整。"
+      },
+      {
+        "field_name": "deal_flag",
+        "comment": "01 未处理，02已处理"
+      },
+      {
+        "field_name": "enter_no",
+        "comment": "录入人员"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "供电单位"
+      },
+      {
+        "field_name": "remarks",
+        "comment": "产生调整电量的原因"
+      },
+      {
+        "field_name": "give_cons_no",
+        "comment": "由A_KBFLDL归档过来,用户编号为被转赠户,转赠户号为被消户号)"
+      },
+      {
+        "field_name": "give_asset_no",
+        "comment": "由A_KBFLDL归档过来,转赠资产号为被消户的资产号)"
+      },
+      {
+        "field_name": "sys_flag",
+        "comment": "0非系统标志,1系统标识"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建人员"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "修改时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "修改人员"
+      },
+      {
+        "field_name": "deal_time",
+        "comment": "处理时间"
+      },
+      {
+        "field_name": "cont_fee_id",
+        "comment": "优惠电量唯一标识"
       }
     ]
   },
@@ -9245,19 +11655,19 @@
       },
       {
         "field_name": "create_time",
-        "comment": ""
+        "comment": "创建时间"
       },
       {
         "field_name": "create_user",
-        "comment": ""
+        "comment": "创建人"
       },
       {
         "field_name": "update_time",
-        "comment": ""
+        "comment": "更新时间"
       },
       {
         "field_name": "update_user",
-        "comment": ""
+        "comment": "更新人"
       },
       {
         "field_name": "take_effect_flag",
@@ -9270,7 +11680,7 @@
     "fields": [
       {
         "field_name": "id",
-        "comment": "本实体记录的唯一标识。"
+        "comment": "本实体记录的唯一标识"
       },
       {
         "field_name": "para_sort_id",
@@ -9408,6 +11818,131 @@
       {
         "field_name": "update_user",
         "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_ps_iccard_info",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "IC卡信息主键"
+      },
+      {
+        "field_name": "orgId",
+        "comment": "组织机构ID"
+      },
+      {
+        "field_name": "consmeterId",
+        "comment": "用户电能表ID"
+      },
+      {
+        "field_name": "purchaseId",
+        "comment": "购电记录ID"
+      },
+      {
+        "field_name": "consCode",
+        "comment": "用户编号"
+      },
+      {
+        "field_name": "meterCode",
+        "comment": "电能表编号"
+      },
+      {
+        "field_name": "iccardCode",
+        "comment": "IC卡号"
+      },
+      {
+        "field_name": "iccardSequenceNum",
+        "comment": "IC卡序列号"
+      },
+      {
+        "field_name": "iccardType",
+        "comment": "IC卡类型"
+      },
+      {
+        "field_name": "iccardStatus",
+        "comment": "IC卡状态"
+      },
+      {
+        "field_name": "iccardTradeFee",
+        "comment": "IC卡交易金额"
+      },
+      {
+        "field_name": "iccardTradeQuantity",
+        "comment": "IC卡交易电量"
+      },
+      {
+        "field_name": "iccardPurchaseNum",
+        "comment": "IC卡累计购电次数"
+      },
+      {
+        "field_name": "meterPurchaseNum",
+        "comment": "电能表累计购电次数"
+      },
+      {
+        "field_name": "writeCardStatus",
+        "comment": "写卡状态"
+      },
+      {
+        "field_name": "returnFee",
+        "comment": "退补金额"
+      },
+      {
+        "field_name": "factoryFee",
+        "comment": "出厂金额"
+      },
+      {
+        "field_name": "openFee",
+        "comment": "开户金额"
+      },
+      {
+        "field_name": "meterFee",
+        "comment": "表计余额"
+      },
+      {
+        "field_name": "unInsertFee",
+        "comment": "IC卡未插表金额"
+      },
+      {
+        "field_name": "operateNum",
+        "comment": "操作次数"
+      },
+      {
+        "field_name": "cpuType",
+        "comment": "CPU卡规范"
+      },
+      {
+        "field_name": "mediumGuid",
+        "comment": "介质ID"
+      },
+      {
+        "field_name": "operatorGuid",
+        "comment": "判断自管户IC卡是否有效"
+      },
+      {
+        "field_name": "initPreSellTimes",
+        "comment": "初始购电次数"
+      },
+      {
+        "field_name": "calutRate",
+        "comment": "倍率"
+      },
+      {
+        "field_name": "updateTime",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "made_no_int",
+        "comment": "出厂编号整数值"
+      },
+      {
+        "field_name": "meterPurchaseId",
+        "comment": "购电操作记录ID"
+      },
+      {
+        "field_name": "fillMeterCode",
+        "comment": "电能表编号全码"
       }
     ]
   },
@@ -9725,7 +12260,7 @@
       },
       {
         "field_name": "baudrate_code",
-        "comment": "波特率:不同的电能表的波特率是不同的 "
+        "comment": "波特率:不同的电能表的波特率是不同的"
       },
       {
         "field_name": "serial_para",
@@ -9814,6 +12349,87 @@
       {
         "field_name": "cj_tg_total",
         "comment": "是否主表(参与电量计算)"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_cons_balance_day",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "主键ID"
+      },
+      {
+        "field_name": "region",
+        "comment": "集中器逻辑地址"
+      },
+      {
+        "field_name": "local",
+        "comment": "集中器区域码"
+      },
+      {
+        "field_name": "pn",
+        "comment": "采集点"
+      },
+      {
+        "field_name": "recordTime",
+        "comment": "数据冻结时间"
+      },
+      {
+        "field_name": "remainMoney",
+        "comment": "剩余金额"
+      },
+      {
+        "field_name": "createDate",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "buyNum",
+        "comment": "购电次数"
+      },
+      {
+        "field_name": "remainEnergy",
+        "comment": "剩余电量"
+      },
+      {
+        "field_name": "sumEnergy",
+        "comment": "总电量"
+      },
+      {
+        "field_name": "sumMoney",
+        "comment": "总金额"
+      },
+      {
+        "field_name": "overdraftEnergy",
+        "comment": "透支电量"
+      },
+      {
+        "field_name": "overdraftLimit",
+        "comment": "透支限额"
+      },
+      {
+        "field_name": "alarmEnergy",
+        "comment": "报警电量"
+      },
+      {
+        "field_name": "failEnergy",
+        "comment": "故障电量"
+      },
+      {
+        "field_name": "settlementDate",
+        "comment": "结算日期"
+      },
+      {
+        "field_name": "settlementBuyNum",
+        "comment": "结算日当天购电次数"
+      },
+      {
+        "field_name": "settlementRemainMoney",
+        "comment": "结算日当天电表余额"
+      },
+      {
+        "field_name": "dbwb",
+        "comment": "电表倍率，取自 sum( CASE category WHEN ..."
       }
     ]
   },
@@ -10104,6 +12720,39 @@
     ]
   },
   {
+    "table_name": "m_r_cp_cons_rela",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "采集用户关系标识：本实体记录的唯一标识"
+      },
+      {
+        "field_name": "cp_no",
+        "comment": "采集点编号：本实体记录的唯一标识"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用户标识：本实体记录的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "create_time",
+        "comment": ""
+      },
+      {
+        "field_name": "create_user",
+        "comment": ""
+      },
+      {
+        "field_name": "update_time",
+        "comment": ""
+      },
+      {
+        "field_name": "update_user",
+        "comment": ""
+      }
+    ]
+  },
+  {
     "table_name": "m_r_data",
     "fields": [
       {
@@ -10128,7 +12777,7 @@
       },
       {
         "field_name": "cons_no",
-        "comment": "用户的外部标识\\n            引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则"
+        "comment": "用户的外部标识\n            引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则"
       },
       {
         "field_name": "org_no",
@@ -10156,7 +12805,7 @@
       },
       {
         "field_name": "read_type_code",
-        "comment": "示数类型，引用营销标准代码集5110.75电能表示数类型分类与代码，并包括：\\n            需量(尖峰)\\n            需量(峰)\\n            需量(平)\\n            需量(谷)"
+        "comment": "示数类型，引用营销标准代码集5110.75电能表示数类型分类与代码，并包括：\n            需量(尖峰)\n            需量(峰)\n            需量(平)\n            需量(谷)"
       },
       {
         "field_name": "t_factor",
@@ -10176,7 +12825,7 @@
       },
       {
         "field_name": "this_read_pq",
-        "comment": "本次抄见电量:本次抄见电量。有功表、无功表抄见电量计算：抄见电量i=（本次示数i－上次示数i）× 综合倍率；                                                                                                                                                            \\n            需量表抄见电量计算：抄见最大需量i= 本次示数i × 综合倍率                                                                                                                                                                                                                                                                                                      \\n            其中i表示各时段。                                                                                                                                                                                                                                                                                                                                                             \\n            单位：千瓦时"
+        "comment": "本次抄见电量:本次抄见电量。有功表、无功表抄见电量计算：抄见电量i=（本次示数i－上次示数i）× 综合倍率；                                                                                                                                                            \n            需量表抄见电量计算：抄见最大需量i= 本次示数i × 综合倍率                                                                                                                                                                                                                                                                                                      \n            其中i表示各时段。                                                                                                                                                                                                                                                                                                                                                             \n            单位：千瓦时"
       },
       {
         "field_name": "mr_status_code",
@@ -10240,7 +12889,7 @@
       },
       {
         "field_name": "usage_code",
-        "comment": "\"用途代码:引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06"
+        "comment": "用途代码:引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06"
       },
       {
         "field_name": "asset_no",
@@ -10297,7 +12946,7 @@
       },
       {
         "field_name": "mr_plan_no",
-        "comment": "本实体记录外部唯一标识，产生规则为流水号"
+        "comment": "本实体记录外部唯一标识，产生规则为流水号。"
       },
       {
         "field_name": "app_no",
@@ -10305,19 +12954,19 @@
       },
       {
         "field_name": "calc_id",
-        "comment": "对应所算费结果所对应的电费记录"
+        "comment": "对应所算费结果所对应的电费记录。"
       },
       {
         "field_name": "amt_ym",
-        "comment": "电费年月，此处用于描述抄表年月"
+        "comment": "电费年月，此处用于描述抄表年月。"
       },
       {
         "field_name": "cons_no",
-        "comment": "用户的外部标识\\n            引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则"
+        "comment": "用户的外部标识。引用国家电网公司营销管理代码类集:5110.1  用电客户编号规则。"
       },
       {
         "field_name": "org_no",
-        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位。"
       },
       {
         "field_name": "meter_id",
@@ -10325,15 +12974,15 @@
       },
       {
         "field_name": "mp_id",
-        "comment": "计量点编号，引用自计量点实体计量点实体属性"
+        "comment": "计量点编号，引用自计量点实体计量点实体属性。"
       },
       {
         "field_name": "mr_sn",
-        "comment": "抄表顺序号，用于方便抄表给计量点的排序号"
+        "comment": "抄表顺序号，用于方便抄表给计量点的排序号。"
       },
       {
         "field_name": "avg_pq",
-        "comment": "平均电量:一边为前三个月的平均电量，单位：千瓦时"
+        "comment": "平均电量:一边为前三个月的平均电量，单位：千瓦时。"
       },
       {
         "field_name": "mr_digit",
@@ -10341,7 +12990,7 @@
       },
       {
         "field_name": "read_type_code",
-        "comment": "示数类型，引用营销标准代码集5110.75电能表示数类型分类与代码，并包括：\\n            需量(尖峰)\\n            需量(峰)\\n            需量(平)\\n            需量(谷)"
+        "comment": "示数类型，引用营销标准代码集5110.75电能表示数类型分类与代码，并包括：需量(尖峰)、需量(峰)、需量(平)、需量(谷)。"
       },
       {
         "field_name": "t_factor",
@@ -10353,7 +13002,7 @@
       },
       {
         "field_name": "last_mr_pq",
-        "comment": "上次抄见电量:上次抄见电量：用于存放用户上次 计费抄见电量。单位：千瓦时"
+        "comment": "上次抄见电量:上次抄见电量：用于存放用户上次 计费抄见电量。单位：千瓦时。"
       },
       {
         "field_name": "this_read",
@@ -10361,7 +13010,7 @@
       },
       {
         "field_name": "this_read_pq",
-        "comment": "本次抄见电量:本次抄见电量。有功表、无功表抄见电量计算：抄见电量i=（本次示数i－上次示数i）× 综合倍率；"
+        "comment": "本次抄见电量:本次抄见电量。有功表、无功表抄见电量计算：抄见电量i=（本次示数i－上次示数i）× 综合倍率。"
       },
       {
         "field_name": "mr_status_code",
@@ -10393,11 +13042,237 @@
       },
       {
         "field_name": "actual_mode",
-        "comment": "实际使用抄表方式：引用国家电网公司营销管理代码类集: 5110.31 电能计量抄表方式/采集方式分"
+        "comment": "实际使用抄表方式：引用国家电网公司营销管理代码类集: 5110.31 电能计量抄表方式/采集方式分类。"
       },
       {
         "field_name": "meter_date",
-        "comment": "电能表对时前日期"
+        "comment": "电能表对时前日期。"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间。"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户。"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间。"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户。"
+      },
+      {
+        "field_name": "ref_meter_flag",
+        "comment": "是否参考表:标明电能表是否是参考表，包括01是、02否。"
+      },
+      {
+        "field_name": "use_id",
+        "comment": "用途标识。"
+      },
+      {
+        "field_name": "usage_code",
+        "comment": "用途代码:引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06）。"
+      },
+      {
+        "field_name": "asset_no",
+        "comment": "资产编号:资产编号，局编号。"
+      },
+      {
+        "field_name": "made_no",
+        "comment": "出厂编号:厂家印制的编号。"
+      },
+      {
+        "field_name": "comm_no",
+        "comment": "通讯规约:通讯规约：645、…。"
+      },
+      {
+        "field_name": "meas_box",
+        "comment": "计量箱号。"
+      },
+      {
+        "field_name": "remain_amt",
+        "comment": "剩余金额:智能表剩余金额。"
+      },
+      {
+        "field_name": "adjust_amt",
+        "comment": "调整电费:费控表计算出的电费和正常电费计算出的电费的差值电费。"
+      },
+      {
+        "field_name": "adjust_35_pq",
+        "comment": "35度政策调整电量。"
+      },
+      {
+        "field_name": "calc_35_pq_flag",
+        "comment": "35度政策计算结果 00 未计算 01 已计算 02 计算失败：采集示数缺失。"
+      },
+      {
+        "field_name": "purchase_times",
+        "comment": "表计购电次数。"
+      },
+      {
+        "field_name": "mic_ym",
+        "comment": "小电量年月。"
+      },
+      {
+        "field_name": "sys_purp_times",
+        "comment": "抄表时系统购电次数。"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_oper_activity",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "act_code",
+        "comment": "抄表的操作环节，用标准代码表示，如：01：数据准备、02：数据下装、03：抄表、04：上装、05：复核等。"
+      },
+      {
+        "field_name": "operator_no",
+        "comment": "抄表操作环节负责人的人员代码。"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志"
+      },
+      {
+        "field_name": "status_date",
+        "comment": "状态时间"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_plan",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录外部唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "mr_day_id",
+        "comment": "计划抄表例日ID"
+      },
+      {
+        "field_name": "app_no",
+        "comment": ""
+      },
+      {
+        "field_name": "event_type",
+        "comment": "抄表事件类型，引用代码“抄表事件类型”，包括：\n            001，电费结算抄表\n            002，稽查抄表\n            003，线损关口抄表\n            004，分次结算第1...N-1次抄表\n            005，电费结算仿真抄表\n            006，漏抄\n            007，估抄\n            008，业扩变更结算抄表"
+      },
+      {
+        "field_name": "plan_type_code",
+        "comment": "抄表计划类型：正常计划、稽查计划、临时计划等。"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "amt_ym",
+        "comment": "电费年月，此处用于描述抄表年月"
+      },
+      {
+        "field_name": "reader_no",
+        "comment": "抄表员工号，抄表员的人员代码"
+      },
+      {
+        "field_name": "mr_mode_code",
+        "comment": "抄表方式：引用国家电网公司营销管理代码类集: 5110.31 电能计量抄表方式/采集方式分"
+      },
+      {
+        "field_name": "last_mr_date",
+        "comment": "上次抄表日期：用于存放用户上次计费抄表日期。"
+      },
+      {
+        "field_name": "plan_mr_date",
+        "comment": "计划抄表日期：规定的抄表日期，抄表例日的实例。"
+      },
+      {
+        "field_name": "plan_mr_time",
+        "comment": "计划抄表时间：用于自动化抄表的单个抄表计划中抄表数据定时获取。"
+      },
+      {
+        "field_name": "mrm_no",
+        "comment": "抄表机编码，下载抄表数据时记录，防止下一次下载抄表数据时未上传数据被覆盖。"
+      },
+      {
+        "field_name": "plan_status",
+        "comment": "当前计划状态，引用代码“抄核状态代码”，包括：\n            00，初始化：生成计划时\n            01，数据准备：准备数据后\n            02，数据下载：抄表机下载后\n            03，录入：录入手工抄表数据后\n            04，上装：抄表机抄表上装后\n            05，复核：复核完成。\n            07，电量电费计算\n            08，电量电费审核\n            09，发行"
+      },
+      {
+        "field_name": "finish_flag",
+        "comment": "抄表完成标识：已经获取更新本次抄见示数。"
+      },
+      {
+        "field_name": "usage_type_code",
+        "comment": "定义计量点的主要用途，引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06地市供电关口、07省级供电关口、08跨省输电关口、09跨区输电关口、10跨国输电关口、11发电上网关口......）"
+      },
+      {
+        "field_name": "calc_date",
+        "comment": "电费计算日期"
+      },
+      {
+        "field_name": "send_date",
+        "comment": "电费发行日期"
+      },
+      {
+        "field_name": "actual_date",
+        "comment": "实际抄表日期"
+      },
+      {
+        "field_name": "remark",
+        "comment": "备注"
+      },
+      {
+        "field_name": "tmp_cons_no",
+        "comment": "产生的临时抄表计划用户编号用逗号分割，数据准备时使用"
+      },
+      {
+        "field_name": "data_prepare_time",
+        "comment": "抄表数据准备时间"
+      },
+      {
+        "field_name": "finish_status",
+        "comment": "自动准备完成状态：如果该抄表计划用于自动抄表，用于记录自动抄表完成状态：如：数据准备完成、抄表完成，抄表异常等"
+      },
+      {
+        "field_name": "auto_ready_flag",
+        "comment": "是否自动抄表标记，0为否，1为是"
+      },
+      {
+        "field_name": "step_finish_code",
+        "comment": "00：未准备 01：准备失败 02：已抄 03：未抄…"
       },
       {
         "field_name": "create_time",
@@ -10416,60 +13291,1411 @@
         "comment": "更新用户"
       },
       {
-        "field_name": "ref_meter_flag",
-        "comment": "是否参考表:标明电能表是否是参考表，包括01是、02否"
+        "field_name": "plan_flag",
+        "comment": "描述多个计划同一批次处理以及每个计划完成状态，格式：唯一序列#状态"
       },
       {
-        "field_name": "use_id",
-        "comment": "用途标识"
+        "field_name": "ope_type",
+        "comment": "操作类型(空或01数据准备，02档案调整，03另发及销户)"
       },
       {
-        "field_name": "usage_code",
-        "comment": "\"用途代码:引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06"
+        "field_name": "period_code",
+        "comment": "抄表周期，引用营销代码标准5110.2抄表周期分类与代码，包括：1，每月  2，双月 3，每月多次"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_plan_arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录外部唯一标识，产生规则为流水号"
       },
       {
-        "field_name": "asset_no",
-        "comment": "资产编号:资产编号，局编号"
+        "field_name": "mr_day_id",
+        "comment": "计划抄表例日ID"
       },
       {
-        "field_name": "made_no",
-        "comment": "出厂编号:厂家印制的编号"
+        "field_name": "app_no",
+        "comment": ""
       },
       {
-        "field_name": "comm_no",
-        "comment": "通讯规约:通讯规约：645、…"
+        "field_name": "event_type",
+        "comment": "抄表事件类型，引用代码“抄表事件类型”，包括：\n            001，电费结算抄表\n            002，稽查抄表\n            003，线损关口抄表\n            004，分次结算第1...N-1次抄表\n            005，电费结算仿真抄表\n            006，漏抄\n            007，估抄\n            008，业扩变更结算抄表"
       },
       {
-        "field_name": "meas_box",
-        "comment": "计量箱号"
+        "field_name": "plan_type_code",
+        "comment": "抄表计划类型：正常计划、稽查计划、临时计划等。"
       },
       {
-        "field_name": "remain_amt",
-        "comment": "剩余金额:智能表剩余金额"
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
       },
       {
-        "field_name": "adjust_amt",
-        "comment": "调整电费:费控表计算出的电费和正常电费计算出的电费的差值电费"
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
       },
       {
-        "field_name": "adjust_35_pq",
-        "comment": "35度政策调整电量"
+        "field_name": "amt_ym",
+        "comment": "电费年月，此处用于描述抄表年月"
       },
       {
-        "field_name": "calc_35_pq_flag",
-        "comment": "35度政策计算结果 00 未计算 01 已计算 02 计算失败：采集示数缺失"
+        "field_name": "reader_no",
+        "comment": "抄表员工号，抄表员的人员代码"
       },
       {
-        "field_name": "purchase_times",
-        "comment": "表计购电次数"
+        "field_name": "mr_mode_code",
+        "comment": "抄表方式：引用国家电网公司营销管理代码类集: 5110.31 电能计量抄表方式/采集方式分"
       },
       {
-        "field_name": "mic_ym",
-        "comment": "小电量年月"
+        "field_name": "last_mr_date",
+        "comment": "上次抄表日期：用于存放用户上次计费抄表日期。"
       },
       {
-        "field_name": "sys_purp_times",
-        "comment": "抄表时系统购电次数"
+        "field_name": "plan_mr_date",
+        "comment": "计划抄表日期：规定的抄表日期，抄表例日的实例。"
+      },
+      {
+        "field_name": "plan_mr_time",
+        "comment": "计划抄表时间：用于自动化抄表的单个抄表计划中抄表数据定时获取。"
+      },
+      {
+        "field_name": "mrm_no",
+        "comment": "抄表机编码，下载抄表数据时记录，防止下一次下载抄表数据时未上传数据被覆盖。"
+      },
+      {
+        "field_name": "plan_status",
+        "comment": "当前计划状态，引用代码“抄核状态代码”，包括：\n            00，初始化：生成计划时\n            01，数据准备：准备数据后\n            02，数据下载：抄表机下载后\n            03，录入：录入手工抄表数据后\n            04，上装：抄表机抄表上装后\n            05，复核：复核完成。\n            07，电量电费计算\n            08，电量电费审核\n            09，发行"
+      },
+      {
+        "field_name": "finish_flag",
+        "comment": "抄表完成标识：已经获取更新本次抄见示数。"
+      },
+      {
+        "field_name": "usage_type_code",
+        "comment": "定义计量点的主要用途，引用国家电网公司营销管理代码类集:5110.19电能计量点类型分类与代码（01售电侧结算、02台区供电考核、03线路供电考核、04指标分析、05趸售供电关口、06地市供电关口、07省级供电关口、08跨省输电关口、09跨区输电关口、10跨国输电关口、11发电上网关口......）"
+      },
+      {
+        "field_name": "calc_date",
+        "comment": "电费计算日期"
+      },
+      {
+        "field_name": "send_date",
+        "comment": "电费发行日期"
+      },
+      {
+        "field_name": "actual_date",
+        "comment": "实际抄表日期"
+      },
+      {
+        "field_name": "remark",
+        "comment": "备注"
+      },
+      {
+        "field_name": "tmp_cons_no",
+        "comment": "产生的临时抄表计划用户编号用逗号分割，数据准备时使用"
+      },
+      {
+        "field_name": "data_prepare_time",
+        "comment": "抄表数据准备时间"
+      },
+      {
+        "field_name": "finish_status",
+        "comment": "自动准备完成状态：如果该抄表计划用于自动抄表，用于记录自动抄表完成状态：如：数据准备完成、抄表完成，抄表异常等"
+      },
+      {
+        "field_name": "auto_ready_flag",
+        "comment": "是否自动抄表标记，0为否，1为是"
+      },
+      {
+        "field_name": "step_finish_code",
+        "comment": "00：未准备 01：准备失败 02：已抄 03：未抄…"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "period_code",
+        "comment": "抄表周期，引用营销代码标准5110.2抄表周期分类与代码，包括：1，每月  2，双月 3，每月多次"
+      },
+      {
+        "field_name": "plan_flag",
+        "comment": "描述多个计划同一批次处理以及每个计划完成状态，格式：唯一序列#状态"
+      },
+      {
+        "field_name": "ope_type",
+        "comment": "操作类型(空或01数据准备，02档案调整，03另发及销户)"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_plan_day",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "event_type",
+        "comment": "抄表事件类型，引用代码“抄表事件类型”，包括：\n            001，电费结算抄表\n            002，稽查抄表\n            003，线损关口抄表\n            004，分次结算第1...N-1次抄表\n            005，电费结算仿真抄表\n            006，漏抄\n            007，估抄\n            008，业扩变更结算抄表"
+      },
+      {
+        "field_name": "mr_mode_code",
+        "comment": "抄表方式：引用国家电网公司营销管理代码类集: 5110.31 电能计量抄表方式/采集方式分"
+      },
+      {
+        "field_name": "period_num",
+        "comment": "用于区分多次抄表时第几期抄表"
+      },
+      {
+        "field_name": "mr_day",
+        "comment": "抄表例日值：用代码表示，根据抄表例日的配置范围进行选取，如：1-30、月末零点、每日等。"
+      },
+      {
+        "field_name": "period_code",
+        "comment": "抄表周期，引用营销代码标准5110.2抄表周期分类与代码，包括：\n            1，每月\n            2，双月\n            3，每月多次"
+      },
+      {
+        "field_name": "mon_interval",
+        "comment": "抄表间隔月份数，一个月、两个月、三个月等，用数字表示，单位为月份数。"
+      },
+      {
+        "field_name": "latest_mr_mon",
+        "comment": "记录最近一次的抄表月份，抄表复核完成或电费发行时更新。"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志"
+      },
+      {
+        "field_name": "status_date",
+        "comment": "状态时间"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_sect",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则"
+      },
+      {
+        "field_name": "name",
+        "comment": "抄表段名称"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "一般是用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "attr",
+        "comment": "描述抄表段属性，如：居民、动力等"
+      },
+      {
+        "field_name": "group_no",
+        "comment": "为方便抄表管理抄表员自定义的抄表段组将多个抄表段归纳起来的名称"
+      },
+      {
+        "field_name": "group_remark",
+        "comment": "描述该抄表段组组成说明等属性"
+      },
+      {
+        "field_name": "effect_flag",
+        "comment": "生效标志"
+      },
+      {
+        "field_name": "status_date",
+        "comment": "状态时间"
+      },
+      {
+        "field_name": "mr_type",
+        "comment": "抄表段分类:非市场化抄表段，市场化直接交易抄表段，市场化零售抄表段"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "idx",
+        "comment": "序号"
+      }
+    ]
+  },
+  {
+    "table_name": "m_r_tmnl_run",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识"
+      },
+      {
+        "field_name": "cp_no",
+        "comment": "本实体记录的唯一标识"
+      },
+      {
+        "field_name": "status_code",
+        "comment": "终端的运行状态，运行、停运、待装。"
+      },
+      {
+        "field_name": "terminal_addr",
+        "comment": "终端通信的地址码信息。"
+      },
+      {
+        "field_name": "coll_mode",
+        "comment": "230MHz、GPRS、CDMA、电话网、电力线、微功率电台、光纤、其它。"
+      },
+      {
+        "field_name": "terminal_type_code",
+        "comment": "负荷管理终端、客户电能量终端、配变终端、配变监控终端、低压集中器、低压采集终端、采集模块。"
+      },
+      {
+        "field_name": "factory_code",
+        "comment": "终端的生产厂家。"
+      },
+      {
+        "field_name": "speaker_flag",
+        "comment": "是否外接扬声器。"
+      },
+      {
+        "field_name": "speaker_dist",
+        "comment": "扬声器与终端的距离。"
+      },
+      {
+        "field_name": "work_ps",
+        "comment": "工作电源取自何处。"
+      },
+      {
+        "field_name": "ps_line_len",
+        "comment": "终端的电源线长度。"
+      },
+      {
+        "field_name": "instl_loc_diagram",
+        "comment": "终端在配电房的安装位置图"
+      },
+      {
+        "field_name": "wiring_diagram",
+        "comment": "受电工程电气主接线图"
+      },
+      {
+        "field_name": "harmonic_dev_flag",
+        "comment": "1已接谐波动装置 0未接谐波装置"
+      },
+      {
+        "field_name": "ps_ensure_flag",
+        "comment": "1是交流采样 0 非交流采样"
+      },
+      {
+        "field_name": "eliminate_flag",
+        "comment": "1是交流采样 0 非交流采样"
+      },
+      {
+        "field_name": "ac_sampling_flag",
+        "comment": "1是交流采样 0 非交流采样"
+      },
+      {
+        "field_name": "gate_attr_flag",
+        "comment": "1-常开 2-常闭"
+      },
+      {
+        "field_name": "prio_ps_mode",
+        "comment": "引用国家电网公司营销管理代码类集:5110.15供电方式分类与代码（11单路公用线、12单路专线、21双路电源，一主供（公用线）一备用（公用线）、22双路电源，一主供（专线）一备用（公用线）、23双路电源，一主供（专线）一备用（专线）、24双路电源，独立常供、低压切换、25双路电源，独立常供、不切换（公用线）、26双路电源，独立常供、不切换（专线）、31两路以上电源供电、互为备用（公用线）、32两路以上电源供电、互为备用（专线）......）"
+      },
+      {
+        "field_name": "protocol_code",
+        "comment": "采用的通讯规约版本，如：04 版本规约、96版规约等"
+      },
+      {
+        "field_name": "freeze_mode",
+        "comment": "冻结的方式，如：01定时冻结，02立即冻结，03出、入冬与出、入夏电量冻结等"
+      },
+      {
+        "field_name": "freeze_cycle_num",
+        "comment": "冻结周期数"
+      },
+      {
+        "field_name": "max_load_curve_days",
+        "comment": "负荷曲线的最大天数"
+      },
+      {
+        "field_name": "run_date",
+        "comment": "终端的投运日期"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "供电单位编号"
+      },
+      {
+        "field_name": "antenna_height",
+        "comment": "天线的高度"
+      },
+      {
+        "field_name": "feeder_length",
+        "comment": "馈线长度"
+      },
+      {
+        "field_name": "ctrl_flag",
+        "comment": "是否可控标志:1可控、0不可控"
+      },
+      {
+        "field_name": "coll_flag",
+        "comment": "是否可采标志:1可采、0不可采"
+      },
+      {
+        "field_name": "sys_id",
+        "comment": "厂家代码：表示这个终端是归属于哪个系统集成厂家"
+      },
+      {
+        "field_name": "broadcast_station_no",
+        "comment": "电台编码"
+      },
+      {
+        "field_name": "lead_length_impluse",
+        "comment": "脉冲线长度"
+      },
+      {
+        "field_name": "lead_length_485",
+        "comment": "485线长度"
+      },
+      {
+        "field_name": "circumstance_photo1",
+        "comment": "安装环境相片1"
+      },
+      {
+        "field_name": "circumstance_photo2",
+        "comment": "安装环境相片2"
+      },
+      {
+        "field_name": "circumstance_photo3",
+        "comment": "安装环境相片3"
+      },
+      {
+        "field_name": "wiring_mode",
+        "comment": "接线方式"
+      },
+      {
+        "field_name": "circumstance_photo4",
+        "comment": "安装环境相片4"
+      },
+      {
+        "field_name": "maint_org_no",
+        "comment": "维护单位"
+      },
+      {
+        "field_name": "inst_attr",
+        "comment": "安装性质"
+      },
+      {
+        "field_name": "prj_no",
+        "comment": "工程期数"
+      },
+      {
+        "field_name": "ground_line_loc",
+        "comment": "接地引出线位置"
+      },
+      {
+        "field_name": "channel_no",
+        "comment": "信道编号"
+      },
+      {
+        "field_name": "wiring_diagram2",
+        "comment": "一次接线图"
+      },
+      {
+        "field_name": "to_ant_dist",
+        "comment": "与天线距离"
+      },
+      {
+        "field_name": "ant_shelf_height",
+        "comment": "天线架高"
+      },
+      {
+        "field_name": "alarm_line_flag",
+        "comment": "报警线引出标志"
+      },
+      {
+        "field_name": "feeder_model",
+        "comment": "馈线型号"
+      },
+      {
+        "field_name": "alarm_dev",
+        "comment": "报警设备"
+      },
+      {
+        "field_name": "alarm_loc",
+        "comment": "报警安装位置"
+      },
+      {
+        "field_name": "ant_inst_loc",
+        "comment": "天线安装位置"
+      },
+      {
+        "field_name": "power_line_loc",
+        "comment": "220电源引出线位置"
+      },
+      {
+        "field_name": "lightning_height",
+        "comment": "避雷针高度"
+      },
+      {
+        "field_name": "dev_name",
+        "comment": "设备名称:设备名称"
+      },
+      {
+        "field_name": "dev_psdesc",
+        "comment": "设备电源描述:设备电源描述"
+      },
+      {
+        "field_name": "inst_collbox_flg",
+        "comment": "是否安装采集箱:0:否;1:是"
+      },
+      {
+        "field_name": "cover_rang",
+        "comment": "覆盖范围:覆盖范围"
+      },
+      {
+        "field_name": "channel_up",
+        "comment": "上行通道"
+      },
+      {
+        "field_name": "channel_up_bak",
+        "comment": "上行备用通道"
+      },
+      {
+        "field_name": "channel_down",
+        "comment": "下行通道"
+      },
+      {
+        "field_name": "carr_freq",
+        "comment": "载波中心频率"
+      },
+      {
+        "field_name": "chip_manuf",
+        "comment": "芯片厂家"
+      },
+      {
+        "field_name": "comm_port",
+        "comment": "通讯端口：集中器与网络表相接网络表的端口号，借用网络表通讯模块通讯用。"
+      },
+      {
+        "field_name": "comm_mode",
+        "comment": "通讯方式，终端与表通讯方式"
+      },
+      {
+        "field_name": "baudrate_code",
+        "comment": "波特率:不同的电能表的波特率是不同的"
+      },
+      {
+        "field_name": "serial_para",
+        "comment": "串口参数"
+      },
+      {
+        "field_name": "antenna_type",
+        "comment": "天线类型：八木天线、内置小全向天线、外置小全向天线、内置、外置、高增益、485、其他"
+      },
+      {
+        "field_name": "terminal_loc",
+        "comment": "终端安装位置"
+      },
+      {
+        "field_name": "tmnl_id",
+        "comment": "运行终端标识"
+      },
+      {
+        "field_name": "tmnl_mode",
+        "comment": "终端型号:终端厂家生产各类终端的标识。"
+      },
+      {
+        "field_name": "collection_address",
+        "comment": "所属采集器通信地址"
+      },
+      {
+        "field_name": "online_status",
+        "comment": "在线状态"
+      }
+    ]
+  },
+  {
+    "table_name": "m_rt_nwf_cons_amt_detail",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "主键ID"
+      },
+      {
+        "field_name": "prt_id",
+        "comment": "报表标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "管理单位"
+      },
+      {
+        "field_name": "org_name",
+        "comment": "管理单位名称"
+      },
+      {
+        "field_name": "ym",
+        "comment": "年月"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "户号"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "户名"
+      },
+      {
+        "field_name": "tg_no",
+        "comment": "台区编号"
+      },
+      {
+        "field_name": "tg_name",
+        "comment": "台区名称"
+      },
+      {
+        "field_name": "note_type_code",
+        "comment": "票据类型"
+      },
+      {
+        "field_name": "volt_code",
+        "comment": "电压等级"
+      },
+      {
+        "field_name": "elec_addr",
+        "comment": "用电地址"
+      },
+      {
+        "field_name": "rural_cons_code",
+        "comment": "城农网标志"
+      },
+      {
+        "field_name": "prc_code",
+        "comment": "电价编码"
+      },
+      {
+        "field_name": "prc_name",
+        "comment": "电价名称"
+      },
+      {
+        "field_name": "t_settle_pq",
+        "comment": "总电量"
+      },
+      {
+        "field_name": "t_amt",
+        "comment": "总电费"
+      },
+      {
+        "field_name": "nwf_amt",
+        "comment": "农维费电费"
+      },
+      {
+        "field_name": "nwf_prc",
+        "comment": "农维费电费均价"
+      },
+      {
+        "field_name": "billing_date",
+        "comment": "开票日期"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      }
+    ]
+  },
+  {
+    "table_name": "m_s_app_arc",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "申请信息标识：本实体记录的唯一标识，产生规则为流水号"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "申请编号：工作单的外部唯一标识，引用国家电网公司营销管理代码类集:5110.48 业务受理编号规则"
+      },
+      {
+        "field_name": "cust_id",
+        "comment": "客户标识：客户的唯一标识，变更的时候用于对应客户子域中的客户和申请客户自然信息中的客户信息"
+      },
+      {
+        "field_name": "main_app_id",
+        "comment": "主申请信息标识：对于分户或并户等一个工作有多个用户申请的情况，主申请信息标识表示和关联哪个是主申请信息标识。如分户，原户为主申请信息标识，其他户的主申请信息标识则为原户的申请信息标识"
+      },
+      {
+        "field_name": "app_mode",
+        "comment": "申请方式：提出用电申请的方式 枚举值: 01=营业厅, 02=95598, 03=服务平台"
+      },
+      {
+        "field_name": "handle_dept_no",
+        "comment": "受理部门：受理申请的供电企业的部门代码"
+      },
+      {
+        "field_name": "handle_time",
+        "comment": "受理时间：受理申请的时间"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用户标识：用电客户的唯一标识，变更的时候用于对应客户子域中的用电客户"
+      },
+      {
+        "field_name": "cons_no",
+        "comment": "用户编号：用电客户的外部标识 引用国家电网公司营销管理代码类集:5110.1 用电客户编号规则"
+      },
+      {
+        "field_name": "cons_name",
+        "comment": "用户名称：用户的名称，一般等于客户实体中的客户名称，但也允许附加上一些非自然的信息。如 XXX（东城），便于通过用户名称直接识别。"
+      },
+      {
+        "field_name": "cust_query_no",
+        "comment": "自定义查询号：存储客户提供的自己熟悉的一串标识码，客户通过各种服务渠道可以通过这个查询号来查询自己用电的信息，如客户有多个用电地址，可提供不同的查询号"
+      },
+      {
+        "field_name": "tmp_pay_rela_no",
+        "comment": "临时缴费关系号：方便收费操作，用户间建立的松散的缴费关系的标识，可根据此编号缴费，系统显示该编号的所有客户欠费记录，但用户间不能互相共用余额"
+      },
+      {
+        "field_name": "orgn_cons_no",
+        "comment": "原用户编号：原用户编号，用于系统升级的时候用户编号重新编号可以在一段时间内继续使用原用户编号查询用户信息"
+      },
+      {
+        "field_name": "cons_sort_code",
+        "comment": "用户分类：用户一种常用的分类方式，方便用户的管理 枚举值: 01=高压, 02=低压非居民, 03=低压居民"
+      },
+      {
+        "field_name": "elec_addr",
+        "comment": "用电地址：用电客户的用电地址"
+      },
+      {
+        "field_name": "trade_code",
+        "comment": "行业分类：用电客户的行业分类代码 引用国标GB/T 4754-2002"
+      },
+      {
+        "field_name": "elec_type_code",
+        "comment": "用电类别：用电客户的用电类别分类 引用国家电网公司营销管理代码类集:5110.4 用电类别 大工业用电，中小化肥，居民生活用电，农业生产用电，贫困县农业排灌用电"
+      },
+      {
+        "field_name": "shift_no",
+        "comment": "生产班次：用电客户的生产班次分类 引用国家电网公司营销管理代码类集:5110.6用电客户生产班次代码 单班，二班，三班，连续生产"
+      },
+      {
+        "field_name": "lode_attr_code",
+        "comment": "负荷性质：负荷的重要程度分类 引用国家电网公司营销管理代码类集:5110.44负荷类别分类与代码 一类，二类，三类"
+      },
+      {
+        "field_name": "volt_code",
+        "comment": "供电电压：用电客户的供电电压等级代码，多路电源时取电压等级最高的供电电压等级代码 引用《国家电网公司信息分类与代码体系－综合代码类集－电压等级代码表》"
+      },
+      {
+        "field_name": "hec_industry_code",
+        "comment": "高耗能行业类别：依据国家最新的高耗能行业划分"
+      },
+      {
+        "field_name": "holiday",
+        "comment": "厂休日：周休日通过数字连续表示周休哪几天，类似于飞机航班日期表示，如1.2.3,表示星期一星期二和星期三休息。"
+      },
+      {
+        "field_name": "notify_mode",
+        "comment": "用户每月电费的通知方式,引用国家电网公司营销管理代码类集:5110.57催费方式分类与代码:短信，通知单，电话，传真，E-MAIL等"
+      },
+      {
+        "field_name": "settle_mode",
+        "comment": "电费结算方式：用于区分是否分期结算 枚举值: 01=分期结算, 02=抄表结算"
+      },
+      {
+        "field_name": "ps_org_no",
+        "comment": "供电单位：供电单位编码，一般是指的用户的直接供电管理单位，也可以是大客户管理中心等由于管理原因产生的客户管理单位"
+      },
+      {
+        "field_name": "transfer_code",
+        "comment": "转供标志：标识客户是否是转供相关客户，如果涉及转供，是属于转供户还是被转供户 引用国家电网公司营销管理代码类集:5110.35 转供标志分类与代码 无转供，转供户，被转供户"
+      },
+      {
+        "field_name": "note_type_code",
+        "comment": "票据类型：用电客户每月电费默认打印的票据类型 引用国家电网公司营销管理代码类集:5110.107票据类型 普通发票，增殖税发票，收据，无"
+      },
+      {
+        "field_name": "tmp_flag",
+        "comment": "临时用电标志：表示是否是临时用电的用电客户，且属于哪种临时用电 枚举值: 01=装表临时用电, 02=无表临时用电, 03=非临时用电"
+      },
+      {
+        "field_name": "tmp_trade_code",
+        "comment": "临时用电用户分类(为营商环境添加),01铁路、02公路、03桥梁、04公园、05绿道、06轨道交通、07农业水利排灌"
+      },
+      {
+        "field_name": "tmp_date",
+        "comment": "临时用电到期日期：临时用电用户临时用电的到期日期"
+      },
+      {
+        "field_name": "contract_cap",
+        "comment": "申请合同容量：申请增加或减少的合同容量"
+      },
+      {
+        "field_name": "orgn_contract_cap",
+        "comment": "原有合同容量：增容或变更用电时候用电客户原有合同容量"
+      },
+      {
+        "field_name": "t_contract_cap",
+        "comment": "合计合同容量：合计合同容量对应客户核心模型中的用电客户的合同容量 合计合同容量的计算公司分三种情况：增减容时：合计合同容量＝申请合同容量+原有合同容量＋转入合同容量－转出合同容量 分户的分出户，并户的并入户：合计合同容量＝原有合同容量＋转入合同容量 分户的原户，并户的被并户：合计合同容量＝原有合同容量－转出合同容量"
+      },
+      {
+        "field_name": "app_run_cap",
+        "comment": "申请运行容量：申请增加或减少的运行容量，主要处理合同容量不变，但实际运行容量要求减少的业务，如暂停或恢复，记录要求增加或减少的运行容量"
+      },
+      {
+        "field_name": "orgn_run_cap",
+        "comment": "原有运行容量：用电客户变更用电前的运行容量，新增客户运行容量等于合同容量，发生暂停等业务后运行容量才不等于合同容量"
+      },
+      {
+        "field_name": "t_run_cap",
+        "comment": "合计运行容量：合计运行容量＝申请运行容量＋原有运行容量"
+      },
+      {
+        "field_name": "bgn_date",
+        "comment": "申请执行起日期：变更用电时提出的申请业务的执行起日期，如对暂拆业务是用电客户申请时提出的要求暂拆日期。"
+      },
+      {
+        "field_name": "end_date",
+        "comment": "申请执行止日期：变更用电时提出的申请业务的执行止日期，如对暂拆业务是用电客户申请时提出的计划复装日期。"
+      },
+      {
+        "field_name": "reason",
+        "comment": "申请原因：客户申请此业务原因描述。如对不装表临时用电延期业务申请时候提出的延期原因的记录，对提出申请校验业务的原因记录等。"
+      },
+      {
+        "field_name": "shift_in_cap",
+        "comment": "转入合同容量：此属性是针对合同容量发生转移类业务，用于表示其他用电客户转入到本用电客户的合同容量，如并户的时候，被并户转入到并入户的合同容量。"
+      },
+      {
+        "field_name": "shift_out_cap",
+        "comment": "转出合同容量：此属性是针对合同容量发生转移类业务，用于表示用电客户转出给其他用电客户的合同容量，如分户的时候，原户转出给分出户的合同容量。"
+      },
+      {
+        "field_name": "permenant_reduce_flag",
+        "comment": "是否永久性减容：此属性针对减容业务，表明是否永久性减容 枚举值: 01=永久性减容, 02=临时性减容"
+      },
+      {
+        "field_name": "content",
+        "comment": "申请变更内容：申请变更的内容描述信息 如批量更改线路台区时候申请更改的具体内容，线路改成哪条，台区改成哪个等"
+      },
+      {
+        "field_name": "st_upq",
+        "comment": "近期用电容量：此属性针对用电大项目前期咨询业务，表示用电大项目预计的近期用电容量"
+      },
+      {
+        "field_name": "longterm_cap",
+        "comment": "远期用电容量：此属性针对用电大项目前期咨询业务，表示用电大项目预计的远期用电容量"
+      },
+      {
+        "field_name": "power_usage",
+        "comment": "电力用途：预期用电的电力的用途描述。用电大项目前期咨询需要填写的内容。"
+      },
+      {
+        "field_name": "dmd_date",
+        "comment": "要求用电日期：用电申请时客户提出的要求用电日期"
+      },
+      {
+        "field_name": "app_type_code",
+        "comment": "申请业务类型：办理客户申请确定业务时候客户要求申请的业务类型。此属性只处理客户申请确定业务，其他业务时本属性为空，其他业务本身的业务类型保存在流程实例中。引用国家电网公司营销管理代码类集:5110.47 新装、增容及变更用电业务受理类别分类与代码 低压居民新装，低压非居民新装，小区新装，高压新装，装表临时用电"
+      },
+      {
+        "field_name": "handle_flag",
+        "comment": "是否受理：办理客户申请确定业务时候表示申请是否能被受理 枚举值: 01=正式受理, 02=暂不能受理"
+      },
+      {
+        "field_name": "refuse_reason",
+        "comment": "不能受理原因：办理客户申请确定业务时候的不能受理的原因"
+      },
+      {
+        "field_name": "rela_app_code",
+        "comment": "确定申请编号：用于客户申请确认转为正式受理时记录正式受理的申请编号 通过此编号可以关联客户申请确定工作单和正式受理的工作单"
+      },
+      {
+        "field_name": "remark",
+        "comment": "申请备注：申请的其他需要说明的信息"
+      },
+      {
+        "field_name": "mrd_factor_code",
+        "comment": "用于表示用电客户的抄表难度情况，用于抄表员的工作量管理。可根据各地情况确定。如住在高层的居民，可能是1.1,住在平房的居民，可能是0.8。"
+      },
+      {
+        "field_name": "mr_sect_no",
+        "comment": "抄表段编号:抄表段编号，引用国家电网公司营销管理代码类集:5110.7 抄表段编号规则。"
+      },
+      {
+        "field_name": "prio_code",
+        "comment": "用户重要性等级：特级、一级、二级、临时"
+      },
+      {
+        "field_name": "urban_rural_flag",
+        "comment": "城乡类别：城市、农村、特殊边远地区"
+      },
+      {
+        "field_name": "pr_flag",
+        "comment": "是否储备库项目 枚举值: 01=是, 02=否"
+      },
+      {
+        "field_name": "rt_flag",
+        "comment": "储备库项目退库标志 枚举值: 01=在库, 02=退库申请中, 03=已退库"
+      },
+      {
+        "field_name": "rt_date",
+        "comment": "储备库项目退库日期"
+      },
+      {
+        "field_name": "load_feature_code",
+        "comment": "用户对应负荷特性，包含：一般负荷、连续性负荷"
+      },
+      {
+        "field_name": "security_cap",
+        "comment": "用户保安设施对应负荷容量"
+      },
+      {
+        "field_name": "market_prop_sort",
+        "comment": "市场化用户分类：01 批发用户,02 零售用户,0301 普通代购用户,0302 正当退市转代购用户,0303 无正当理由退市转代购用户,0304 有燃煤自发电代购用户,0305 高耗能代购用户,0306 电网代购用户,0307 优先用户"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建人"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "修改时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "修改人"
+      },
+      {
+        "field_name": "rural_cons_code",
+        "comment": "用于区分是否为农网用电客户，对城乡类别进行分类编码，引用国家电网公司营销管理代码类集5110.104 处理现场分类与代码：01 城市   02 农村  03 特殊边远山区"
+      },
+      {
+        "field_name": "rrio_code",
+        "comment": "用户重要性等级：特级、一级、二级、临时"
+      },
+      {
+        "field_name": "status_code",
+        "comment": "客户状态"
+      },
+      {
+        "field_name": "app_status",
+        "comment": "工单状态标识,0:历史工单,1:正常归档，2：终止归档"
+      },
+      {
+        "field_name": "ctl_mode",
+        "comment": "费控类型（01-本地费控，02-本地量控，03-无，04-中心费控）。在现场勘查环节录入该信息。后付费用户选择03，费控用户选择01或是04"
+      },
+      {
+        "field_name": "busi_scale",
+        "comment": "企业规模：busiScale 01空，02大型企业、03中型企业、04小微企业、05其他"
+      },
+      {
+        "field_name": "client_type",
+        "comment": "01-微信   02-APP  03-客服  04-营销系统"
+      },
+      {
+        "field_name": "chk_cycle",
+        "comment": "检查周期(单位：月)：用于存放客户检查周期信息，便于周期检查计划制定时，获取参数。"
+      },
+      {
+        "field_name": "last_chk_date",
+        "comment": "上次检查日期：用于存放客户上次检查日期，默认为客户的开户日期。"
+      },
+      {
+        "field_name": "checker_no",
+        "comment": "人员编号：分管检查人员的人员编号。"
+      },
+      {
+        "field_name": "orgn_elec_type_code",
+        "comment": "原来的用电地址"
+      },
+      {
+        "field_name": "orgn_volt_code",
+        "comment": "原来的电压等级"
+      },
+      {
+        "field_name": "orgn_elec_addr",
+        "comment": "原来的用电客户的用电地址"
+      },
+      {
+        "field_name": "orgn_cons_name",
+        "comment": "原来的客户名称"
+      },
+      {
+        "field_name": "sms_or_not",
+        "comment": "是否发送短信"
+      },
+      {
+        "field_name": "submit_time",
+        "comment": "资料提交时间，在预受理启动流程时，查询预受理资料表进行取值"
+      },
+      {
+        "field_name": "supervise_no",
+        "comment": "监管平台编号"
+      },
+      {
+        "field_name": "three_zero_flag",
+        "comment": "是否是三零  1是 0 否"
+      },
+      {
+        "field_name": "zero_investment_flag",
+        "comment": "是否零投资  1是 0 否"
+      },
+      {
+        "field_name": "investment_amount",
+        "comment": "投资金额"
+      },
+      {
+        "field_name": "economical_flag",
+        "comment": "省钱标志   1是  0否"
+      },
+      {
+        "field_name": "economical_amount",
+        "comment": "节省的金额"
+      },
+      {
+        "field_name": "auth_real_per",
+        "comment": "是否刷脸办电 00 是, 01 否"
+      },
+      {
+        "field_name": "transactors_type",
+        "comment": "办理人身份 00 产权人、01 法人代表、 02 经办人"
+      },
+      {
+        "field_name": "ps_num_code",
+        "comment": "电源数目"
+      },
+      {
+        "field_name": "gc_date",
+        "comment": "发电客户的首次并网日期"
+      },
+      {
+        "field_name": "abso_mode",
+        "comment": "发电客户发电量的消纳方式 引用国家电网公司营销管理代码类集 01 全部自用 02 全部上网  03自发自用余电上网"
+      },
+      {
+        "field_name": "gc_type",
+        "comment": "客户类别：01 同一法人 02 不同法人 03 居民客户"
+      },
+      {
+        "field_name": "invest_mode",
+        "comment": "分布式电源的投资模式：01 自投资 02 合同能源类型 03 其他"
+      },
+      {
+        "field_name": "cen_gov_sub",
+        "comment": "中央财政补助模式：01 金太阳 02 金屋顶 03 度电补助 04 光电建筑一体化"
+      },
+      {
+        "field_name": "pro_gra",
+        "comment": "省级是否补助：01 是 02 否"
+      },
+      {
+        "field_name": "city_gra",
+        "comment": "市级是否补助：01 是 02 否"
+      },
+      {
+        "field_name": "county_gra",
+        "comment": "县级是否补助：01 是 02 否"
+      },
+      {
+        "field_name": "taxer_type",
+        "comment": "纳税人类型：01 一般纳税人 02 非一般纳税人"
+      },
+      {
+        "field_name": "switch_type",
+        "comment": "接入方式 01 用户侧 02公共电网"
+      },
+      {
+        "field_name": "inst_loc",
+        "comment": "安装的物理位置"
+      },
+      {
+        "field_name": "elec_gener_type",
+        "comment": "发电方式"
+      },
+      {
+        "field_name": "owner_classify",
+        "comment": "业主分类"
+      },
+      {
+        "field_name": "owner_property",
+        "comment": "业主性质"
+      },
+      {
+        "field_name": "resource_area",
+        "comment": "01 Ⅰ类资源区        02 Ⅱ类资源区        03Ⅲ类资源区"
+      },
+      {
+        "field_name": "value_added_tax",
+        "comment": "百分数"
+      },
+      {
+        "field_name": "orgn_market_prop_sort",
+        "comment": "原市场化用户分类    01 批发用户,02 零售用户,0301 普通代购用户,0302 正当退市转代购用户,0303 无正当理由退市转代购用户,0304 有燃煤自发电代购用户,0305 高耗能代购用户,0306 电网代购用户,0307 优先用户"
+      },
+      {
+        "field_name": "tmp_type",
+        "comment": "临时用电类型  ：01 正常   02 突发事件"
+      },
+      {
+        "field_name": "impact_calc_flag",
+        "comment": "影响算费标志  1 是 0 否，档案普查修改环节发送写入"
+      },
+      {
+        "field_name": "enterprise_property",
+        "comment": "企业性质：01 国有经济组织、02 集体经济组织、03 民营经济组织、04 外资经济组织、05 混合所有制经济组织、06 非经济组织"
+      },
+      {
+        "field_name": "ac_charging_pile_num",
+        "comment": "交流充电桩（台）"
+      },
+      {
+        "field_name": "dc_charging_pile_num",
+        "comment": "直流充电桩（台）"
+      },
+      {
+        "field_name": "swap_station_num",
+        "comment": "换电站（台）"
+      },
+      {
+        "field_name": "charging_gun_num",
+        "comment": "充电枪（个）"
+      },
+      {
+        "field_name": "manage_org",
+        "comment": "管理机构：01 自有电厂、02 并网新能源"
+      }
+    ]
+  },
+  {
+    "table_name": "m_s_market_push_log",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "id"
+      },
+      {
+        "field_name": "app_no",
+        "comment": "工单编号"
+      },
+      {
+        "field_name": "cons_id",
+        "comment": "用户id"
+      },
+      {
+        "field_name": "req_content",
+        "comment": "推送内容，JSON格式"
+      },
+      {
+        "field_name": "resp_content",
+        "comment": "返回内容，JSON格式"
+      },
+      {
+        "field_name": "status",
+        "comment": "推送状态  1成功  0失败"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建人"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "修改人"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "修改时间"
+      }
+    ]
+  },
+  {
+    "table_name": "m_sm_sale_outlet_device",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "售电营业网点设备信息主键"
+      },
+      {
+        "field_name": "saleOutletId",
+        "comment": "售电营业网点ID"
+      },
+      {
+        "field_name": "deviceCode",
+        "comment": "售电营业网点设备编码"
+      },
+      {
+        "field_name": "deviceName",
+        "comment": "售电营业网点设备名称"
+      },
+      {
+        "field_name": "remarks",
+        "comment": "备注"
+      },
+      {
+        "field_name": "dataStatus",
+        "comment": "数据状态"
+      },
+      {
+        "field_name": "updateTime",
+        "comment": "更新时间"
+      }
+    ]
+  },
+  {
+    "table_name": "m_sm_sale_outlet_info",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "售电营业网点主键"
+      },
+      {
+        "field_name": "orgId",
+        "comment": "组织机构ID"
+      },
+      {
+        "field_name": "pId",
+        "comment": "售电营业网点父ID"
+      },
+      {
+        "field_name": "saleOutletCode",
+        "comment": "售电营业网点编码"
+      },
+      {
+        "field_name": "saleOutletName",
+        "comment": "售电营业网点名称"
+      },
+      {
+        "field_name": "remarks",
+        "comment": "备注"
+      },
+      {
+        "field_name": "useStatus",
+        "comment": "售电营业网点使用状态(01在用;02停用)"
+      },
+      {
+        "field_name": "updateTime",
+        "comment": "更新时间"
+      }
+    ]
+  },
+  {
+    "table_name": "m_st_message_template",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "本实体记录的唯一标识"
+      },
+      {
+        "field_name": "code",
+        "comment": "消息模板的编码"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "组织机构编码"
+      },
+      {
+        "field_name": "name",
+        "comment": "消息模板的名字"
+      },
+      {
+        "field_name": "groovy_code",
+        "comment": "动态规则编码，获取模板参数使用"
+      },
+      {
+        "field_name": "content",
+        "comment": "模板内容，根据占位符的替换形成真正的消息"
+      },
+      {
+        "field_name": "type_code",
+        "comment": "分类标识，用于定位在哪个分类下"
+      },
+      {
+        "field_name": "status",
+        "comment": "状态：0：未启用，1：启用"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "priority",
+        "comment": "优先级 数字越小优先级越高"
+      },
+      {
+        "field_name": "param_mapping",
+        "comment": "短信参数映射关系"
+      }
+    ]
+  },
+  {
+    "table_name": "m_st_sms_send_record",
+    "fields": [
+      {
+        "field_name": "id",
+        "comment": "主键id"
+      },
+      {
+        "field_name": "sms_phone",
+        "comment": "发送的手机号"
+      },
+      {
+        "field_name": "sms_content",
+        "comment": "发送短信内容"
+      },
+      {
+        "field_name": "send_status",
+        "comment": "00代表发送成功 01代表处理中 02代表调用短信接口失败 -1代表发送失败"
+      },
+      {
+        "field_name": "reponse_msg",
+        "comment": "发送返回信息"
+      },
+      {
+        "field_name": "sms_key",
+        "comment": "短信返回标识"
+      },
+      {
+        "field_name": "org_no",
+        "comment": "组织机构编码"
+      },
+      {
+        "field_name": "template_code",
+        "comment": "短信模板编码"
+      },
+      {
+        "field_name": "sms_params",
+        "comment": "短信模板组装需要的参数"
+      },
+      {
+        "field_name": "create_time",
+        "comment": "创建时间"
+      },
+      {
+        "field_name": "create_user",
+        "comment": "创建用户"
+      },
+      {
+        "field_name": "update_time",
+        "comment": "更新时间"
+      },
+      {
+        "field_name": "update_user",
+        "comment": "更新用户"
+      },
+      {
+        "field_name": "generate_time",
+        "comment": "短信生成时间"
+      },
+      {
+        "field_name": "send_time",
+        "comment": "短信发送时间"
+      },
+      {
+        "field_name": "rela_id",
+        "comment": "关联id"
+      },
+      {
+        "field_name": "send_channel",
+        "comment": "发送渠道"
+      },
+      {
+        "field_name": "is_send",
+        "comment": "规则定义是否发送，规则打开时，定时任务读取发送 0:不发送 1:发送"
       }
     ]
   }

@@ -94,10 +94,13 @@ def build_fewshot_documents(few_shots: list[dict]) -> list[Document]:
         keywords = " ".join(fs.get("search_keywords", []))
         title = fs.get("title", "")
 
+        scenario_tag = fs.get("scenario_tag", "综合查询")
+
         page_content = (
             f"【查询需求】: {question}\n"
             f"【业务规则】: {business_rules}\n"
-            f"【关键词】: {keywords}"
+            f"【关键词】: {keywords}\n"
+            f"【场景】: {scenario_tag}"
         )
 
         doc = Document(
@@ -109,7 +112,8 @@ def build_fewshot_documents(few_shots: list[dict]) -> list[Document]:
                 "sql": fs.get("sql", ""),
                 "tables_used": json.dumps(fs.get("tables_used", []), ensure_ascii=False),
                 "search_keywords": json.dumps(fs.get("search_keywords", []), ensure_ascii=False),
-                "complexity": fs.get("complexity", "medium")
+                "complexity": fs.get("complexity", "medium"),
+                "scenario_tag": scenario_tag,
             }
         )
         documents.append(doc)

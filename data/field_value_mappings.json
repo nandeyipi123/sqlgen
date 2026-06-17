@@ -1,5 +1,126 @@
 [
   {
+    "_note": "此文件为构建中间产物。所有码值已注入 final_super_schema_by_ai.json 的字段注释中。本文件仅供 step2/step4 重新生成时使用，不参与 Agent 运行时逻辑。",
+    "_generated_by": "step2_extract_mappings.py",
+    "_used_by": [
+      "step4_ai_enhance_schema.py",
+      "step4b_enrich_code_values.py"
+    ]
+  },
+  {
+    "table_name": "a",
+    "fields": [
+      {
+        "field_name": "amt_type",
+        "code_types": [
+          "paTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "ac_org",
+    "fields": [
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [],
+        "hardcoded_values": {
+          "02": "专变"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "base",
+    "fields": [
+      {
+        "field_name": "amt_type",
+        "code_types": [
+          "paTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "df",
+    "fields": [
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "elecTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "trade_type_code",
+        "code_types": [
+          "tradeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "fp",
+    "fields": [
+      {
+        "field_name": "note_type_code",
+        "code_types": [
+          "noteTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
     "table_name": "m_a_acct_bal",
     "fields": [
       {
@@ -29,12 +150,41 @@
           "settleMode"
         ],
         "hardcoded_values": {},
-        "source": ""
+        "source": "m_p_code"
       },
       {
         "field_name": "type_code",
         "code_types": [
           "chargeType"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_a_rcvbl_flow",
+    "fields": [
+      {
+        "field_name": "amt_type",
+        "code_types": [
+          "paTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "ctl_mode",
+        "code_types": [
+          "ctlMode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "settle_flag",
+        "code_types": [
+          "settleflag"
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
@@ -204,6 +354,14 @@
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
+      },
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [],
+        "hardcoded_values": {
+          "02": "专变"
+        },
+        "source": "case_when"
       },
       {
         "field_name": "rrio_code",
@@ -463,9 +621,49 @@
     "table_name": "m_c_meter",
     "fields": [
       {
+        "field_name": "model_code",
+        "code_types": [
+          "meterModelNo"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "rated_current",
+        "code_types": [
+          "meterRcSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
         "field_name": "ref_meter_flag",
         "code_types": [
           "ynJudgeFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "sort_code",
+        "code_types": [
+          "meterSort"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "type_code",
+        "code_types": [
+          "meterTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "wiring_mode",
+        "code_types": [
+          "wiringMode"
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
@@ -551,6 +749,14 @@
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
+      },
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [],
+        "hardcoded_values": {
+          "02": "专变"
+        },
+        "source": "case_when"
       },
       {
         "field_name": "side_code",
@@ -927,6 +1133,35 @@
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
+      },
+      {
+        "field_name": "prc_volt_code",
+        "code_types": [
+          "prcVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_e_cat_prc_det",
+    "fields": [
+      {
+        "field_name": "prc_ti_code",
+        "code_types": [
+          "prcTsCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "range_type_code",
+        "code_types": [
+          "rangeTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
       }
     ]
   },
@@ -1003,6 +1238,53 @@
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
+      },
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [
+          "pubPrivFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [
+          "psVoltCode"
+        ],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "both"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_chkunit_comp",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
       }
     ]
   },
@@ -1016,12 +1298,36 @@
           "0": "出口计量"
         },
         "source": "case_when"
+      },
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
       }
     ]
   },
   {
     "table_name": "m_g_line",
     "fields": [
+      {
+        "field_name": "pub_priv_flag",
+        "code_types": [],
+        "hardcoded_values": {
+          "02": "专变"
+        },
+        "source": "case_when"
+      },
       {
         "field_name": "run_status_code",
         "code_types": [
@@ -1035,8 +1341,94 @@
         "code_types": [
           "psVoltCode"
         ],
-        "hardcoded_values": {},
-        "source": "m_p_code"
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "both"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_ll_stat",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_ll_stat_byvolt",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_llr_cmpl",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
+      }
+    ]
+  },
+  {
+    "table_name": "m_g_llr_cmpl_highvolt",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
       }
     ]
   },
@@ -1069,8 +1461,10 @@
         "code_types": [
           "pubPrivFlag"
         ],
-        "hardcoded_values": {},
-        "source": "m_p_code"
+        "hardcoded_values": {
+          "02": "专变"
+        },
+        "source": "both"
       },
       {
         "field_name": "run_status_code",
@@ -1172,6 +1566,27 @@
         ],
         "hardcoded_values": {},
         "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "m_p_code",
+    "fields": [
+      {
+        "field_name": "volt_code",
+        "code_types": [],
+        "hardcoded_values": {
+          "AC02201": "1%"
+        },
+        "source": "case_when"
+      },
+      {
+        "field_name": "volt_name",
+        "code_types": [],
+        "hardcoded_values": {
+          "交流220kV": "1%"
+        },
+        "source": "case_when"
       }
     ]
   },
@@ -1381,12 +1796,51 @@
     ]
   },
   {
+    "table_name": "prc",
+    "fields": [
+      {
+        "field_name": "elec_type_code",
+        "code_types": [
+          "prcVoltCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "qf",
+    "fields": [
+      {
+        "field_name": "settle_flag",
+        "code_types": [
+          "amtSettleFlag"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
     "table_name": "re",
     "fields": [
       {
         "field_name": "read_type_code",
         "code_types": [
           "readTypeCode"
+        ],
+        "hardcoded_values": {},
+        "source": "m_p_code"
+      }
+    ]
+  },
+  {
+    "table_name": "ys",
+    "fields": [
+      {
+        "field_name": "settle_flag",
+        "code_types": [
+          "settleflag"
         ],
         "hardcoded_values": {},
         "source": "m_p_code"

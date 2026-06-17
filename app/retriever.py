@@ -33,7 +33,7 @@ def get_exact_ddls(table_names_list):
     found_tables = []
 
     # 将要找的表名统一转小写，防止大小写匹配失败
-    target_tables = [str(t).strip().lower() for t in table_names_list]
+    target_tables = list(set(str(t).strip().lower() for t in table_names_list))
 
     for table in schema_data:
         table_name = table.get("table_name", "").lower()
@@ -78,15 +78,15 @@ def init_ensemble_retriever():
     return EnsembleRetriever(retrievers=[chroma_retriever, bm25_retriever], weights=[0.5, 0.5])
 
 def init_few_shot_retriever():
-    """初始化历史 SQL 案例检索器 (MMR 多样性召回版)"""
+    """初始化历史 SQL 案例检索器（纯相似度 + 表重叠重排序）"""
     embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
     vector_store = Chroma(
         collection_name="few_shot_sql",
         embedding_function=embeddings,
         persist_directory=FEW_SHOT_DB_PATH
     )
-    # 使用 MMR 算法：先在底层捞出最相似的 20 个案例，然后从中精心挑选出差异性最大的 5 个返回给 AI
+    # 纯相似度检索 20 条候选，后续在 retrieve_and_plan_node 中按表重叠度重排序取前 5
+    # 不用 MMR：MMR 追求多样性，会把同场景的相似案例挤掉
     return vector_store.as_retriever(
-        search_type="mmr",
-        search_kwargs={"k": 5, "fetch_k": 10}
+        search_kwargs={"k": 20}
     )
