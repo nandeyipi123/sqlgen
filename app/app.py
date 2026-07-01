@@ -11,6 +11,21 @@ from agent_graph import sql_agent_graph
 # from database import execute_export_sql  # [已废弃] 导出逻辑
 from config import OLLAMA_BASE_URL, CHROMA_DB_PATH, FEW_SHOT_DB_PATH, DB_HOST, DB_PORT
 
+# ================= 组织编号数据加载 =================
+_ORG_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "组织编号.json")
+
+
+@st.cache_data
+def _load_org_tree():
+    """加载原始树结构（缓存）"""
+    try:
+        with open(_ORG_DATA_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+
 # ================= 1. 页面与全局配置 =================
 st.set_page_config(page_title="DeepSeek SQL Copilot", page_icon="⚡", layout="wide")
 
@@ -353,10 +368,310 @@ with st.sidebar:
             for err in hc["errors"]:
                 st.error(err)
 
+    # ---- 组织编号 ----
+    st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">组织编号</p>',
+                unsafe_allow_html=True)
+
+    org_tree = _load_org_tree()
+    if org_tree:
+        tree_json = json.dumps(org_tree, ensure_ascii=False)
+        tree_html = f"""<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><style>
+  * {{ margin:0; padding:0; box-sizing:border-box; }}
+  html, body {{
+    height: 100%; margin: 0; padding: 0;
+    background: transparent; color: #e2e8f0;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size: 0.82rem; line-height: 1.5;
+  }}
+  body {{
+    display: flex; flex-direction: column;
+    padding: 4px 6px; user-select: none;
+  }}
+  /* 顶部区域：面包屑 + 返回按钮，固定不滚动 */
+  .header {{
+    flex-shrink: 0;
+  }}
+  /* 中间列表：自动撑满，内容多时滚动 */
+  .list-scroll {{
+    flex: 1; overflow-y: auto; min-height: 0;
+    margin: 2px 0;
+  }}
+  .list-scroll::-webkit-scrollbar {{ width: 3px; }}
+  .list-scroll::-webkit-scrollbar-thumb {{ background: rgba(148,163,184,0.2); border-radius: 2px; }}
+  /* 底部卡片：固定不滚动 */
+  .footer {{
+    flex-shrink: 0;
+  }}
+
+  /* 面包屑 */
+  .breadcrumb {{
+    display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+    padding: 4px 6px; margin-bottom: 4px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    font-size: 0.7rem; color: #94a3b8;
+    min-height: 22px;
+  }}
+  .breadcrumb span {{ color: #64748b; }}
+  .breadcrumb .active {{ color: #a5b4fc; font-weight: 600; }}
+
+  /* 后退按钮 */
+  .back-row {{
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 4px;
+  }}
+  .back-btn {{
+    background: rgba(255,255,255,0.06); border: none;
+    color: #94a3b8; cursor: pointer;
+    padding: 2px 10px; border-radius: 4px;
+    font-size: 0.72rem;
+    transition: all 0.15s;
+  }}
+  .back-btn:hover {{ background: rgba(255,255,255,0.12); color: #e2e8f0; }}
+  .back-btn:disabled {{ opacity: 0.3; cursor: default; }}
+  .level-hint {{
+    font-size: 0.66rem; color: #475569;
+  }}
+
+  /* 列表项 */
+  .item {{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 8px; border-radius: 5px;
+    cursor: pointer; transition: background 0.12s;
+    gap: 6px;
+  }}
+  .item:hover {{ background: rgba(255,255,255,0.05); }}
+  .item-name {{
+    flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: #cbd5e1;
+  }}
+  .item-id {{
+    flex-shrink: 0;
+    padding: 2px 8px; border-radius: 3px;
+    background: rgba(99,102,241,0.14);
+    color: #818cf8;
+    font-family: "SF Mono","Fira Code",monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    transition: all 0.15s;
+  }}
+  .item:hover .item-id {{ background: rgba(99,102,241,0.25); }}
+  .item.has-children::after {{
+    content: '›'; color: #475569; font-size: 0.9rem; margin-left: 2px;
+  }}
+
+  /* 选中卡 */
+  .selected-card {{
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.18);
+    border-radius: 8px; padding: 6px 10px;
+  }}
+  .sel-path {{
+    font-size: 0.68rem; color: #64748b; margin-bottom: 3px;
+    line-height: 1.3;
+  }}
+  .sel-row {{
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  }}
+  .sel-id {{
+    background: rgba(99,102,241,0.15);
+    color: #a5b4fc;
+    padding: 3px 10px; border-radius: 4px;
+    font-family: "SF Mono","Fira Code",monospace;
+    font-size: 0.8rem;
+  }}
+  .copy-btn {{
+    background: rgba(99,102,241,0.18); border: none;
+    color: #a5b4fc; cursor: pointer;
+    padding: 3px 12px; border-radius: 5px;
+    font-size: 0.7rem; white-space: nowrap;
+    transition: all 0.15s;
+  }}
+  .copy-btn:hover {{ background: rgba(99,102,241,0.35); }}
+  .copy-btn.copied {{ background: rgba(34,197,94,0.22); color: #4ade80; }}
+
+  .toast {{
+    position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+    padding: 4px 12px; border-radius: 5px;
+    background: rgba(34,197,94,0.18); color: #4ade80;
+    font-size: 0.68rem; opacity: 0; transition: opacity 0.2s;
+    pointer-events: none; z-index: 10;
+  }}
+  .toast.show {{ opacity: 1; }}
+
+  .empty-hint {{
+    text-align: center; color: #475569; font-size: 0.7rem;
+    padding: 20px 0;
+  }}
+</style></head><body>
+<div class="header">
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div class="back-row">
+    <button class="back-btn" id="backBtn" onclick="goBack()" disabled>← 返回上级</button>
+    <span class="level-hint" id="levelHint"></span>
+  </div>
+</div>
+<div class="list-scroll" id="list"></div>
+<div class="footer">
+  <div class="selected-card" id="selCard" style="display:none;">
+    <div class="sel-path" id="selPath"></div>
+    <div class="sel-row">
+      <span class="sel-id" id="selId"></span>
+      <button class="copy-btn" id="copyBtn" onclick="doCopy()">📋 复制</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  const TREE = {tree_json};
+  let path = [];           // {{id, text}} 从根到当前
+  let currentNode = null;  // TREE 根节点的引用
+
+  function getChildren(node) {{
+    return (node && node.children) ? node.children : [];
+  }}
+
+  function findNode(pathIds) {{
+    let list = TREE;
+    for (let pid of pathIds) {{
+      let found = list.find(n => String(n.id) === String(pid));
+      if (!found) return null;
+      list = getChildren(found);
+    }}
+    return list;  // 返回 children 列表
+  }}
+
+  function render() {{
+    const bc = document.getElementById('breadcrumb');
+    const list = document.getElementById('list');
+    const backBtn = document.getElementById('backBtn');
+    const levelHint = document.getElementById('levelHint');
+    const selCard = document.getElementById('selCard');
+
+    // 面包屑
+    if (path.length === 0) {{
+      bc.innerHTML = '<span>🏢 全部组织</span>';
+      backBtn.disabled = true;
+      levelHint.textContent = '点击展开下级';
+    }} else {{
+      let html = '';
+      for (let i = 0; i < path.length; i++) {{
+        if (i > 0) html += '<span> › </span>';
+        html += '<span class="active">' + esc(path[i].text) + '</span>';
+      }}
+      bc.innerHTML = html;
+      backBtn.disabled = false;
+      levelHint.textContent = path.length + ' 级深度';
+    }}
+
+    // 当前层级的子节点
+    let children;
+    if (path.length === 0) {{
+      children = TREE;
+    }} else {{
+      let parentList = findNode(path.slice(0, -1).map(p => p.id));
+      let parent = parentList ? parentList.find(n => String(n.id) === String(path[path.length-1].id)) : null;
+      children = parent ? parent.children || [] : [];
+    }}
+
+    // 渲染列表
+    list.innerHTML = '';
+    if (!children || children.length === 0) {{
+      list.innerHTML = '<div class="empty-hint">已到最底层，无下级组织</div>';
+    }} else {{
+      children.forEach(function(node) {{
+        const div = document.createElement('div');
+        div.className = 'item' + (node.children && node.children.length > 0 ? ' has-children' : '');
+
+        const name = document.createElement('span');
+        name.className = 'item-name';
+        name.textContent = node.text;
+
+        const idSpan = document.createElement('span');
+        idSpan.className = 'item-id';
+        idSpan.textContent = node.id;
+        idSpan.title = '点击复制 ' + node.id;
+        idSpan.addEventListener('click', function(e) {{
+          e.stopPropagation();
+          copyId(node.id);
+        }});
+
+        div.appendChild(name);
+        div.appendChild(idSpan);
+
+        div.addEventListener('click', function() {{
+          path.push({{id: String(node.id), text: node.text}});
+          render();
+        }});
+
+        list.appendChild(div);
+      }});
+    }}
+
+    // 选中卡片
+    if (path.length > 0) {{
+      const last = path[path.length - 1];
+      selCard.style.display = 'block';
+      document.getElementById('selPath').textContent = path.map(p => p.text).join(' › ');
+      document.getElementById('selId').textContent = last.id;
+    }} else {{
+      selCard.style.display = 'none';
+    }}
+  }}
+
+  function goBack() {{
+    if (path.length > 0) {{
+      path.pop();
+      render();
+    }}
+  }}
+
+  function copyId(id) {{
+    navigator.clipboard.writeText(id).then(function() {{
+      showToast('✓ 已复制 ' + id);
+    }}).catch(function() {{
+      showToast('复制失败，请手动选择');
+    }});
+  }}
+
+  function doCopy() {{
+    if (path.length > 0) {{
+      const id = path[path.length - 1].id;
+      const btn = document.getElementById('copyBtn');
+      navigator.clipboard.writeText(id).then(function() {{
+        btn.textContent = '✓ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function() {{ btn.textContent = '📋 复制'; btn.classList.remove('copied'); }}, 1500);
+        showToast('✓ 已复制 ' + id);
+      }}).catch(function() {{
+        showToast('复制失败，请手动选择');
+      }});
+    }}
+  }}
+
+  function showToast(msg) {{
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(function() {{ t.classList.remove('show'); }}, 1500);
+  }}
+
+  function esc(s) {{
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }}
+
+  render();
+</script>
+</body></html>"""
+        st.components.v1.html(tree_html, height=450, scrolling=False)
+    else:
+        st.caption("组织数据加载失败")
+
     # ---- 底部信息 ----
     st.markdown(
-        '<div style="position:fixed;bottom:0.75rem;left:0.75rem;font-size:0.62rem;'
-        'color:#475569;">MySQL 5.7 · DeepSeek · Ollama</div>',
+        '<div style="font-size:0.62rem;color:#475569;padding:0.5rem 0.5rem;">'
+        'MySQL 5.7 · DeepSeek · Ollama</div>',
         unsafe_allow_html=True,
     )
 

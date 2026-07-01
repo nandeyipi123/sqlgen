@@ -1,0 +1,3604 @@
+[
+    {
+        "id": "510",
+        "pid": "0",
+        "text": "四川能源发展集团有限责任公司",
+        "state": "closed",
+        "checked": false,
+        "attributes": {
+            "checkState": "checked",
+            "code": "510",
+            "isAdmin": true,
+            "keywordCode": "00",
+            "type": "0"
+        },
+        "children": [
+            {
+                "id": "51001",
+                "pid": "510",
+                "text": "四川省水电投资经营集团有限公司",
+                "state": "closed",
+                "checked": false,
+                "attributes": {
+                    "checkState": "checked",
+                    "code": "51001",
+                    "isAdmin": true,
+                    "keywordCode": "00,01",
+                    "type": "0"
+                },
+                "children": [
+                    {
+                        "id": "5100101",
+                        "pid": "51001",
+                        "text": "四川省水电投资经营集团有限公司本部",
+                        "state": "open",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100101",
+                            "isAdmin": true,
+                            "keywordCode": "04",
+                            "type": "0"
+                        },
+                        "children": null
+                    },
+                    {
+                        "id": "5100105",
+                        "pid": "51001",
+                        "text": "资中龙源电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100105",
+                            "isAdmin": true,
+                            "keywordCode": "",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510010507",
+                                "pid": "5100105",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010507",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010514",
+                                "pid": "5100105",
+                                "text": "球溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010514",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010515",
+                                "pid": "5100105",
+                                "text": "龙江供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010515",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010517",
+                                "pid": "5100105",
+                                "text": "太平供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010517",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010518",
+                                "pid": "5100105",
+                                "text": "孟塘供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010518",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010519",
+                                "pid": "5100105",
+                                "text": "龙结供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010519",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010520",
+                                "pid": "5100105",
+                                "text": "发轮供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010520",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100102",
+                        "pid": "51001",
+                        "text": "三台永安电力股份有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100102",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510010207",
+                                "pid": "5100102",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010207",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010217",
+                                "pid": "5100102",
+                                "text": "潼川供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010217",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010218",
+                                "pid": "5100102",
+                                "text": "芦溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010218",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010219",
+                                "pid": "5100102",
+                                "text": "花园供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010219",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010220",
+                                "pid": "5100102",
+                                "text": "西平供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010220",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010221",
+                                "pid": "5100102",
+                                "text": "刘营供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010221",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010222",
+                                "pid": "5100102",
+                                "text": "古井供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010222",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010223",
+                                "pid": "5100102",
+                                "text": "塔山供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010223",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010224",
+                                "pid": "5100102",
+                                "text": "富顺供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010224",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010225",
+                                "pid": "5100102",
+                                "text": "新生供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010225",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010226",
+                                "pid": "5100102",
+                                "text": "观桥供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010226",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010227",
+                                "pid": "5100102",
+                                "text": "景福供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010227",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010228",
+                                "pid": "5100102",
+                                "text": "金石供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010228",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100108",
+                        "pid": "51001",
+                        "text": "四川能投合江电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100108",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510010801",
+                                "pid": "5100108",
+                                "text": "经营管理部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010801",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010802",
+                                "pid": "5100108",
+                                "text": "城区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010802",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010803",
+                                "pid": "5100108",
+                                "text": "九支供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010803",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "51001080314",
+                                        "pid": "510010803",
+                                        "text": "尧坝供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080314",
+                                            "isAdmin": true,
+                                            "keywordCode": "04",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080315",
+                                        "pid": "510010803",
+                                        "text": "先市供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080315",
+                                            "isAdmin": true,
+                                            "keywordCode": "04",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080317",
+                                        "pid": "510010803",
+                                        "text": "车辋供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080317",
+                                            "isAdmin": true,
+                                            "keywordCode": "04",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080318",
+                                        "pid": "510010803",
+                                        "text": "九支供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080318",
+                                            "isAdmin": true,
+                                            "keywordCode": "04",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080319",
+                                        "pid": "510010803",
+                                        "text": "五通供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080319",
+                                            "isAdmin": true,
+                                            "keywordCode": "04",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510010804",
+                                "pid": "5100108",
+                                "text": "佛荫供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010804",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "51001080409",
+                                        "pid": "510010804",
+                                        "text": "荔江供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080409",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080410",
+                                        "pid": "510010804",
+                                        "text": "大桥供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080410",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080412",
+                                        "pid": "510010804",
+                                        "text": "堰坝供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080412",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080413",
+                                        "pid": "510010804",
+                                        "text": "凤鸣供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080413",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510010805",
+                                "pid": "5100108",
+                                "text": "白沙供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010805",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "51001080503",
+                                        "pid": "510010805",
+                                        "text": "白米供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080503",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080504",
+                                        "pid": "510010805",
+                                        "text": "望龙供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080504",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080505",
+                                        "pid": "510010805",
+                                        "text": "白沙供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080505",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080506",
+                                        "pid": "510010805",
+                                        "text": "参宝供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080506",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510010806",
+                                "pid": "5100108",
+                                "text": "榕山供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010806",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "51001080621",
+                                        "pid": "510010806",
+                                        "text": "榕山供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080621",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080622",
+                                        "pid": "510010806",
+                                        "text": "白鹿供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080622",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510010807",
+                                "pid": "5100108",
+                                "text": "甘雨供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010807",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "51001080723",
+                                        "pid": "510010807",
+                                        "text": "甘雨供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080723",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080724",
+                                        "pid": "510010807",
+                                        "text": "福宝供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080724",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080726",
+                                        "pid": "510010807",
+                                        "text": "石龙供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080726",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "51001080727",
+                                        "pid": "510010807",
+                                        "text": "先滩供电服务站",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "51001080727",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100109",
+                        "pid": "51001",
+                        "text": "四川昭觉电力有限责任公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100109",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510010906",
+                                "pid": "5100109",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010906",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010912",
+                                "pid": "5100109",
+                                "text": "城关供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010912",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010913",
+                                "pid": "5100109",
+                                "text": "四开供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010913",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010914",
+                                "pid": "5100109",
+                                "text": "俄尔供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010914",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010915",
+                                "pid": "5100109",
+                                "text": "比尔供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010915",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010916",
+                                "pid": "5100109",
+                                "text": "且莫供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010916",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010917",
+                                "pid": "5100109",
+                                "text": "解放沟供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010917",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010919",
+                                "pid": "5100109",
+                                "text": "庆恒供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010919",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010920",
+                                "pid": "5100109",
+                                "text": "悬崖村供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010920",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510010941",
+                                "pid": "5100109",
+                                "text": "龙恩供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510010941",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100110",
+                        "pid": "51001",
+                        "text": "美姑电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100110",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011007",
+                                "pid": "5100110",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011007",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011038",
+                                "pid": "5100110",
+                                "text": "牛牛坝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011038",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011037",
+                                "pid": "5100110",
+                                "text": "新桥供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011037",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011034",
+                                "pid": "5100110",
+                                "text": "后苏供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011034",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "510011039",
+                                        "pid": "510011034",
+                                        "text": "候布供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011039",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "510011040",
+                                        "pid": "510011034",
+                                        "text": "苏洛供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011040",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510011045",
+                                "pid": "5100110",
+                                "text": "洪溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011045",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011049",
+                                "pid": "5100110",
+                                "text": "瓦黑供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011049",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011036",
+                                "pid": "5100110",
+                                "text": "洪瓦供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011036",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011021",
+                                "pid": "5100110",
+                                "text": "城关供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011021",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011035",
+                                "pid": "5100110",
+                                "text": "大九供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011035",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "510011042",
+                                        "pid": "510011035",
+                                        "text": "大桥供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011042",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "510011041",
+                                        "pid": "510011035",
+                                        "text": "九口供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011041",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510011051",
+                                "pid": "5100110",
+                                "text": "拉柳供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011051",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "510011043",
+                                        "pid": "510011051",
+                                        "text": "柳洪供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011043",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "510011047",
+                                        "pid": "510011051",
+                                        "text": "拉木阿觉供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011047",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "510011052",
+                                "pid": "5100110",
+                                "text": "峨龙供电所",
+                                "state": "closed",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011052",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": [
+                                    {
+                                        "id": "510011050",
+                                        "pid": "510011052",
+                                        "text": "龙门供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011050",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "510011044",
+                                        "pid": "510011052",
+                                        "text": "峨曲古供电所",
+                                        "state": "open",
+                                        "checked": false,
+                                        "attributes": {
+                                            "checkState": "checked",
+                                            "code": "510011044",
+                                            "isAdmin": true,
+                                            "keywordCode": "03",
+                                            "type": "0"
+                                        },
+                                        "children": null
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100115",
+                        "pid": "51001",
+                        "text": "德格格萨尔电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100115",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011507",
+                                "pid": "5100115",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011507",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011511",
+                                "pid": "5100115",
+                                "text": "城区供电一所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011511",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011512",
+                                "pid": "5100115",
+                                "text": "麦宿供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011512",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011513",
+                                "pid": "5100115",
+                                "text": "马尼干弋供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011513",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011514",
+                                "pid": "5100115",
+                                "text": "年古供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011514",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011515",
+                                "pid": "5100115",
+                                "text": "阿须供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011515",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011530",
+                                "pid": "5100115",
+                                "text": "城区供电二所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011530",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011531",
+                                "pid": "5100115",
+                                "text": "柯洛洞供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011531",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011532",
+                                "pid": "5100115",
+                                "text": "龚垭供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011532",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011533",
+                                "pid": "5100115",
+                                "text": "竹庆供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011533",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100113",
+                        "pid": "51001",
+                        "text": "普格电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100113",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011307",
+                                "pid": "5100113",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011307",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011311",
+                                "pid": "5100113",
+                                "text": "城关供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011311",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011312",
+                                "pid": "5100113",
+                                "text": "螺髻山供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011312",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011313",
+                                "pid": "5100113",
+                                "text": "西洛供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011313",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011314",
+                                "pid": "5100113",
+                                "text": "小兴场供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011314",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011326",
+                                "pid": "5100113",
+                                "text": "洛乌沟供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011326",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011327",
+                                "pid": "5100113",
+                                "text": "荞窝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011327",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100116",
+                        "pid": "51001",
+                        "text": "四川省水电投资经营集团青川县电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100116",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011605",
+                                "pid": "5100116",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011605",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011609",
+                                "pid": "5100116",
+                                "text": "青溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011609",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011610",
+                                "pid": "5100116",
+                                "text": "凉水供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011610",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011611",
+                                "pid": "5100116",
+                                "text": "关庄供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011611",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011612",
+                                "pid": "5100116",
+                                "text": "曲河供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011612",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100118",
+                        "pid": "51001",
+                        "text": "四川省平武电力(集团)有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100118",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011808",
+                                "pid": "5100118",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011808",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011822",
+                                "pid": "5100118",
+                                "text": "龙安供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011822",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011823",
+                                "pid": "5100118",
+                                "text": "南坝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011823",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011824",
+                                "pid": "5100118",
+                                "text": "古城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011824",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011825",
+                                "pid": "5100118",
+                                "text": "平通供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011825",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011826",
+                                "pid": "5100118",
+                                "text": "豆叩供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011826",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011827",
+                                "pid": "5100118",
+                                "text": "水晶供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011827",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011828",
+                                "pid": "5100118",
+                                "text": "大桥供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011828",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011829",
+                                "pid": "5100118",
+                                "text": "响岩供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011829",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011830",
+                                "pid": "5100118",
+                                "text": "坝子供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011830",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011831",
+                                "pid": "5100118",
+                                "text": "大印供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011831",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011832",
+                                "pid": "5100118",
+                                "text": "白马供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011832",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011833",
+                                "pid": "5100118",
+                                "text": "木座供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011833",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011834",
+                                "pid": "5100118",
+                                "text": "木皮供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011834",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011835",
+                                "pid": "5100118",
+                                "text": "计量检定中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011835",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011836",
+                                "pid": "5100118",
+                                "text": "泗耳藏族乡供电班",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011836",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100120",
+                        "pid": "51001",
+                        "text": "开江明月电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100120",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510012001",
+                                "pid": "5100120",
+                                "text": "城区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012001",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012002",
+                                "pid": "5100120",
+                                "text": "城北供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012002",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012003",
+                                "pid": "5100120",
+                                "text": "普安供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012003",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012004",
+                                "pid": "5100120",
+                                "text": "回龙供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012004",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012005",
+                                "pid": "5100120",
+                                "text": "天师供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012005",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012006",
+                                "pid": "5100120",
+                                "text": "永兴供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012006",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012007",
+                                "pid": "5100120",
+                                "text": "灵岩供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012007",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012008",
+                                "pid": "5100120",
+                                "text": "梅家供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012008",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012009",
+                                "pid": "5100120",
+                                "text": "讲治供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012009",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012010",
+                                "pid": "5100120",
+                                "text": "甘棠供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012010",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012011",
+                                "pid": "5100120",
+                                "text": "任市供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012011",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012012",
+                                "pid": "5100120",
+                                "text": "长岭供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012012",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012015",
+                                "pid": "5100120",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012015",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100121",
+                        "pid": "51001",
+                        "text": "万源市龙源电力有限责任公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100121",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510012106",
+                                "pid": "5100121",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012106",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012113",
+                                "pid": "5100121",
+                                "text": "城区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012113",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012114",
+                                "pid": "5100121",
+                                "text": "旧院供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012114",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012115",
+                                "pid": "5100121",
+                                "text": "黄钟供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012115",
+                                    "isAdmin": true,
+                                    "keywordCode": "06,03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012116",
+                                "pid": "5100121",
+                                "text": "竹峪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012116",
+                                    "isAdmin": true,
+                                    "keywordCode": "06,03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012117",
+                                "pid": "5100121",
+                                "text": "长坝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012117",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012118",
+                                "pid": "5100121",
+                                "text": "草坝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012118",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012119",
+                                "pid": "5100121",
+                                "text": "石窝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012119",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012120",
+                                "pid": "5100121",
+                                "text": "河口供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012120",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012121",
+                                "pid": "5100121",
+                                "text": "罗文供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012121",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100122",
+                        "pid": "51001",
+                        "text": "渠县电力有限责任公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100122",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510012201",
+                                "pid": "5100122",
+                                "text": "西城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012201",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012202",
+                                "pid": "5100122",
+                                "text": "东城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012202",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012203",
+                                "pid": "5100122",
+                                "text": "三汇供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012203",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012204",
+                                "pid": "5100122",
+                                "text": "有庆供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012204",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012205",
+                                "pid": "5100122",
+                                "text": "静边供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012205",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012206",
+                                "pid": "5100122",
+                                "text": "临巴供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012206",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012207",
+                                "pid": "5100122",
+                                "text": "岩峰供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012207",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012208",
+                                "pid": "5100122",
+                                "text": "琅琊供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012208",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012209",
+                                "pid": "5100122",
+                                "text": "涌兴供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012209",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012210",
+                                "pid": "5100122",
+                                "text": "清溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012210",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012211",
+                                "pid": "5100122",
+                                "text": "宝城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012211",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012212",
+                                "pid": "5100122",
+                                "text": "土溪供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012212",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012213",
+                                "pid": "5100122",
+                                "text": "贵福供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012213",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012217",
+                                "pid": "5100122",
+                                "text": "计量检定中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012217",
+                                    "isAdmin": true,
+                                    "keywordCode": "10",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012233",
+                                "pid": "5100122",
+                                "text": "变电站管理单位（虚拟）",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012233",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012226",
+                                "pid": "5100122",
+                                "text": "北城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012226",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100123",
+                        "pid": "51001",
+                        "text": "大竹电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100123",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510012312",
+                                "pid": "5100123",
+                                "text": "经营管理部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012312",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012338",
+                                "pid": "5100123",
+                                "text": "东城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012338",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012339",
+                                "pid": "5100123",
+                                "text": "北城供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012339",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012343",
+                                "pid": "5100123",
+                                "text": "东柳供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012343",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012347",
+                                "pid": "5100123",
+                                "text": "石河供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012347",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012350",
+                                "pid": "5100123",
+                                "text": "清河供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012350",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012352",
+                                "pid": "5100123",
+                                "text": "石桥供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012352",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012354",
+                                "pid": "5100123",
+                                "text": "周家供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012354",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012356",
+                                "pid": "5100123",
+                                "text": "石子供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012356",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012357",
+                                "pid": "5100123",
+                                "text": "文星供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012357",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012358",
+                                "pid": "5100123",
+                                "text": "庙坝供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012358",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510012359",
+                                "pid": "5100123",
+                                "text": "高穴供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012359",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100423",
+                        "pid": "51001",
+                        "text": "四川省水电集团金堂电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100423",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510042301",
+                                "pid": "5100423",
+                                "text": "转龙供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510042301",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510042302",
+                                "pid": "5100423",
+                                "text": "竹篙供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510042302",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510042303",
+                                "pid": "5100423",
+                                "text": "土桥供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510042303",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510042309",
+                                "pid": "5100423",
+                                "text": "经营管理部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510042309",
+                                    "isAdmin": true,
+                                    "keywordCode": "04",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100125",
+                        "pid": "51001",
+                        "text": "华蓥市地方电力有限责任公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100125",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510012507",
+                                "pid": "5100125",
+                                "text": "庆华供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510012507",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100112",
+                        "pid": "51001",
+                        "text": "四川省水电集团金阳电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100112",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510011207",
+                                "pid": "5100112",
+                                "text": "市场营销部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011207",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011213",
+                                "pid": "5100112",
+                                "text": "大宗所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011213",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011214",
+                                "pid": "5100112",
+                                "text": "城关供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011214",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011215",
+                                "pid": "5100112",
+                                "text": "对坪片区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011215",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011216",
+                                "pid": "5100112",
+                                "text": "派来片区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011216",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011217",
+                                "pid": "5100112",
+                                "text": "天台片区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011217",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011218",
+                                "pid": "5100112",
+                                "text": "南瓦片区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011218",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510011222",
+                                "pid": "5100112",
+                                "text": "洛觉片区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510011222",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100150",
+                        "pid": "51001",
+                        "text": "达州电力集团有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100150",
+                            "isAdmin": true,
+                            "keywordCode": null,
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510015001",
+                                "pid": "5100150",
+                                "text": "市中区供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015001",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015002",
+                                "pid": "5100150",
+                                "text": "通川区供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015002",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015003",
+                                "pid": "5100150",
+                                "text": "达川区供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015003",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015004",
+                                "pid": "5100150",
+                                "text": "高新区供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015004",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015005",
+                                "pid": "5100150",
+                                "text": "赵家供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015005",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015007",
+                                "pid": "5100150",
+                                "text": "营销部(公司)",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015007",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015008",
+                                "pid": "5100150",
+                                "text": "石梯电力有限公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015008",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015009",
+                                "pid": "5100150",
+                                "text": "西区供电分公司",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015009",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5100434",
+                        "pid": "51001",
+                        "text": "四川能投长宁电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100434",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510043401",
+                                "pid": "5100434",
+                                "text": "营销部（客服服务中心）",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043401",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043402",
+                                "pid": "5100434",
+                                "text": "城区供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043402",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043403",
+                                "pid": "5100434",
+                                "text": "下长供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043403",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043404",
+                                "pid": "5100434",
+                                "text": "开佛供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043404",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043405",
+                                "pid": "5100434",
+                                "text": "老翁供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043405",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043406",
+                                "pid": "5100434",
+                                "text": "竹海供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043406",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043407",
+                                "pid": "5100434",
+                                "text": "龙头供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043407",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043408",
+                                "pid": "5100434",
+                                "text": "双河供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043408",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043409",
+                                "pid": "5100434",
+                                "text": "梅硐供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043409",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043410",
+                                "pid": "5100434",
+                                "text": "铜鼓供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043410",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043411",
+                                "pid": "5100434",
+                                "text": "硐底供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043411",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510043412",
+                                "pid": "5100434",
+                                "text": "井江供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510043412",
+                                    "isAdmin": true,
+                                    "keywordCode": "",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": "5106666",
+                        "pid": "51001",
+                        "text": "成都太阳高科技有限责任公司",
+                        "state": "open",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5106666",
+                            "isAdmin": true,
+                            "keywordCode": null,
+                            "type": "0"
+                        },
+                        "children": null
+                    },
+                    {
+                        "id": "5100151",
+                        "pid": "51001",
+                        "text": "乐山市金洋电力开发有限责任公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100151",
+                            "isAdmin": true,
+                            "keywordCode": null,
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510015101",
+                                "pid": "5100151",
+                                "text": "经营管理部",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015101",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015102",
+                                "pid": "5100151",
+                                "text": "永和供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015102",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015103",
+                                "pid": "5100151",
+                                "text": "永乐供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015103",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015104",
+                                "pid": "5100151",
+                                "text": "金河供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015104",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510015105",
+                                "pid": "5100151",
+                                "text": "共安供电所",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510015105",
+                                    "isAdmin": true,
+                                    "keywordCode": null,
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "51004",
+                "pid": "510",
+                "text": "四川能投发展股份有限公司",
+                "state": "closed",
+                "checked": false,
+                "attributes": {
+                    "checkState": "checked",
+                    "code": "51004",
+                    "isAdmin": true,
+                    "keywordCode": "01",
+                    "type": "0"
+                },
+                "children": [
+                    {
+                        "id": "5100404",
+                        "pid": "51004",
+                        "text": "四川能投高县电力有限公司",
+                        "state": "closed",
+                        "checked": false,
+                        "attributes": {
+                            "checkState": "checked",
+                            "code": "5100404",
+                            "isAdmin": true,
+                            "keywordCode": "02",
+                            "type": "0"
+                        },
+                        "children": [
+                            {
+                                "id": "510040423",
+                                "pid": "5100404",
+                                "text": "文江供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040423",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040424",
+                                "pid": "5100404",
+                                "text": "庆符供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040424",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040425",
+                                "pid": "5100404",
+                                "text": "罗场供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040425",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040426",
+                                "pid": "5100404",
+                                "text": "沙河供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040426",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040427",
+                                "pid": "5100404",
+                                "text": "月江供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040427",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040428",
+                                "pid": "5100404",
+                                "text": "怀远供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040428",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040429",
+                                "pid": "5100404",
+                                "text": "落润供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040429",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040430",
+                                "pid": "5100404",
+                                "text": "贾村供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040430",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040431",
+                                "pid": "5100404",
+                                "text": "来复供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040431",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040437",
+                                "pid": "5100404",
+                                "text": "客户服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040437",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            },
+                            {
+                                "id": "510040438",
+                                "pid": "5100404",
+                                "text": "高县园区供电服务中心",
+                                "state": "open",
+                                "checked": false,
+                                "attributes": {
+                                    "checkState": "checked",
+                                    "code": "510040438",
+                                    "isAdmin": true,
+                                    "keywordCode": "03",
+                                    "type": "0"
+                                },
+                                "children": null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
