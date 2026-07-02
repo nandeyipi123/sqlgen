@@ -4,20 +4,38 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.retrievers import BM25Retriever
 from langchain_classic.retrievers import EnsembleRetriever
-from config import OLLAMA_BASE_URL, JSON_SCHEMA_PATH, CHROMA_DB_PATH, FEW_SHOT_DB_PATH
+from config import (
+    OLLAMA_BASE_URL,
+    get_schema_json_path,
+    get_chroma_db_path,
+    get_few_shot_db_path,
+    get_current_db_config,
+)
 
 
 # ============================================================
-# Schema JSON 缓存 (避免每次检索重复加载 373KB 文件)
+# 缓存管理：数据库切换时自动失效
 # ============================================================
 _SCHEMA_CACHE = None
+_LAST_DB_NAME = None
+
+
+def _ensure_cache():
+    """如果数据库已切换，清空所有模块级缓存"""
+    global _SCHEMA_CACHE, _LAST_DB_NAME
+    current_db = get_current_db_config().name
+    if _LAST_DB_NAME != current_db:
+        _SCHEMA_CACHE = None
+        _LAST_DB_NAME = current_db
 
 
 def _load_schema():
-    """加载 Schema JSON，模块级缓存"""
+    """加载 Schema JSON，模块级缓存（DB 切换时自动失效）"""
     global _SCHEMA_CACHE
+    _ensure_cache()
     if _SCHEMA_CACHE is None:
-        with open(JSON_SCHEMA_PATH, 'r', encoding='utf-8') as f:
+        path = get_schema_json_path()
+        with open(path, 'r', encoding='utf-8') as f:
             _SCHEMA_CACHE = json.load(f)
     return _SCHEMA_CACHE
 
@@ -49,13 +67,14 @@ def get_exact_ddls(table_names_list):
 
 
 def init_ensemble_retriever():
-    """初始化混合检索器"""
+    """初始化混合检索器（使用当前数据库的向量库）"""
+    _ensure_cache()
     # A. 向量检索
     embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
     vector_store = Chroma(
         collection_name="electric_sql_schema",
         embedding_function=embeddings,
-        persist_directory=CHROMA_DB_PATH
+        persist_directory=get_chroma_db_path()
     )
     chroma_retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 
@@ -77,13 +96,15 @@ def init_ensemble_retriever():
     # C. 混合检索
     return EnsembleRetriever(retrievers=[chroma_retriever, bm25_retriever], weights=[0.5, 0.5])
 
+
 def init_few_shot_retriever():
-    """初始化历史 SQL 案例检索器（纯相似度 + 表重叠重排序）"""
+    """初始化历史 SQL 案例检索器（使用当前数据库的向量库）"""
+    _ensure_cache()
     embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
     vector_store = Chroma(
         collection_name="few_shot_sql",
         embedding_function=embeddings,
-        persist_directory=FEW_SHOT_DB_PATH
+        persist_directory=get_few_shot_db_path()
     )
     # 纯相似度检索 20 条候选，后续在 retrieve_and_plan_node 中按表重叠度重排序取前 5
     # 不用 MMR：MMR 追求多样性，会把同场景的相似案例挤掉

@@ -1,0 +1,723 @@
+{
+  "_description": "电力营销系统核心表领域知识库。每条记录包含表角色、使用原则、正确模式、反模式及检测规则。用于 Schema 增强注入和领域规则校验。",
+
+  "m_a_rcvbl_flow": {
+    "business_role": "应收电费流水（现用库）。记录每笔电费账单从发行到收费的全过程。这是月电费查询的核心表。",
+    "alias": "应收流水、电费流水、应收账款",
+    "key_principles": [
+      "同一行同时包含 rcvbl_amt（应收）和 rcved_amt（实收）——它们是同一条记录的聚合字段，不需要跨表 JOIN 查实收",
+      "按 rcvbl_ym（账单归属月份）过滤，不是 rcved_ym（收款到账月份）",
+      "历史已结清账单会迁移到 m_a_rcvbl_flow_arc，任何汇总查询必须 UNION ALL 两表",
+      "通过 cons_no 关联 m_c_cons，通过 calc_id 关联 m_e_cons_prc_amt_arc"
+    ],
+    "field_semantics": {
+      "rcvbl_ym": "账单归属月份（YYYYMM）。这是业务口径的核心过滤维度。用户问'202605月电费'时，用 rcvbl_ym = '202605'",
+      "rcvbl_amt": "应收电费金额（出账时确定），与 rcved_amt 共存在同一行",
+      "rcved_amt": "实收电费金额（用户缴费后累加更新），与 rcvbl_amt 共存在同一行。不要因为要查'实收'就去查 m_a_rcved_flow",
+      "rcved_ym": "[极少使用] 收款到账月份。仅用于收费台账/缴款时序查询，不用于月电费汇总",
+      "settle_flag": "结清标志（直接取字段值+字典翻译即可，禁止 CASE WHEN 硬编码！）。枚举: 01=欠费, 02=部分结清, 03=全部结清, 04=坏账核销, 05=已撤还",
+      "t_pq": "总用电量（总有功电量）。⚠️ 月电费查询的总有功电量必须从这里取 SUM(t_pq)，不要从 m_r_data_arc 取（m_r_data_arc 按计量点存，多表用户会重复累加导致数据错误）",
+      "rcvbl_penalty": "应收违约金",
+      "rcved_penalty": "实收违约金",
+      "cons_no": "用户编号，关联 m_c_cons.cons_no",
+      "calc_id": "电费计算标识，关联 m_e_cons_prc_amt_arc.calc_id",
+      "org_no": "供电单位编号，数据隔离字段",
+      "release_date": "电费发行日期"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "月电费汇总（含应收+实收）",
+        "sql_template": "SELECT cons_no, SUM(rcvbl_amt) 应收, SUM(rcved_amt) 实收 FROM (SELECT cons_no, rcvbl_amt, rcved_amt FROM m_a_rcvbl_flow WHERE org_no LIKE 'xxx%' AND rcvbl_ym = 'YYYYMM' UNION ALL SELECT cons_no, rcvbl_amt, rcved_amt FROM m_a_rcvbl_flow_arc WHERE org_no LIKE 'xxx%' AND rcvbl_ym = 'YYYYMM') f GROUP BY cons_no"
+      },
+      {
+        "scenario": "欠费查询",
+        "sql_template": "SELECT ... FROM m_a_rcvbl_flow WHERE rcvbl_amt - rcved_amt > 0 AND settle_flag <> '全部结清' ..."
+      }
+    ],
+    "anti_patterns": [
+      {
+        "mistake": "用 m_a_rcved_flow 查月电费汇总",
+        "why_wrong": "m_a_rcved_flow 是逐笔收款明细（每次缴费一条记录），月电费汇总应直接用本表的 rcved_amt 聚合字段，数据量少且业务正确",
+        "detection": "IF m_a_rcved_flow IN tables AND question 含(月电费|汇总|统计|月均) AND question NOT 含(收费明细|收费台账|逐笔) THEN ERROR"
+      },
+      {
+        "mistake": "用 rcved_ym 过滤月度电费",
+        "why_wrong": "用户6月交5月电费，按 rcved_ym = '202605' 过滤只能查到5月到账的钱（实际是4月的账单），与需求'202605月电费'完全错位",
+        "detection": "IF sql 含 rcved_ym AND question NOT 含(收费明细|到账|实收日期|台账|缴款) THEN ERROR"
+      },
+      {
+        "mistake": "从 m_r_data_arc 取总有功电量（read_type_code='11' 然后 SUM）",
+        "why_wrong": "m_r_data_arc 按计量点存储，多表用户同一 calc_id 下有多条记录，SUM 会导致总有功电量重复累加（是真实值的多倍）",
+        "detection": "IF sql 含 m_r_data_arc AND question 含(总有功|有功总|总电量) THEN WARN"
+      },
+      {
+        "mistake": "用 CASE WHEN 硬编码 settle_flag（如 WHEN rcved=rcvbl THEN '03'）",
+        "why_wrong": "m_a_rcvbl_flow 表中有现成的 settle_flag 字段，直接用 + m_p_code 字典翻译即可，枚举 01=欠费 02=部分结清 03=全部结清 04=坏账核销 05=已撤还",
+        "detection": "IF sql 含 CASE WHEN.*settle_flag 或 CASE WHEN.*结清 THEN ERROR"
+      }
+    ],
+    "must_union_with": ["m_a_rcvbl_flow_arc"],
+    "related_tables": {
+      "m_a_rcvbl_flow_arc": {
+        "relationship": "完全相同的表结构，flow_arc 是 flow 的历史归档。已结清账单定期从 flow 迁移到 flow_arc",
+        "rule": "汇总查询必须 UNION ALL 两表，否则历史数据缺失"
+      },
+      "m_a_rcved_flow": {
+        "relationship": "收款明细表。通过 rcvbl_amt_id 关联到本表的 id。逐笔记录每次缴费动作（银行扣款、微信支付等）",
+        "use_when": "查询收费明细、到账日期排序、收费方式统计、银行对账",
+        "do_not_use_when": "月电费汇总、应收统计——直接用本表的 rcved_amt 字段"
+      },
+      "m_e_cons_prc_amt_arc": {
+        "relationship": "电价电费明细表。通过 calc_id 关联。t_amt 是按电价目录细分的应收金额",
+        "use_when": "需要按电价目录（峰谷平）拆分应收电费时"
+      }
+    }
+  },
+
+  "m_a_rcvbl_flow_arc": {
+    "business_role": "应收电费流水历史归档表。与 m_a_rcvbl_flow 完全相同的表结构。",
+    "alias": "应收归档、历史应收",
+    "key_principles": [
+      "字段定义与 m_a_rcvbl_flow 完全一致",
+      "所有使用 m_a_rcvbl_flow 的汇总查询，必须 UNION ALL 此表"
+    ],
+    "must_union_with": ["m_a_rcvbl_flow"]
+  },
+
+  "m_a_rcved_flow": {
+    "business_role": "收款明细表。逐笔记录每次缴费/扣款的具体动作。",
+    "alias": "实收流水、收费明细、收款记录",
+    "key_principles": [
+      "每条记录 = 一笔具体的收款动作（一次微信支付、一次银行扣款等）",
+      "通过 rcvbl_amt_id 关联到 m_a_rcvbl_flow.id",
+      "rcved_ym 是'钱哪天到账的'，rcvbl_ym 是'这笔钱付的是哪个月的账单'"
+    ],
+    "field_semantics": {
+      "rcvbl_amt_id": "关联到 m_a_rcvbl_flow.id，表示这笔收款对应哪笔应收账单",
+      "this_rcved_amt": "本次收款金额",
+      "rcved_ym": "收款到账年月（YYYYMM）。注意：这和账单月份是两个概念！",
+      "rcvbl_ym": "应收年月——这笔收款对应的账单属于哪个月",
+      "rcved_date": "收款具体日期"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "收费明细台账（逐笔）",
+        "sql_template": "SELECT ... FROM m_a_rcved_flow WHERE rcved_date BETWEEN '...' AND '...' ORDER BY rcved_date"
+      }
+    ],
+    "anti_patterns": [
+      {
+        "mistake": "用于月电费汇总查询",
+        "why_wrong": "月电费汇总需要用 rcvbl_ym 做聚合维度，本表粒度是'逐笔收款'，聚合成月汇总会因同一个月账单的多次缴费产生重复计算",
+        "detection": "IF m_a_rcved_flow IN tables AND question 含(月电费|月汇总|月度统计) THEN ERROR"
+      }
+    ],
+    "related_tables": {
+      "m_a_rcvbl_flow": {
+        "relationship": "应收流水表。本表的 rcvbl_amt_id 关联到它的 id",
+        "use_when": "需要把逐笔收款关联到具体账单时",
+        "do_not_use_when": "月电费汇总——直接用 m_a_rcvbl_flow.rcved_amt"
+      }
+    }
+  },
+
+  "m_e_cons_snap_arc": {
+    "business_role": "用户电价快照归档表。每月每个用户一条记录，是月电费查询的入口表。",
+    "alias": "用户快照、电费快照、月快照",
+    "key_principles": [
+      "按月分区（ym 字段），查询必须带 ym 过滤，否则扫描亿级数据",
+      "通过 cons_no + cons_id 关联 m_c_cons，通过 id（即 calc_id）关联 m_e_cons_prc_amt_arc 和 m_r_data_arc",
+      "作为子查询的驱动表：先用它按 ym + org_no 过滤出用户范围，再 JOIN 其他大表"
+    ],
+    "field_semantics": {
+      "id": "快照记录 ID，同时作为 calc_id 用于关联 m_e_cons_prc_amt_arc 和 m_r_data_arc",
+      "ym": "快照年月（YYYYMM）。必须过滤！",
+      "cons_no": "用户编号",
+      "cons_id": "用户 ID，关联 m_c_cons.id",
+      "org_no": "供电单位编号"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "电量查询",
+        "sql_template": "FROM m_e_cons_snap_arc e JOIN m_r_data_arc rd ON e.id = rd.calc_id WHERE e.ym = 'YYYYMM' AND e.org_no LIKE 'xxx%' GROUP BY e.cons_no"
+      },
+      {
+        "scenario": "电费查询",
+        "sql_template": "FROM m_e_cons_snap_arc e JOIN m_e_cons_prc_amt_arc epa ON e.id = epa.calc_id WHERE e.ym = 'YYYYMM' AND e.org_no LIKE 'xxx%'"
+      }
+    ],
+    "anti_patterns": [
+      {
+        "mistake": "不带 ym 过滤条件",
+        "why_wrong": "该表按 ym 分区，不带 ym 会导致全表扫描数亿行",
+        "detection": "IF m_e_cons_snap_arc IN tables AND ym NOT IN WHERE conditions THEN ERROR"
+      },
+      {
+        "mistake": "从 m_r_data_arc 出发 JOIN 本表",
+        "why_wrong": "m_r_data_arc 有数亿行，应该从本表（已按 ym 过滤）出发 JOIN 大表",
+        "detection": "IF FROM m_r_data_arc ... JOIN m_e_cons_snap_arc THEN WARN"
+      }
+    ],
+    "related_tables": {
+      "m_e_cons_prc_amt_arc": {
+        "relationship": "电价电费明细。通过 e.id = epa.calc_id 关联",
+        "use_when": "需要按电价目录拆分电费金额时"
+      },
+      "m_r_data_arc": {
+        "relationship": "抄表数据归档。通过 e.id = rd.calc_id 关联",
+        "use_when": "需要分时段电量（峰谷平）时"
+      }
+    }
+  },
+
+  "m_e_cons_prc_amt_arc": {
+    "business_role": "用户电价电费明细归档表。按电价目录拆分每笔电费的金额和电量。",
+    "alias": "电价电费、电费明细",
+    "key_principles": [
+      "通过 calc_id 关联 m_e_cons_snap_arc.id",
+      "t_amt 是按电价目录细分的金额，SUM(t_amt) 等于 rcvbl_amt",
+      "ym 和 org_no 字段也需要过滤（虽然通常通过 calc_id 关联已经限定了范围）"
+    ],
+    "field_semantics": {
+      "calc_id": "关联 m_e_cons_snap_arc.id（也是 m_a_rcvbl_flow.calc_id）",
+      "t_amt": "该电价目录下的电费金额",
+      "t_settle_pq": "该电价目录下的结算电量",
+      "ym": "电费年月",
+      "prc_code": "电价编码",
+      "elec_type_code": "用电类别编码（需翻译）"
+    }
+  },
+
+  "m_r_data_arc": {
+    "business_role": "抄表数据归档表。存储每次抄表的读数信息。亿级大表！",
+    "alias": "抄表数据、表底数据",
+    "key_principles": [
+      "通过 calc_id 关联 m_e_cons_snap_arc.id",
+      "是系统最大的表之一（数亿行），必须通过关联条件限制扫描范围",
+      "read_type_code 区分不同时段：11=有功总, 12=有功尖峰, 13=有功峰, 14=有功谷, 15=有功平（DDL枚举）。⚠️ 但是：15(有功平)在数据写入时始终为0，实际平电量 = 有功总(11) - 有功尖峰(12) - 有功峰(13) - 有功谷(14)，禁止直接查 read_type_code='15'！",
+      "严禁在 WHERE 中使用 EXISTS 子查询关联本表——会导致 DEPENDENT SUBQUERY"
+    ],
+    "field_semantics": {
+      "calc_id": "关联 m_e_cons_snap_arc.id",
+      "this_read_pq": "⚠️ 本次抄见电量（已是计算后的最终电量 = (本次读数-上次读数)×倍率）。直接 SUM 即可，禁止手动用 this_read/last_mr_num/t_factor 重算！",
+      "this_read": "本次抄表原始读数（不是电量！单读数可达几万到几十万）",
+      "last_mr_num": "上次抄表原始读数（不是电量！）",
+      "t_factor": "综合倍率",
+      "read_type_code": "抄表类型编码。11=有功总, 12=有功尖峰, 13=有功峰, 14=有功谷, 15=有功平。⚠️ 15(平)始终为0，平电量必须计算: SUM(11) - SUM(12) - SUM(13) - SUM(14)"
+    },
+    "anti_patterns": [
+      {
+        "mistake": "手动计算电量: (this_read - last_mr_num) * t_factor",
+        "why_wrong": "this_read_pq 已经是计算后的电量！手动重算 = 重复计算，值会变成正确值的 N 倍",
+        "detection": "IF sql 含 this_read 或 last_mr_num 且用于加减乘除 THEN ERROR"
+      },
+      {
+        "mistake": "EXISTS (SELECT 1 FROM m_r_data_arc WHERE calc_id = outer.id)",
+        "why_wrong": "导致 DEPENDENT SUBQUERY，外层每行都要扫描内层大表，总扫描行数可达数亿",
+        "detection": "IF EXISTS (SELECT ... FROM m_r_data_arc ...) THEN ERROR"
+      }
+    ]
+  },
+
+  "m_c_cons": {
+    "business_role": "用电用户表。电力营销系统最核心的主数据表。",
+    "alias": "用户表、用电户、cons表",
+    "key_principles": [
+      "org_no 关联 ac_org.id（不是 code）",
+      "cust_id 关联 m_c_cust.id",
+      "查询用户列表时必须加 status_code IN ('0','1','2','3')",
+      "cons_no 是用户编号（业务主键），cons_name 是用户名",
+      "ctl_mode 是费控类型：'01'=预付费 '03'=后付费/无"
+    ],
+    "field_semantics": {
+      "org_no": "供电单位编号（存储的是 ac_org.id）",
+      "cons_no": "用户编号（业务主键）",
+      "cons_name": "用户名称",
+      "cust_id": "客户ID，关联 m_c_cust.id",
+      "status_code": "状态：0/1/2/3 为有效，其他为销户/归档",
+      "ctl_mode": "费控类型：01=本地费控 02=远程费控 03=无（后付费） 04=混合费控",
+      "elec_type_code": "用电类别（需翻译）",
+      "trade_code": "行业分类（需翻译）",
+      "contract_cap": "合同容量",
+      "run_cap": "运行容量",
+      "elec_addr": "用电地址",
+      "mr_sect_no": "抄表段编号"
+    },
+    "missing_fields": {
+      "联系电话": "⚠️ m_c_cons 没有联系电话字段！手机号存在 m_c_cust.mobile（通过 cust_id 关联），固定电话存在 m_c_cust.tel",
+      "mobile": "⚠️ m_c_cons 没有 mobile 字段！手机号在 m_c_cust.mobile（通过 cust_id 关联）",
+      "phone": "⚠️ m_c_cons 没有 phone 字段！电话在 m_c_cust.mobile / m_c_cust.tel（通过 cust_id 关联）",
+      "联系人": "⚠️ m_c_cons 没有联系人字段！联系人姓名在 m_c_cust.contact_name，电话在 m_c_cust.mobile"
+    },
+    "related_tables": {
+      "ac_org": {"relationship": "a.org_no = o.id", "note": "注意是 id，不是 code"},
+      "m_c_cust": {"relationship": "a.cust_id = b.id", "note": "客户表有 social_credit_code（统一社会信用代码）、联系电话(mobile/tel)、联系人"}
+    }
+  },
+
+  "ac_org": {
+    "business_role": "组织机构表。存储供电公司/供电所的层级结构。",
+    "alias": "组织表、单位表、供电单位",
+    "key_principles": [
+      "m_c_cons.org_no 存储的是 ac_org.id（不是 code）",
+      "JOIN 条件: a.org_no = o.id",
+      "name 是组织名称，code 是组织编码"
+    ],
+    "field_semantics": {
+      "id": "组织 ID（m_c_cons.org_no 存储此值）",
+      "name": "组织名称（用于显示'供电单位'）",
+      "code": "组织编码（如 5100113）",
+      "pid": "上级组织 ID"
+    },
+    "anti_patterns": [
+      {
+        "mistake": "a.org_no = o.code",
+        "why_wrong": "org_no 存储的是 ac_org.id，不是 code。用 code 会导致关联不上或关联错误",
+        "detection": "IF ON 条件中有 org_no = o.code THEN WARN"
+      }
+    ]
+  },
+
+  "m_c_cust": {
+    "business_role": "客户表。一个客户（自然人或法人）可以有多个用电用户。",
+    "alias": "客户表、cust表",
+    "key_principles": [
+      "通过 a.cust_id = b.id 关联 m_c_cons",
+      "social_credit_code 存储统一社会信用代码",
+      "mobile 和 tel 提供客户联系电话"
+    ],
+    "field_semantics": {
+      "social_credit_code": "统一社会信用代码（企业）",
+      "mobile": "手机号码",
+      "tel": "固定电话"
+    }
+  },
+
+  "m_p_code": {
+    "business_role": "数据字典表。存储所有编码的中文翻译。",
+    "alias": "字典表、码值表、code表",
+    "key_principles": [
+      "code_type 指定字典类别（如 'ctlMode'、'elecTypeCode'）",
+      "value 是码值，name 是中文名称",
+      "take_effect_flag = 1 过滤生效的字典项（必须加！）",
+      "推荐使用 LEFT JOIN 方式，ON 条件包含 code_type、value、take_effect_flag"
+    ],
+    "field_semantics": {
+      "code_type": "字典类别",
+      "value": "码值",
+      "name": "中文名称（要显示的）",
+      "take_effect_flag": "生效标志：1=生效 0=失效"
+    },
+    "anti_patterns": [
+      {
+        "mistake": "JOIN 条件缺少 take_effect_flag = 1",
+        "why_wrong": "可能返回已停用的字典值",
+        "detection": "IF m_p_code IN tables AND take_effect_flag NOT IN sql THEN WARN"
+      }
+    ]
+  },
+
+  "m_c_cons_cert_rela": {
+    "business_role": "用户证件关联表。存储用户与证件的多对多关系。",
+    "alias": "证件关系表",
+    "key_principles": [
+      "cons_id 关联 m_c_cons.id",
+      "cert_id 关联 m_c_cert.id"
+    ]
+  },
+
+  "m_c_cert": {
+    "business_role": "证件表。存储身份证、营业执照等证件信息。",
+    "alias": "证件表、身份证表",
+    "key_principles": [
+      "cert_type_code = '01' 表示身份证",
+      "cert_no 存储证件号码",
+      "通过 m_c_cons_cert_rela 关联到用户"
+    ],
+    "field_semantics": {
+      "cert_no": "证件号码",
+      "cert_type_code": "证件类型: 01=身份证 02=营业执照 ...",
+      "org_no": "发证机关所属单位"
+    }
+  },
+
+  "m_c_sp": {
+    "business_role": "受电点表（Service Point）。用户受电的物理接入点——每个用户至少有一个受电点，一个受电点下挂多个计量点。是从用户表到计量点表的必经桥梁。",
+    "alias": "受电点、SP表、供电点",
+    "key_principles": [
+      "通过 cons_id 关联 m_c_cons.id，一个用户可以有多个受电点（多路电源）",
+      "m_c_mp 通过 sp_id 关联本表，SP → MP 是一对多关系",
+      "type_code 区分受电点类型（变电站/配电站/箱式变等），字典: spTypeCode",
+      "多路电源场景下，每个受电点可以有不同的电压等级和容量"
+    ],
+    "field_semantics": {
+      "id": "受电点 ID（m_c_mp.sp_id 关联此值）",
+      "cons_id": "用户 ID，关联 m_c_cons.id",
+      "sp_name": "受电点名称",
+      "type_code": "受电点类型（字典: spTypeCode）",
+      "ps_num_code": "接入电源数目（字典: psNumCode）"
+    },
+    "related_tables": {
+      "m_c_cons": {"relationship": "sp.cons_id = cons.id", "note": "所属用户"},
+      "m_c_mp": {"relationship": "mp.sp_id = sp.id AND mp.cons_id = sp.cons_id", "note": "受电点下的计量点"}
+    }
+  },
+
+  "m_c_mp": {
+    "business_role": "计量点表。电力营销系统中连接用户与电网资产的枢纽表——一台变压器/一条线路通过计量点向用户供电。",
+    "alias": "计量点、MP表",
+    "key_principles": [
+      "通过 sp_id + cons_id 关联 m_c_sp，再通过 m_c_sp.cons_id 关联 m_c_cons",
+      "每个用电用户至少有一个计量点",
+      "计量点关联变压器（tg_id）、线路（line_id）、抄表段（mr_sect_no）",
+      "type_code 区分计量点类型：'01'=用电客户（最常见）、'02'=关口",
+      "volt_code 是计量点电压等级，与 m_c_cons.volt_code 可能不同（多路电源场景）",
+      "status_code: 01=设立 02=在用 03=停用 04=撤销。查询时通常只取在用(02)",
+      "mp_attr_code: '01'=结算计量点（主计量点），每个用户通常只有一个"
+    ],
+    "field_semantics": {
+      "id": "计量点 ID（m_c_meter_mp_rela.mp_id 关联此值）",
+      "mp_no": "计量点编号",
+      "mp_name": "计量点名称",
+      "sp_id": "受电点 ID，关联 m_c_sp.id。从用户到计量点的桥梁",
+      "cons_id": "用户 ID，关联 m_c_cons.id",
+      "tg_id": "台区 ID，关联 m_g_tg.id。这是计量点所属台区（用户档案台区）",
+      "line_id": "线路 ID，关联 m_g_line.id",
+      "mr_sect_no": "抄表段编号，关联 m_r_sect.id",
+      "volt_code": "电压等级（字典: psVoltCode）",
+      "type_code": "计量点分类（字典: mpSortCode）",
+      "mp_attr_code": "计量点属性: 01=结算 02=计量 03=计费 04=考核",
+      "wiring_mode": "接线方式（字典: wiringMode）"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "用户 → 计量点 → 台区（查用户档案台区）",
+        "sql_template": "m_c_cons a JOIN m_c_sp b ON a.id = b.cons_id JOIN m_c_mp c ON b.id = c.sp_id AND b.cons_id = c.cons_id JOIN m_g_tg tg ON c.tg_id = tg.id"
+      }
+    ],
+    "related_tables": {
+      "m_c_sp": {"relationship": "mp.sp_id = sp.id AND mp.cons_id = sp.cons_id", "note": "从计量点到受电点再到用户"},
+      "m_g_tg": {"relationship": "a.tg_id = b.id", "note": "台区信息（名称、容量、公专变）"},
+      "m_g_line": {"relationship": "a.line_id = b.id", "note": "线路信息（名称、电压）"},
+      "m_r_sect": {"relationship": "a.mr_sect_no = b.id", "note": "抄表段信息（名称、属性）"},
+      "m_g_io_mp": {"relationship": "通过 mp_id 关联", "note": "计量点流入流出考核单元关系"},
+      "m_c_meter_mp_rela": {"relationship": "mp.id = rela.mp_id", "note": "通过此关系表找到计量点下的电能表"}
+    }
+  },
+
+  "m_c_meter_mp_rela": {
+    "business_role": "电能表-计量点关系表。连接计量点与电能表的多对多桥梁——一个计量点可能挂多个表，一个表也可能关联多个计量点。",
+    "alias": "表计关系、meter-mp-rela",
+    "key_principles": [
+      "mp_id 关联 m_c_mp.id，meter_id 关联 m_c_meter.id",
+      "这是从计量点到电能表的必经之路——不能跳过此表直接 JOIN m_c_meter"
+    ],
+    "field_semantics": {
+      "mp_id": "计量点 ID，关联 m_c_mp.id",
+      "meter_id": "电能表 ID，关联 m_c_meter.id"
+    },
+    "related_tables": {
+      "m_c_mp": {"relationship": "rela.mp_id = mp.id", "note": "所属计量点"},
+      "m_c_meter": {"relationship": "rela.meter_id = meter.id", "note": "所属电能表"}
+    }
+  },
+
+  "m_r_coll_obj": {
+    "business_role": "采集对象表。记录每个电能表被哪个采集终端采集、采集端口号是多少。是从电能表到采集终端的桥梁。",
+    "alias": "采集对象、coll_obj、采集装置关系",
+    "key_principles": [
+      "⚠️ 本表没有 cons_id 字段！不能直接 JOIN m_c_cons",
+      "通过 meter_id 关联 m_c_meter.id，再通过 m_c_meter_mp_rela → m_c_mp → m_c_sp → m_c_cons 才能到达用户",
+      "cp_no 关联 m_r_cp.cp_no（采集点编号）",
+      "coll_port 是采集端口号（电能表接线端口）",
+      "collector_id 关联 m_d_lc_equip.id（采集终端/集中器）"
+    ],
+    "field_semantics": {
+      "id": "采集对象 ID",
+      "meter_id": "电能表 ID，关联 m_c_meter.id",
+      "cp_no": "采集点编号，关联 m_r_cp.cp_no",
+      "coll_port": "采集端口号（与电能表接线的端口）",
+      "collector_id": "采集终端 ID，关联 m_d_lc_equip.id",
+      "ct_ratio": "电流互感器变比",
+      "pt_ratio": "电压互感器变比",
+      "t_factor": "综合倍率"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "用户 → 采集点 → 台区（正确路径）",
+        "sql_template": "m_c_cons a JOIN m_c_sp b ON a.id = b.cons_id JOIN m_c_mp c ON b.id = c.sp_id AND b.cons_id = c.cons_id JOIN m_c_meter_mp_rela d ON c.id = d.mp_id JOIN m_c_meter e ON d.meter_id = e.id JOIN m_r_coll_obj f ON e.id = f.meter_id JOIN m_r_cp g ON f.cp_no = g.cp_no"
+      }
+    ],
+    "anti_patterns": [
+      {
+        "mistake": "m_r_coll_obj JOIN m_c_cons ON co.cons_id = c.id",
+        "why_wrong": "m_r_coll_obj 没有 cons_id 字段！必须通过 meter_id → m_c_meter → m_c_meter_mp_rela → m_c_mp → m_c_sp → m_c_cons 才能关联到用户",
+        "detection": "IF m_r_coll_obj IN tables AND sql 含 m_r_coll_obj.*cons_id THEN ERROR"
+      },
+      {
+        "mistake": "跳过 m_c_sp 和 m_c_meter_mp_rela 直接 JOIN",
+        "why_wrong": "m_c_mp 通过 sp_id 关联 m_c_sp（不是直接 JOIN m_c_cons），m_c_meter 通过 m_c_meter_mp_rela 关联 m_c_mp。缺少中间表会导致关联不上或走错路径",
+        "detection": "IF m_r_coll_obj IN tables AND m_c_sp NOT IN tables AND question 含(用户|档案) THEN WARN"
+      }
+    ],
+    "related_tables": {
+      "m_c_meter": {"relationship": "coll_obj.meter_id = meter.id", "note": "本表直接关联的是电能表，不是用户！"},
+      "m_r_cp": {"relationship": "coll_obj.cp_no = cp.cp_no", "note": "采集点。cp.tg_id 是采集点的台区，与 m_c_mp.tg_id 可能不同"},
+      "m_d_lc_equip": {"relationship": "coll_obj.collector_id = equip.id", "note": "采集终端设备"}
+    }
+  },
+
+  "m_r_cp": {
+    "business_role": "采集点表。每个采集装置（终端/集中器）安装的位置是一个采集点。采集点有自己的台区归属（tg_id），可能与用户的计量点台区不同。",
+    "alias": "采集点、CP表、采集终端安装点",
+    "key_principles": [
+      "cp_no 是采集点编号（主键），m_r_coll_obj.cp_no 关联此字段",
+      "cp_type_code 区分采集点类型（低压集抄/专变/公变/变电站）",
+      "tg_id 是本采集点的台区归属——⚠️ 这可能与用户计量点的台区（m_c_mp.tg_id）不同！",
+      "比较 m_r_cp.tg_id <> m_c_mp.tg_id 可以找出采集点台区与用户档案台区不一致的记录"
+    ],
+    "field_semantics": {
+      "cp_no": "采集点编号（主键），m_r_coll_obj.cp_no 关联此值",
+      "name": "采集点名称",
+      "cp_type_code": "采集点类型（字典: cpType）。00=低压集抄 01=专变 02=公变 03=变电站",
+      "tg_id": "采集点所属台区 ID，关联 m_g_tg.id。⚠️ 这是采集点的台区，不是用户档案的台区",
+      "status_code": "采集点状态",
+      "cp_addr": "采集点地址",
+      "org_no": "供电单位编码"
+    },
+    "correct_patterns": [
+      {
+        "scenario": "查找采集点台区与用户档案台区不一致的用户",
+        "sql_template": "m_c_cons → m_c_sp → m_c_mp(tg_id AS 档案台区) → m_c_meter_mp_rela → m_c_meter → m_r_coll_obj → m_r_cp(tg_id AS 采集点台区). WHERE 档案台区 <> 采集点台区"
+      }
+    ],
+    "related_tables": {
+      "m_g_tg": {"relationship": "cp.tg_id = tg.id", "note": "采集点的台区（可能与用户计量点台区不同！）"},
+      "m_r_coll_obj": {"relationship": "cp.cp_no = coll_obj.cp_no", "note": "采集点下的采集对象"}
+    }
+  },
+
+  "m_d_lc_equip": {
+    "business_role": "采集终端设备表。集中器/采集终端等硬件设备，安装在采集点(m_r_cp)处，通过采集对象(m_r_coll_obj)采集电能表数据。",
+    "alias": "采集终端、集中器、终端设备",
+    "key_principles": [
+      "id 就是采集终端 ID，m_r_coll_obj.collector_id 关联此值",
+      "manufacturer 是厂家编码（字典: lcdevFacturer），model_code 是型号编码（字典: lcModeCode）",
+      "made_no 是终端出厂编号"
+    ],
+    "field_semantics": {
+      "id": "采集终端 ID，m_r_coll_obj.collector_id 关联此值",
+      "made_no": "终端出厂编号",
+      "manufacturer": "终端厂家编码（字典: lcdevFacturer）",
+      "model_code": "终端型号编码（字典: lcModeCode）"
+    },
+    "related_tables": {
+      "m_r_coll_obj": {"relationship": "equip.id = coll_obj.collector_id", "note": "终端采集的电能表列表"}
+    }
+  },
+
+  "m_r_sect": {
+    "business_role": "抄表段表。将用户按地理位置/管理归属分组，方便抄表管理。每个抄表段由一名抄表员负责。",
+    "alias": "抄表段、sect表",
+    "key_principles": [
+      "id 就是抄表段编号（数据库里既是主键也是业务编号）",
+      "m_c_cons.mr_sect_no 和 m_c_mp.mr_sect_no 都关联到这里",
+      "attr 描述抄表段属性（高压/低压/居民/台区关口/线路关口），是分类过滤的关键字段",
+      "org_no 限定管理单位范围"
+    ],
+    "field_semantics": {
+      "id": "抄表段编号（同时是主键）",
+      "name": "抄表段名称",
+      "attr": "抄表段属性（字典: mrSectAttr）。01=高压用户 02=低压用户 03=居民用户 11=台区关口 12=线路关口",
+      "group_no": "抄表段组",
+      "org_no": "管理单位"
+    },
+    "related_tables": {
+      "m_c_cons": {"relationship": "通过 mr_sect_no 关联"},
+      "m_c_mp": {"relationship": "通过 mr_sect_no 关联"}
+    }
+  },
+
+  "m_g_tg": {
+    "business_role": "台区表。一台配电变压器及其供电范围的统称。线损统计的基础单元。",
+    "alias": "台区、变压器台区、TG表",
+    "key_principles": [
+      "每个台区对应一台配电变压器",
+      "pub_priv_flag = '01' 公变、'02' 专变。线损统计主要针对公变台区",
+      "通过 m_c_mp.tg_id 或 m_c_ps.tg_id 关联到用户",
+      "run_status_code: 01=运行 02=停用 03=拆除"
+    ],
+    "field_semantics": {
+      "tg_no": "台区编码",
+      "tg_name": "台区名称",
+      "tg_cap": "台区容量（可并列运行变压器容量之和）",
+      "pub_priv_flag": "公专变标志（字典: pubPrivFlag）。01=公变 02=专变",
+      "run_status_code": "运行状态（字典: runStatusCode）",
+      "org_no": "管理单位"
+    },
+    "related_tables": {
+      "m_c_mp": {"relationship": "通过 tg_id 关联", "note": "计量点所属台区（用户档案台区）"},
+      "m_r_cp": {"relationship": "通过 tg_id 关联", "note": "采集点所属台区。采集点台区可能与计量点台区不同！"},
+      "m_g_line": {"relationship": "通过 m_g_line_tg_rela 多对多关联"},
+      "m_g_ll_stat": {"relationship": "线损统计关联台区", "note": "stat_sort_code='台区电量统计'时 range_id 就是 tg_id"}
+    }
+  },
+
+  "m_g_line": {
+    "business_role": "线路表。10kV/35kV/110kV 等电压等级的配电/输电线路。线损考核的重要单元。",
+    "alias": "线路、line表",
+    "key_principles": [
+      "每条线路有固定电压等级（volt_code）",
+      "通过 m_c_mp.line_id 或 m_c_ps.line_id 关联到用户",
+      "run_status_code: 01=运行 02=停用 03=拆除 04=未投运",
+      "ll_calc_mode 定义线损计算方式：0=不计算 1=按定比 2=按定量 3=按标准公式"
+    ],
+    "field_semantics": {
+      "line_no": "线路编码",
+      "line_name": "线路名称",
+      "volt_code": "线路电压等级（字典: psVoltCode）",
+      "run_status_code": "运行状态（字典: runStatusCode）",
+      "ll_calc_mode": "线损计算方式（字典: llCalcMode）",
+      "org_no": "管理单位"
+    },
+    "related_tables": {
+      "m_g_tg": {"relationship": "通过 m_g_line_tg_rela 关联", "note": "一条线路下面挂多个台区"},
+      "m_g_subs": {"relationship": "通过 m_g_subs_line_rela 关联", "note": "线路所属变电站"},
+      "m_g_ll_stat": {"relationship": "线损统计", "note": "stat_sort_code='线路电量统计'时 range_id 就是 line_id"}
+    }
+  },
+
+  "m_e_cat_prc": {
+    "business_role": "目录电价表。定义每种用电类别+电压等级的官方电价标准。用户的实际电价从这张表派生。",
+    "alias": "电价目录、目录电价、cat_prc",
+    "key_principles": [
+      "prc_code 是电价编码（如 10022001 = 大工业.10KV）",
+      "elec_type_code + prc_volt_code 组合唯一确定一个电价",
+      "m_c_cons_prc.prc_code 关联到这里，表示用户执行哪个电价",
+      "cat_prc_name 是业务可读的电价名称"
+    ],
+    "field_semantics": {
+      "prc_code": "电价编码",
+      "cat_prc_name": "目录电价名称",
+      "elec_type_code": "用电类别（字典: elecTypeCode）",
+      "prc_volt_code": "电价电压等级（字典: prcVoltCode）",
+      "idu_flag": "变动标识（增加/删除/修改）"
+    },
+    "related_tables": {
+      "m_c_cons_prc": {"relationship": "m_c_cons_prc.prc_code = m_e_cat_prc.prc_code", "note": "用户电价关联到目录电价查名称"}
+    }
+  },
+
+  "m_c_meter": {
+    "business_role": "电能表资产表。记录每个电能表的物理参数（型号、接线方式、倍率等）。是从计量点到采集对象的中间桥梁。",
+    "alias": "电能表、电表、meter表",
+    "key_principles": [
+      "通过 m_c_meter_mp_rela 关联 m_c_mp，一个计量点可能有多个表",
+      "通过 m_r_coll_obj.meter_id 关联采集对象，再通过 m_r_coll_obj.cp_no → m_r_cp 到达采集点",
+      "t_factor 是综合倍率（表自身倍率 × CT变比 × PT变比），抄表读数乘以倍率才是实际电量",
+      "model_code 是厂家型号编码（字典: meterModelNo，超1000种），按需翻译"
+    ],
+    "field_semantics": {
+      "id": "电能表 ID（m_c_meter_mp_rela.meter_id 和 m_r_coll_obj.meter_id 都关联此值）",
+      "asset_no": "资产编号（局编号）",
+      "made_no": "出厂编号",
+      "type_code": "电能表类型（字典: meterTypeCode）。11=感应式 21=电子式 26=智能费控",
+      "model_code": "电表型号（字典: meterModelNo）",
+      "wiring_mode": "接线方式（字典: wiringMode）",
+      "volt_code": "额定电压",
+      "rated_current": "标定电流（字典: meterRcSort）",
+      "t_factor": "综合倍率"
+    },
+    "related_tables": {
+      "m_c_meter_mp_rela": {"relationship": "meter.id = rela.meter_id", "note": "关联到计量点"},
+      "m_r_coll_obj": {"relationship": "meter.id = coll_obj.meter_id", "note": "关联到采集对象（进而到达采集点和采集点台区）"}
+    }
+  },
+
+  "m_g_io_mp": {
+    "business_role": "计量点与考核单元的流入流出关系表。定义哪个计量点属于哪个考核单元，以及是流入还是流出。线损计算的关键关联表。",
+    "alias": "考核单元计量点关系、IO MP",
+    "key_principles": [
+      "chkunit_id → m_g_chkunit.id（考核单元），mp_id → m_c_mp.id（计量点）",
+      "io_id: 0=流入（供电量） 1=流出（售电量）。线损 = (Σ流入 - Σ流出) / Σ流入",
+      "这是 m_c_mp 和 m_g_chkunit 之间的多对多关联桥梁"
+    ],
+    "field_semantics": {
+      "chkunit_id": "考核单元 ID，关联 m_g_chkunit.id",
+      "mp_id": "计量点 ID，关联 m_c_mp.id",
+      "io_id": "流入流出标志。0=流入(供电) 1=流出(售电)",
+      "meter_read_type": "示数类型: 01=有功总(正) 02=有功总(反)"
+    },
+    "related_tables": {
+      "m_g_chkunit": {"relationship": "通过 chkunit_id 关联", "note": "获取考核单元名称、分类"},
+      "m_c_mp": {"relationship": "通过 mp_id 关联", "note": "获取计量点编号、电压等级"}
+    }
+  },
+
+  "m_g_ll_stat": {
+    "business_role": "线损统计结果表。存储台区/线路/考核单元等维度的线损统计汇总数据。",
+    "alias": "线损统计、线损报表",
+    "key_principles": [
+      "stat_sort_code 区分统计维度: 台区电量统计/线路电量统计/考核单元电量统计",
+      "range_id 是被统计对象的 ID（台区ID/线路ID/考核单元ID）",
+      "fore_flag: 1=测算线损 0=实际统计线损。查询时通常取实际统计(0)",
+      "ym 过滤是必需的——这是按月的统计表"
+    ],
+    "field_semantics": {
+      "stat_sort_code": "统计类别",
+      "rpt_name": "统计报表名称",
+      "range_id": "被统计对象标识（台区/线路/考核单元的ID）",
+      "fore_flag": "测算/实际标志",
+      "ym": "统计年月（YYYYMM格式）",
+      "data_status": "数据状态"
+    },
+    "related_tables": {
+      "m_g_tg": {"relationship": "stat_sort_code='台区电量统计'时 range_id = tg_id"},
+      "m_g_line": {"relationship": "stat_sort_code='线路电量统计'时 range_id = line_id"},
+      "m_g_chkunit": {"relationship": "stat_sort_code='考核单元电量统计'时 range_id = chkunit_id"}
+    }
+  },
+
+  "m_c_ps": {
+    "business_role": "受电点表（供电电源表）。记录用户从哪个变电站/线路/台区接入电网，是多路电源管理的基础。",
+    "alias": "受电点、电源、PS表",
+    "key_principles": [
+      "一个用户可以有多路电源（m_c_ps 中多条记录对应同一个 cons_id）",
+      "ps_attr 区分主供(10)、备用(20)、常用互为备用(11)",
+      "type_code: 1=公变 2=专变 3=专线 4=共用专变",
+      "根据 type_code 不同，关联的资产表不同：专线→subs_id+line_id、专变→line_id、公变→tg_id"
+    ],
+    "field_semantics": {
+      "ps_no": "电源编号",
+      "type_code": "电源类型（字典: psTypeCode）",
+      "phase_code": "相数（字典: phaseCode）",
+      "ps_volt": "供电电压（字典: psVoltCode）",
+      "ps_cap": "供电容量(kVA)",
+      "ps_attr": "电源性质（字典: psAttr）",
+      "subs_id": "变电站 ID",
+      "line_id": "线路 ID",
+      "tg_id": "台区 ID"
+    },
+    "related_tables": {
+      "m_g_subs": {"relationship": "通过 subs_id 关联", "note": "电源所属变电站"},
+      "m_g_line": {"relationship": "通过 line_id 关联", "note": "电源所属线路"},
+      "m_g_tg": {"relationship": "通过 tg_id 关联", "note": "电源所属台区"}
+    }
+  },
+
+  "m_c_cons_prc": {
+    "business_role": "用户电价表。记录每个用户当前执行的电价策略。用户的电费按此电价计算。",
+    "alias": "用户电价、cons_prc",
+    "key_principles": [
+      "一个用户可能有多条电价记录（不同用电类别/不同电价策略）",
+      "prc_code 关联 m_e_cat_prc.prc_code 获取目录电价名称",
+      "m_a_rcvbl_flow 中每条应收记录的 amt_type 会根据电价策略分配"
+    ],
+    "field_semantics": {
+      "cons_id": "用户 ID，关联 m_c_cons.id",
+      "prc_code": "电价编码，关联 m_e_cat_prc.prc_code",
+      "elec_type_code": "用电类别（字典: elecTypeCode）",
+      "trade_code": "行业分类（字典: tradeCode）"
+    }
+  }
+}

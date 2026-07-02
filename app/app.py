@@ -1,3 +1,31 @@
+# ============================================================
+# 环境修复（必须在 retriever/agent 等触发 ollama 导入之前执行）
+# ============================================================
+import os as _os
+from pathlib import Path as _Path
+
+_cert_ok = False
+_cert_val = _os.environ.get("SSL_CERT_FILE", "")
+if _cert_val and _Path(_cert_val).exists():
+    _cert_ok = True
+
+if not _cert_ok:
+    _cert_paths = [
+        _Path(_os.environ.get("CONDA_PREFIX", "")) / "Lib" / "site-packages" / "certifi" / "cacert.pem",
+        _Path(__file__).parent.parent / ".venv" / "Lib" / "site-packages" / "certifi" / "cacert.pem",
+    ]
+    for _cp in _cert_paths:
+        if _cp.exists():
+            _os.environ["SSL_CERT_FILE"] = str(_cp)
+            _cert_ok = True
+            break
+    if not _cert_ok and "SSL_CERT_FILE" in _os.environ:
+        del _os.environ["SSL_CERT_FILE"]
+
+if "OLLAMA_HOST" not in _os.environ:
+    _os.environ["OLLAMA_HOST"] = "http://127.0.0.1:11434"
+# ============================================================
+
 import streamlit as st
 # import io                         # [已废弃] 导出逻辑
 import os
@@ -9,7 +37,16 @@ from retriever import init_ensemble_retriever, init_few_shot_retriever
 from agent import get_llm
 from agent_graph import sql_agent_graph
 # from database import execute_export_sql  # [已废弃] 导出逻辑
-from config import OLLAMA_BASE_URL, CHROMA_DB_PATH, FEW_SHOT_DB_PATH, DB_HOST, DB_PORT
+from config import (
+    OLLAMA_BASE_URL,
+    get_current_db_config,
+    switch_database,
+    get_database_names,
+    get_chroma_db_path,
+    get_few_shot_db_path,
+    get_schema_json_path,
+)
+import case_manager as cm
 
 # ================= 组织编号数据加载 =================
 _ORG_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "组织编号.json")
@@ -218,12 +255,12 @@ st.markdown("""
 
 
 @st.cache_resource
-def load_retriever():
+def load_retriever(_db_name: str):
     return init_ensemble_retriever()
 
 
 @st.cache_resource
-def load_few_shot_retriever():
+def load_few_shot_retriever(_db_name: str):
     return init_few_shot_retriever()
 
 
@@ -233,7 +270,7 @@ def load_llm(model_name, temp):
 
 
 @st.cache_data(ttl=30)  # 30 秒自动过期，避免错误状态被永久缓存
-def health_check() -> dict:
+def health_check(_db_name: str) -> dict:
     """校验所有关键依赖，失败项列入 errors 列表（最多缓存 30 秒）"""
     errors = []
 
@@ -246,21 +283,22 @@ def health_check() -> dict:
         errors.append(f"❌ Ollama 不可用 ({OLLAMA_BASE_URL}): {e}")
 
     # 2. Schema 向量库完整性
-    schema_db = os.path.join(CHROMA_DB_PATH, "chroma.sqlite3")
+    schema_db = os.path.join(get_chroma_db_path(), "chroma.sqlite3")
     if not os.path.exists(schema_db):
         errors.append(f"❌ Schema 向量库缺失: {schema_db}")
 
     # 3. Few-Shot 向量库完整性
-    fewshot_db = os.path.join(FEW_SHOT_DB_PATH, "chroma.sqlite3")
+    fewshot_db = os.path.join(get_few_shot_db_path(), "chroma.sqlite3")
     if not os.path.exists(fewshot_db):
         errors.append(f"❌ Few-Shot 向量库缺失: {fewshot_db}")
 
     # 4. 数据库 TCP 可达性
+    db_cfg = get_current_db_config()
     try:
-        sock = socket.create_connection((DB_HOST, DB_PORT), timeout=5)
+        sock = socket.create_connection((db_cfg.host, db_cfg.port), timeout=5)
         sock.close()
     except Exception as e:
-        errors.append(f"❌ 数据库不可达 ({DB_HOST}:{DB_PORT}): {e}")
+        errors.append(f"❌ 数据库不可达 ({db_cfg.host}:{db_cfg.port}): {e}")
 
     return {"errors": errors}
 
@@ -272,6 +310,28 @@ with st.sidebar:
                 '<h1>⚡ SQL Gen</h1>'
                 '<p>电力营销 · AI SQL 助手</p>'
                 '</div>', unsafe_allow_html=True)
+
+    # ---- 数据库选择 ----
+    st.markdown('<p class="sb-section-title" style="margin:0 0.5rem 0.4rem 0.5rem;">数据库</p>',
+                unsafe_allow_html=True)
+    db_options = get_database_names()
+    current_db = get_current_db_config()
+    default_idx = db_options.index(current_db.name) if current_db.name in db_options else 0
+
+    selected_db = st.selectbox(
+        "知识库",
+        db_options,
+        index=default_idx,
+        help="切换数据库将重新加载对应的 Schema、案例和领域知识库",
+        key="db_selector",
+    )
+    if selected_db != current_db.name:
+        switch_database(selected_db)
+        # 清除 retriever 的 Streamlit 缓存
+        load_retriever.clear()
+        load_few_shot_retriever.clear()
+        health_check.clear()
+        st.rerun()
 
     # ---- 模型配置 ----
     st.markdown('<p class="sb-section-title" style="margin:0 0.5rem 0.4rem 0.5rem;">模型配置</p>',
@@ -322,6 +382,7 @@ with st.sidebar:
         st.session_state.hc_loading = True
         st.rerun()
 
+    db_name = get_current_db_config().name
     if st.session_state.hc_loading:
         # 显示加载中状态
         placeholder = st.empty()
@@ -331,11 +392,11 @@ with st.sidebar:
             '</div>',
             unsafe_allow_html=True,
         )
-        hc = health_check()
+        hc = health_check(db_name)
         st.session_state.hc_loading = False
         placeholder.empty()
     else:
-        hc = health_check()
+        hc = health_check(db_name)
 
     # 逐项展示结果
     checks = [
@@ -367,6 +428,57 @@ with st.sidebar:
         if not all_ok:
             for err in hc["errors"]:
                 st.error(err)
+
+    # ---- 案例管理 ----
+    st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">案例管理</p>',
+                unsafe_allow_html=True)
+
+    # 显示状态
+    status, status_msg = cm.get_publish_status()
+    staging_count = cm.get_staging_count()
+    total_count = cm.get_few_shot_count()
+
+    col_import, col_count = st.columns([1, 1])
+    with col_import:
+        if st.button("📝 导入案例", use_container_width=True, key="btn_import_case"):
+            st.session_state.show_case_dialog = True
+
+    with col_count:
+        st.caption(f"共 {total_count} 条")
+
+    # 暂存区指示
+    if staging_count > 0:
+        st.caption(f"📥 待发布: {staging_count} 条")
+
+        col_pub, col_reb = st.columns([1, 1])
+        with col_pub:
+            pub_disabled = status == "training"
+            pub_label = "⏳ 训练中..." if pub_disabled else "🚀 发布到知识库"
+            if st.button(pub_label, use_container_width=True, key="btn_publish",
+                         disabled=pub_disabled,
+                         help="启动后台训练，训练期间其他用户查询不受影响"):
+                cm.publish_in_background()
+                st.rerun()
+        with col_reb:
+            if st.button("🔄 重建向量库", use_container_width=True, key="btn_rebuild",
+                         help="从 JSON 全量重建向量库（容灾操作）"):
+                cm.rebuild_vector_store_from_json()
+                st.rerun()
+    else:
+        if st.button("🔄 重建向量库", use_container_width=True, key="btn_rebuild2",
+                     help="从 JSON 全量重建向量库（容灾操作）"):
+            cm.rebuild_vector_store_from_json()
+            st.rerun()
+
+    # 训练状态反馈
+    if status == "training":
+        st.info("⏳ 后台训练中...其他用户查询不受影响")
+    elif status == "done":
+        st.success(status_msg)
+        cm.reset_publish_status()
+    elif status == "error":
+        st.error(status_msg)
+        cm.reset_publish_status()
 
     # ---- 组织编号 ----
     st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">组织编号</p>',
@@ -675,7 +787,136 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+# ================= 案例导入 Dialog =================
+
+@st.dialog("📝 批量导入 SQL 案例", width="large")
+def case_import_dialog():
+    """案例导入对话框：粘贴 SQL → AI 解析 → 逐条编辑确认 → 暂存"""
+    # 初始化状态
+    if "dialog_results" not in st.session_state:
+        st.session_state.dialog_results = None
+    if "dialog_confirmed" not in st.session_state:
+        st.session_state.dialog_confirmed = set()
+
+    results = st.session_state.dialog_results
+
+    # ======== 输入模式：尚无解析结果 ========
+    if results is None:
+        st.markdown("### 粘贴 SQL")
+        sql_text = st.text_area(
+            "支持多条 SQL，用分号 (;) 或 '-- 文件名：xxx' 分隔",
+            height=160,
+            placeholder="SELECT ... FROM ... WHERE ...;\nSELECT ... FROM ...;",
+            label_visibility="collapsed",
+            key="dialog_sql_input",
+        )
+
+        col_a, col_b, col_c = st.columns([1, 1, 3])
+        with col_a:
+            parse_clicked = st.button("🤖 AI 解析", disabled=not sql_text,
+                                      use_container_width=True, key="dialog_parse_btn")
+        with col_b:
+            if st.button("❌ 取消", use_container_width=True, key="dialog_cancel_btn"):
+                _cleanup_dialog_state()
+                st.session_state.show_case_dialog = False
+                st.rerun()
+
+        if parse_clicked:
+            with st.spinner("AI 正在反向工程 SQL..."):
+                items = cm.split_sql_text(sql_text)
+                if not items:
+                    st.error("未找到有效的 SQL 语句")
+                    return
+                parsed = []
+                for item in items:
+                    parsed.append(cm.reverse_engineer_sql(item))
+                st.session_state.dialog_results = parsed
+                st.session_state.dialog_confirmed = set()
+                st.toast(f"✅ 解析完成: {len(parsed)} 条")
+                results = parsed  # 继续本执行周期进入结果渲染
+
+        if results is None:
+            return  # 没有结果，不渲染下方表单
+
+    # ======== 结果模式：逐条编辑确认 ========
+    st.markdown(f"### 编辑确认 ({len(results)} 条)")
+
+    for i, record in enumerate(results):
+        confirmed = i in st.session_state.dialog_confirmed
+        prefix = "✅ " if confirmed else ""
+        label = f"{prefix}案例 {i+1}: {record.get('title', '未命名')[:50]}"
+        with st.expander(label, expanded=not confirmed):
+            with st.expander("原始 SQL", expanded=False):
+                st.code(record.get("sql", ""), language="sql")
+
+            edited_q = st.text_input("用户问题", value=record.get("question", ""), key=f"dq_{i}")
+            edited_rules = st.text_area("业务规则", value=record.get("business_rules", ""),
+                                        key=f"dbr_{i}", height=80)
+            kw_str = ", ".join(record.get("search_keywords", []))
+            edited_kw = st.text_input("检索关键词 (逗号分隔)", value=kw_str, key=f"dkw_{i}")
+
+            col_cx, col_sc = st.columns(2)
+            with col_cx:
+                opts = ["simple", "medium", "complex"]
+                complexity = st.selectbox("复杂度", opts,
+                                          index=opts.index(record.get("complexity", "medium")),
+                                          key=f"dcx_{i}")
+            with col_sc:
+                scene = st.text_input("场景标签", value=record.get("scenario_tag", "综合查询"),
+                                      key=f"dsc_{i}")
+
+            if not confirmed:
+                if st.button("✅ 确认入库", key=f"dbtn_{i}", use_container_width=True):
+                    final = {
+                        "question": edited_q,
+                        "business_rules": edited_rules,
+                        "search_keywords": [k.strip() for k in edited_kw.split(",") if k.strip()],
+                        "complexity": complexity,
+                        "sql": record["sql"],
+                        "title": record.get("title", "手动导入"),
+                        "tables_used": record.get("tables_used", []),
+                        "scenario_tag": scene,
+                    }
+                    added = cm.stage_case(final)
+                    if added:
+                        st.session_state.dialog_confirmed.add(i)
+                        st.toast(f"✅ 案例 {i+1} 已暂存")
+                    else:
+                        st.toast("⚠️ 案例已存在，跳过")
+            else:
+                st.success("已暂存 ✅")
+
+    st.caption(f"已确认: {len(st.session_state.dialog_confirmed)}/{len(results)}，关闭后在侧边栏「发布到知识库」")
+
+    # ---- 底部操作按钮 ----
+    col_done, col_reset, _ = st.columns([1, 1, 3])
+    with col_done:
+        if st.button("✔ 完成关闭", use_container_width=True, key="dialog_done_btn"):
+            _cleanup_dialog_state()
+            st.session_state.show_case_dialog = False
+            st.rerun()
+    with col_reset:
+        if st.button("🔄 重新解析", use_container_width=True, key="dialog_reset_btn"):
+            st.session_state.dialog_results = None
+            st.session_state.dialog_confirmed = set()
+            st.session_state.pop("dialog_sql_input", None)
+            st.rerun()
+
+
+def _cleanup_dialog_state():
+    """清除 dialog 相关状态"""
+    st.session_state.dialog_results = None
+    st.session_state.dialog_confirmed = set()
+    st.session_state.pop("dialog_sql_input", None)
+
+
 # ================= 3. 主界面初始化 =================
+
+# Dialog 触发器（在渲染聊天之前）
+if st.session_state.get("show_case_dialog"):
+    case_import_dialog()
+    st.session_state.show_case_dialog = False
+
 st.title("⚡ 智能 SQL 生成AI ")
 st.markdown(
     "💡 **输入自然语言需求，AI 自动检索案例、编写 SQL、审查性能。**\n\n"

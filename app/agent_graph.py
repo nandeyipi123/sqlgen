@@ -10,6 +10,7 @@ from agent import get_llm, get_llm_no_stream, get_sql_fix_chain, get_planner_cha
 from database import extract_and_clean_sql, get_explain_plan
 from domain_validator import validate, format_validation_message
 from logger import get_logger
+from config import get_synonyms_path, get_table_knowledge_path, get_current_db_config
 
 _log = get_logger(__name__)
 
@@ -19,15 +20,26 @@ _log = get_logger(__name__)
 # ============================================================
 _SYNONYMS_CACHE = None
 _TABLE_KNOWLEDGE_CACHE = None
+_LAST_DB_NAME_AG = None
+
+
+def _ensure_ag_cache():
+    """数据库切换时清空 agent_graph 缓存"""
+    global _SYNONYMS_CACHE, _TABLE_KNOWLEDGE_CACHE, _LAST_DB_NAME_AG
+    current_db = get_current_db_config().name
+    if _LAST_DB_NAME_AG != current_db:
+        _SYNONYMS_CACHE = None
+        _TABLE_KNOWLEDGE_CACHE = None
+        _LAST_DB_NAME_AG = current_db
 
 
 def _load_synonyms():
-    """加载同义词词典（运行时查询扩展用）"""
+    """加载同义词词典（运行时查询扩展用，DB 切换时自动失效）"""
     global _SYNONYMS_CACHE
+    _ensure_ag_cache()
     if _SYNONYMS_CACHE is None:
         try:
-            synonyms_path = os.path.join(os.path.dirname(__file__), "..", "data", "domain_synonyms.json")
-            with open(synonyms_path, 'r', encoding='utf-8') as f:
+            with open(get_synonyms_path(), 'r', encoding='utf-8') as f:
                 _SYNONYMS_CACHE = json.load(f)
             _log.info("同义词词典已加载: %d 组", len([k for k in _SYNONYMS_CACHE if not k.startswith('_')]))
         except Exception as e:
@@ -37,12 +49,12 @@ def _load_synonyms():
 
 
 def _load_table_knowledge():
-    """加载表关系领域知识库"""
+    """加载表关系领域知识库（DB 切换时自动失效）"""
     global _TABLE_KNOWLEDGE_CACHE
+    _ensure_ag_cache()
     if _TABLE_KNOWLEDGE_CACHE is None:
         try:
-            knowledge_path = os.path.join(os.path.dirname(__file__), "..", "data", "table_relationships.json")
-            with open(knowledge_path, 'r', encoding='utf-8') as f:
+            with open(get_table_knowledge_path(), 'r', encoding='utf-8') as f:
                 _TABLE_KNOWLEDGE_CACHE = json.load(f)
             tables = [k for k in _TABLE_KNOWLEDGE_CACHE if not k.startswith('_')]
             _log.info("表关系知识库已加载: %d 张表", len(tables))

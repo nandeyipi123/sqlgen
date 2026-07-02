@@ -1,7 +1,7 @@
 import pymysql
 import pandas as pd
 import re
-from config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+from config import get_current_db_config
 from logger import get_logger
 
 _log = get_logger(__name__)
@@ -115,6 +115,18 @@ def extract_and_clean_sql(text):
     return raw_sql
 
 
+def _get_db_connection(connect_timeout=5, read_timeout=30):
+    """创建数据库连接（使用当前选中的数据库配置）"""
+    db = get_current_db_config()
+    return pymysql.connect(
+        host=db.host, port=db.port, user=db.user,
+        password=db.password, database=db.database,
+        cursorclass=pymysql.cursors.DictCursor,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout
+    )
+
+
 def get_explain_plan(sql_query):
     is_safe, reason = _is_safe_sql(sql_query)
     if not is_safe:
@@ -123,13 +135,7 @@ def get_explain_plan(sql_query):
 
     explain_sql = f"EXPLAIN {sql_query}"
     try:
-        connection = pymysql.connect(
-            host=DB_HOST, port=DB_PORT, user=DB_USER,
-            password=DB_PASSWORD, database=DB_NAME,
-            cursorclass=pymysql.cursors.DictCursor,
-            connect_timeout=5,
-            read_timeout=30
-        )
+        connection = _get_db_connection(connect_timeout=5, read_timeout=30)
         with connection.cursor() as cursor:
             cursor.execute(explain_sql)
             result = cursor.fetchall()
@@ -178,13 +184,7 @@ def execute_export_sql(sql_query, max_rows=50000):
     if "limit" not in sql_query.lower():
         sql_query = sql_query.rstrip().rstrip(';') + f" LIMIT {max_rows}"
     try:
-        connection = pymysql.connect(
-            host=DB_HOST, port=DB_PORT, user=DB_USER,
-            password=DB_PASSWORD, database=DB_NAME,
-            cursorclass=pymysql.cursors.DictCursor,
-            connect_timeout=10,
-            read_timeout=1200  # 👈 核心参数：20分钟无响应才会报超时
-        )
+        connection = _get_db_connection(connect_timeout=10, read_timeout=1200)
         with connection.cursor() as cursor:
             cursor.execute(sql_query)
             result = cursor.fetchall()
