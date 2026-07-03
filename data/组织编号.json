@@ -3295,21 +3295,6 @@
                         ]
                     },
                     {
-                        "id": "5106666",
-                        "pid": "51001",
-                        "text": "成都太阳高科技有限责任公司",
-                        "state": "open",
-                        "checked": false,
-                        "attributes": {
-                            "checkState": "checked",
-                            "code": "5106666",
-                            "isAdmin": true,
-                            "keywordCode": null,
-                            "type": "0"
-                        },
-                        "children": null
-                    },
-                    {
                         "id": "5100151",
                         "pid": "51001",
                         "text": "乐山市金洋电力开发有限责任公司",

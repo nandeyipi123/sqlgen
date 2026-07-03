@@ -153,10 +153,9 @@ st.markdown("""
         margin-left: 0.3rem;
     }
 
-    /* 按钮 — 深色主题 */
-    [data-testid="stSidebar"] .stButton > button,
-    [data-testid="stSidebar"] .stButton > button * {
-        color: #e2e8f0 !important;
+    /* 按钮 */
+    [data-testid="stSidebar"] button {
+        color: #1e293b !important;
     }
     [data-testid="stSidebar"] .stButton > button {
         border-radius: 8px !important;
@@ -169,32 +168,26 @@ st.markdown("""
     [data-testid="stSidebar"] .stButton > button:hover {
         background: rgba(255,255,255,0.16) !important;
         border-color: rgba(148,163,184,0.35) !important;
-        color: #f1f5f9 !important;
+        color: #1e293b !important;
         transform: translateY(-1px);
     }
     /* primary 按钮（强制停止） */
-    [data-testid="stSidebar"] .stButton > button[kind="primary"],
-    [data-testid="stSidebar"] .stButton > button[kind="primary"] * {
+    [data-testid="stSidebar"] button[kind="primary"] {
         color: #ffffff !important;
-    }
-    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
         background: #dc2626 !important;
         border-color: #991b1b !important;
     }
-    [data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+    [data-testid="stSidebar"] button[kind="primary"]:hover {
         color: #ffffff !important;
         background: #b91c1c !important;
     }
-    /* secondary / default 按钮 */
-    [data-testid="stSidebar"] .stButton > button[kind="secondary"],
-    [data-testid="stSidebar"] .stButton > button[kind="secondary"] * {
-        color: #e2e8f0 !important;
-    }
-    [data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+    /* secondary 按钮 */
+    [data-testid="stSidebar"] button[kind="secondary"] {
+        color: #1e293b !important;
         background: rgba(255,255,255,0.08) !important;
         border-color: rgba(148,163,184,0.15) !important;
     }
-    [data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+    [data-testid="stSidebar"] button[kind="secondary"]:hover {
         background: rgba(255,255,255,0.16) !important;
     }
 
@@ -230,7 +223,7 @@ st.markdown("""
     }
     /* expander 内容区 */
     [data-testid="stSidebar"] .stExpander details {
-        color: #e2e8f0 !important;
+        color: #1e293b !important;
     }
 
     /* 滚动条 */
@@ -337,20 +330,6 @@ with st.sidebar:
     st.markdown('<p class="sb-section-title" style="margin:0 0.5rem 0.4rem 0.5rem;">模型配置</p>',
                 unsafe_allow_html=True)
 
-    with st.container():
-        model_help = "flash 更快更便宜，pro 推理更强更贵"
-        selected_model = st.selectbox(
-            "AI 模型",
-            ("deepseek-v4-flash", "deepseek-v4-pro"),
-            index=1,
-            help=model_help,
-        )
-        selected_temp = st.slider(
-            "温度",
-            min_value=0.0, max_value=1.0, value=0.1, step=0.1,
-            help="越低越严谨，越高越有创意",
-        )
-
     # ---- 会话控制 ----
     st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">会话</p>',
                 unsafe_allow_html=True)
@@ -433,52 +412,42 @@ with st.sidebar:
     st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">案例管理</p>',
                 unsafe_allow_html=True)
 
-    # 显示状态
-    status, status_msg = cm.get_publish_status()
-    staging_count = cm.get_staging_count()
+    json_count = cm.get_json_count()
+    db_count = cm.get_vector_db_count()
+    untrained = json_count - db_count
     total_count = cm.get_few_shot_count()
 
     col_import, col_count = st.columns([1, 1])
     with col_import:
         if st.button("📝 导入案例", use_container_width=True, key="btn_import_case"):
             st.session_state.show_case_dialog = True
-
     with col_count:
         st.caption(f"共 {total_count} 条")
 
-    # 暂存区指示
-    if staging_count > 0:
-        st.caption(f"📥 待发布: {staging_count} 条")
-
-        col_pub, col_reb = st.columns([1, 1])
-        with col_pub:
-            pub_disabled = status == "training"
-            pub_label = "⏳ 训练中..." if pub_disabled else "🚀 发布到知识库"
-            if st.button(pub_label, use_container_width=True, key="btn_publish",
-                         disabled=pub_disabled,
-                         help="启动后台训练，训练期间其他用户查询不受影响"):
-                cm.publish_in_background()
-                st.rerun()
-        with col_reb:
-            if st.button("🔄 重建向量库", use_container_width=True, key="btn_rebuild",
-                         help="从 JSON 全量重建向量库（容灾操作）"):
-                cm.rebuild_vector_store_from_json()
-                st.rerun()
+    # 训练状态
+    if untrained > 0:
+        st.warning(f"⚠️ 有 {untrained} 条案例未训练")
     else:
-        if st.button("🔄 重建向量库", use_container_width=True, key="btn_rebuild2",
-                     help="从 JSON 全量重建向量库（容灾操作）"):
-            cm.rebuild_vector_store_from_json()
-            st.rerun()
+        st.success("✅ 向量库已是最新")
 
-    # 训练状态反馈
-    if status == "training":
-        st.info("⏳ 后台训练中...其他用户查询不受影响")
-    elif status == "done":
-        st.success(status_msg)
-        cm.reset_publish_status()
-    elif status == "error":
-        st.error(status_msg)
-        cm.reset_publish_status()
+    if st.button("🔄 训练向量库", use_container_width=True, key="btn_train",
+                 help="检测 JSON 与向量库差异，增量训练新增案例"):
+        with st.spinner("⏳ 正在训练向量库..."):
+            trained, msg = cm.train_incremental()
+        st.toast(msg)
+        if trained > 0:
+            load_few_shot_retriever.clear()
+        st.rerun()
+
+    with st.expander("⚙️ 高级"):
+        if st.button("🔧 全量重建向量库", use_container_width=True, key="btn_rebuild",
+                     help="从 JSON 全量重建（手动增删 JSON 后使用）"):
+            with st.spinner("⏳ 正在全量重建向量库..."):
+                ok, msg = cm.rebuild_sync()
+            st.toast(msg)
+            if ok:
+                load_few_shot_retriever.clear()
+            st.rerun()
 
     # ---- 组织编号 ----
     st.markdown('<p class="sb-section-title" style="margin:1rem 0.5rem 0.4rem 0.5rem;">组织编号</p>',
@@ -494,7 +463,7 @@ with st.sidebar:
     height: 100%; margin: 0; padding: 0;
     background: transparent; color: #e2e8f0;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    font-size: 0.82rem; line-height: 1.5;
+    font-size: 0.92rem; line-height: 1.6;
   }}
   body {{
     display: flex; flex-direction: column;
@@ -565,7 +534,7 @@ with st.sidebar:
     background: rgba(99,102,241,0.14);
     color: #818cf8;
     font-family: "SF Mono","Fira Code",monospace;
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     letter-spacing: 0.02em;
     transition: all 0.15s;
   }}
@@ -791,16 +760,29 @@ with st.sidebar:
 
 @st.dialog("📝 批量导入 SQL 案例", width="large")
 def case_import_dialog():
-    """案例导入对话框：粘贴 SQL → AI 解析 → 逐条编辑确认 → 暂存"""
-    # 初始化状态
+    """案例导入对话框：粘贴 SQL → AI 解析 → 编辑 → 一键导入"""
     if "dialog_results" not in st.session_state:
         st.session_state.dialog_results = None
-    if "dialog_confirmed" not in st.session_state:
-        st.session_state.dialog_confirmed = set()
+    if "dialog_done" not in st.session_state:
+        st.session_state.dialog_done = False
+
+    # ======== 导入完成状态（最先检查） ========
+    if st.session_state.dialog_done:
+        new_count = st.session_state.get("dialog_import_result", 0)
+        if new_count > 0:
+            st.success(f"✅ 已导入 {new_count} 条案例")
+        else:
+            st.info("⚠️ 所有案例已存在，无新增")
+        if st.button("✔ 关闭", use_container_width=True, key="dialog_close_btn"):
+            st.session_state.dialog_results = None
+            st.session_state.dialog_done = False
+            st.session_state.show_case_dialog = False
+            st.rerun()
+        return
 
     results = st.session_state.dialog_results
 
-    # ======== 输入模式：尚无解析结果 ========
+    # ======== 第一步：粘贴 SQL 并解析 ========
     if results is None:
         st.markdown("### 粘贴 SQL")
         sql_text = st.text_area(
@@ -817,7 +799,7 @@ def case_import_dialog():
                                       use_container_width=True, key="dialog_parse_btn")
         with col_b:
             if st.button("❌ 取消", use_container_width=True, key="dialog_cancel_btn"):
-                _cleanup_dialog_state()
+                st.session_state.dialog_results = None
                 st.session_state.show_case_dialog = False
                 st.rerun()
 
@@ -831,29 +813,27 @@ def case_import_dialog():
                 for item in items:
                     parsed.append(cm.reverse_engineer_sql(item))
                 st.session_state.dialog_results = parsed
-                st.session_state.dialog_confirmed = set()
                 st.toast(f"✅ 解析完成: {len(parsed)} 条")
-                results = parsed  # 继续本执行周期进入结果渲染
+                results = parsed
 
         if results is None:
-            return  # 没有结果，不渲染下方表单
+            return
 
-    # ======== 结果模式：逐条编辑确认 ========
+    # ======== 第二步：编辑 + 导入 ========
     st.markdown(f"### 编辑确认 ({len(results)} 条)")
 
+    edited_records = []
     for i, record in enumerate(results):
-        confirmed = i in st.session_state.dialog_confirmed
-        prefix = "✅ " if confirmed else ""
-        label = f"{prefix}案例 {i+1}: {record.get('title', '未命名')[:50]}"
-        with st.expander(label, expanded=not confirmed):
+        label = f"案例 {i+1}: {record.get('title', '未命名')[:50]}"
+        with st.expander(label, expanded=(len(results) <= 3)):
             with st.expander("原始 SQL", expanded=False):
                 st.code(record.get("sql", ""), language="sql")
 
-            edited_q = st.text_input("用户问题", value=record.get("question", ""), key=f"dq_{i}")
-            edited_rules = st.text_area("业务规则", value=record.get("business_rules", ""),
-                                        key=f"dbr_{i}", height=80)
+            eq = st.text_input("用户问题", value=record.get("question", ""), key=f"dq_{i}")
+            er = st.text_area("业务规则", value=record.get("business_rules", ""),
+                              key=f"dbr_{i}", height=80)
             kw_str = ", ".join(record.get("search_keywords", []))
-            edited_kw = st.text_input("检索关键词 (逗号分隔)", value=kw_str, key=f"dkw_{i}")
+            ek = st.text_input("检索关键词 (逗号分隔)", value=kw_str, key=f"dkw_{i}")
 
             col_cx, col_sc = st.columns(2)
             with col_cx:
@@ -865,49 +845,31 @@ def case_import_dialog():
                 scene = st.text_input("场景标签", value=record.get("scenario_tag", "综合查询"),
                                       key=f"dsc_{i}")
 
-            if not confirmed:
-                if st.button("✅ 确认入库", key=f"dbtn_{i}", use_container_width=True):
-                    final = {
-                        "question": edited_q,
-                        "business_rules": edited_rules,
-                        "search_keywords": [k.strip() for k in edited_kw.split(",") if k.strip()],
-                        "complexity": complexity,
-                        "sql": record["sql"],
-                        "title": record.get("title", "手动导入"),
-                        "tables_used": record.get("tables_used", []),
-                        "scenario_tag": scene,
-                    }
-                    added = cm.stage_case(final)
-                    if added:
-                        st.session_state.dialog_confirmed.add(i)
-                        st.toast(f"✅ 案例 {i+1} 已暂存")
-                    else:
-                        st.toast("⚠️ 案例已存在，跳过")
-            else:
-                st.success("已暂存 ✅")
+            edited_records.append({
+                "question": eq,
+                "business_rules": er,
+                "search_keywords": [k.strip() for k in ek.split(",") if k.strip()],
+                "complexity": complexity,
+                "sql": record["sql"],
+                "title": record.get("title", "手动导入"),
+                "tables_used": record.get("tables_used", []),
+                "scenario_tag": scene,
+            })
 
-    st.caption(f"已确认: {len(st.session_state.dialog_confirmed)}/{len(results)}，关闭后在侧边栏「发布到知识库」")
-
-    # ---- 底部操作按钮 ----
-    col_done, col_reset, _ = st.columns([1, 1, 3])
-    with col_done:
-        if st.button("✔ 完成关闭", use_container_width=True, key="dialog_done_btn"):
-            _cleanup_dialog_state()
+    # ---- 底部按钮 ----
+    st.divider()
+    col_import, col_cancel, _ = st.columns([1, 1, 3])
+    with col_import:
+        if st.button("📥 导入", use_container_width=True, type="primary", key="dialog_import_btn"):
+            new_count = cm.direct_import(edited_records)
+            st.session_state.dialog_import_result = new_count
+            st.session_state.dialog_done = True
+            st.rerun()
+    with col_cancel:
+        if st.button("❌ 取消", use_container_width=True, key="dialog_cancel2_btn"):
+            st.session_state.dialog_results = None
             st.session_state.show_case_dialog = False
             st.rerun()
-    with col_reset:
-        if st.button("🔄 重新解析", use_container_width=True, key="dialog_reset_btn"):
-            st.session_state.dialog_results = None
-            st.session_state.dialog_confirmed = set()
-            st.session_state.pop("dialog_sql_input", None)
-            st.rerun()
-
-
-def _cleanup_dialog_state():
-    """清除 dialog 相关状态"""
-    st.session_state.dialog_results = None
-    st.session_state.dialog_confirmed = set()
-    st.session_state.pop("dialog_sql_input", None)
 
 
 # ================= 3. 主界面初始化 =================
@@ -915,7 +877,9 @@ def _cleanup_dialog_state():
 # Dialog 触发器（在渲染聊天之前）
 if st.session_state.get("show_case_dialog"):
     case_import_dialog()
-    st.session_state.show_case_dialog = False
+    # 注意：不在外部重置 show_case_dialog！
+    # dialog 内部的"取消"/"关闭"按钮负责设置 show_case_dialog = False。
+    # 如果在此处重置，st.rerun() 后 show_case_dialog 变 False，弹窗再也打不开。
 
 st.title("⚡ 智能 SQL 生成AI ")
 st.markdown(
@@ -1008,8 +972,6 @@ if user_query := st.chat_input("输入查询需求，AI 将为你生成 SQL...")
         # A. 初始化图状态
         initial_state = {
             "question": user_query,
-            "model_name": selected_model,
-            "temperature": selected_temp,
             "few_shot_context": "", "required_tables": [], "exact_schema_context": "",
             "domain_knowledge_context": "",
             "found_tables": [], "sql": None, "sql_candidates": [], "error_msg": None, "warnings": [], "loop_count": 0

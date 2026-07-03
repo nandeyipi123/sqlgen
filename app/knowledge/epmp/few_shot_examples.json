@@ -5032,9 +5032,20 @@
     "question": "查询组织5100123下所有两保户用户档案，包含单位、户号、户名、身份证、联系电话、两保户类型、协议值、有效时间起、有效时间止",
     "business_rules": "1. 两保户档案信息在 m_c_cont_info 表中，cont_type 字段区分类型（01=低保 02=五保 03=协议），通过 m_p_code 字典翻译。2. 通过 cons_id 关联 m_c_cons.id 获取用户信息，m_c_cont_info 也有 cons_no 可直接用。3. org_no 通过 ac_org.id 获取供电单位名称。4. effect_flag=1 过滤生效记录。5. 数据隔离 org_no LIKE '5100123%'。",
     "search_keywords": [
-      "两保户", "低保户", "五保户", "两保", "低保", "五保",
-      "档案", "协议", "用户档案", "有效时间",
-      "身份证", "联系电话", "用户编号", "供电单位"
+      "两保户",
+      "低保户",
+      "五保户",
+      "两保",
+      "低保",
+      "五保",
+      "档案",
+      "协议",
+      "用户档案",
+      "有效时间",
+      "身份证",
+      "联系电话",
+      "用户编号",
+      "供电单位"
     ],
     "complexity": "simple",
     "sql": "SELECT o.name AS 供电单位, b.cons_no AS 用户编号, b.cons_name AS 用户名称, a.cert_no AS 身份证号, a.tel_no AS 联系电话, p1.name AS 两保户类型, a.cont_value AS 协议值, a.beg_ymd AS 有效时间起, a.end_ymd AS 有效时间止 FROM m_c_cont_info a JOIN ac_org o ON a.org_no = o.id AND o.id LIKE '5100123%' JOIN m_c_cons b ON a.cons_id = b.id LEFT JOIN m_p_code p1 ON p1.code_type = 'conttype' AND p1.value = a.cont_type AND p1.take_effect_flag = 1 WHERE a.effect_flag = 1 ORDER BY b.cons_no",

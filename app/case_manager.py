@@ -12,10 +12,10 @@ import json
 import os
 import re
 import shutil
-import threading
 import time
 from typing import List, Dict, Optional
 
+import pymysql
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
@@ -27,15 +27,11 @@ from config import (
     get_staging_json_path,
     get_few_shot_db_path,
     get_schema_json_path,
+    get_chroma_db_path,
 )
 from logger import get_logger
 
 _log = get_logger(__name__)
-
-# 发布状态: "idle" | "training" | "done" | "error"
-_publish_status = "idle"
-_publish_message = ""
-_publish_status_lock = threading.Lock()
 
 
 # ============================================================
@@ -106,8 +102,126 @@ def _extract_tables_from_sql(sql: str) -> List[str]:
 # AI 反向工程
 # ============================================================
 
+def _fetch_table_ddl(table_name: str) -> dict:
+    """从数据库下载单张表的字段信息（SHOW CREATE TABLE + 解析）。
+    返回 {"table_name": str, "fields": [{"field_name": str, "comment": str}]} 或 None"""
+    db = get_current_db_config()
+    try:
+        conn = pymysql.connect(
+            host=db.host, port=db.port, user=db.user,
+            password=db.password, database=db.database,
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10, read_timeout=30,
+        )
+        with conn.cursor() as cursor:
+            cursor.execute(f"SHOW CREATE TABLE `{table_name}`")
+            result = cursor.fetchone()
+        conn.close()
+
+        if not result:
+            _log.warning("_fetch_table_ddl: %s 表不存在", table_name)
+            return None
+
+        ddl = result.get("Create Table", "")
+        fields = []
+        for line in ddl.split('\n'):
+            line = line.strip()
+            if not line or line.startswith('CREATE') or line.startswith(')') or \
+               line.startswith('PRIMARY') or line.startswith('KEY') or \
+               line.startswith('UNIQUE') or line.startswith('INDEX') or \
+               line.startswith('CONSTRAINT') or line.startswith('ENGINE') or \
+               line.startswith('/*'):
+                continue
+            m = re.match(r"`(\w+)`\s+(\w+(?:\([^)]*\))?)\s*(.*)", line)
+            if m:
+                col_name = m.group(1)
+                col_type = m.group(2)
+                rest = m.group(3)
+                comment = ""
+                cm = re.search(r"COMMENT\s+'([^']*)'", rest, re.IGNORECASE)
+                if cm:
+                    comment = cm.group(1)
+                if not comment:
+                    comment = f"{col_name} ({col_type})"
+                fields.append({"field_name": col_name, "comment": comment})
+
+        _log.info("_fetch_table_ddl: %s 下载成功 (%d 字段)", table_name, len(fields))
+        return {"table_name": table_name, "fields": fields}
+    except Exception as e:
+        _log.warning("_fetch_table_ddl: %s 下载失败: %s", table_name, e)
+        return None
+
+
+def _ensure_schema_tables(tables: List[str]) -> None:
+    """检查表是否在 Schema JSON 中，缺失的从数据库下载并缓存到 JSON + ChromaDB"""
+    schema_path = get_schema_json_path()
+    try:
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            schema = json.load(f)
+    except Exception:
+        schema = []
+
+    existing_names = {s.get("table_name", "").lower() for s in schema}
+    missing = [t for t in tables if t.lower() not in existing_names]
+
+    if not missing:
+        return
+
+    _log.info("_ensure_schema_tables: 发现 %d 张新表，开始下载 DDL: %s", len(missing), missing)
+
+    new_tables = []
+    for table_name in missing:
+        ddl = _fetch_table_ddl(table_name)
+        if ddl:
+            schema.append(ddl)
+            new_tables.append(ddl)
+
+    if not new_tables:
+        return
+
+    # 1. 写入 Schema JSON
+    os.makedirs(os.path.dirname(schema_path), exist_ok=True)
+    with open(schema_path, 'w', encoding='utf-8') as f:
+        json.dump(schema, f, ensure_ascii=False, indent=2)
+    _log.info("_ensure_schema_tables: Schema JSON 已更新 (+%d 表)", len(new_tables))
+
+    # 使 retriever 模块级缓存失效
+    try:
+        import retriever
+        retriever._SCHEMA_CACHE = None
+    except Exception:
+        pass
+
+    # 2. 增量添加到 Schema ChromaDB
+    try:
+        embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
+        docs = []
+        for table in new_tables:
+            table_name = table.get("table_name", "unknown")
+            fields = table.get("fields", [])
+            lines = [f"【表名】: {table_name}", "【字段及枚举说明】:"]
+            for f in fields:
+                lines.append(f"- {f.get('field_name', '')}: {f.get('comment', '')}")
+            docs.append(Document(
+                page_content="\n".join(lines),
+                metadata={"table_name": table_name, "field_count": len(fields)},
+            ))
+        store = Chroma(
+            collection_name="electric_sql_schema",
+            embedding_function=embeddings,
+            persist_directory=get_chroma_db_path(),
+        )
+        store.add_documents(docs)
+        _log.info("_ensure_schema_tables: Schema ChromaDB 已更新 (+%d 表)", len(new_tables))
+    except Exception as e:
+        _log.warning("_ensure_schema_tables: Schema ChromaDB 更新失败: %s（JSON 已保存）", e)
+
+
 def _build_schema_summary(tables: List[str]) -> str:
-    """为指定的表列表构建 Schema 摘要（用作 AI 上下文）"""
+    """为指定的表列表构建 Schema 摘要（用作 AI 上下文）。
+    如果表不在本地 Schema JSON 中，自动从数据库下载并缓存。"""
+    _ensure_schema_tables(tables)
+
     schema_path = get_schema_json_path()
     try:
         with open(schema_path, 'r', encoding='utf-8') as f:
@@ -272,15 +386,43 @@ def _build_fewshot_document(record: dict) -> Document:
     )
 
 
-def _publish_train(db_cfg):
-    """后台线程：构建新向量库 + 原子替换。
-    注意：此函数在后台线程中运行，不访问 Streamlit session_state。"""
-    global _publish_status, _publish_message
-
+def _close_chroma_store(store):
+    """主动关闭 ChromaDB 内部连接，释放 Windows 文件锁。"""
     try:
-        with _publish_status_lock:
-            _publish_status = "training"
-            _publish_message = ""
+        # langchain_chroma.Chroma 内部持有 chromadb.PersistentClient
+        client = getattr(store, '_client', None) or getattr(store, '_chroma_client', None)
+        if client is not None:
+            # PersistentClient._system 是 DuckDB 的 System 对象
+            system = getattr(client, '_system', None)
+            if system and hasattr(system, 'stop'):
+                system.stop()
+    except Exception:
+        pass
+
+
+def _copy_tree_replace(src: str, dst: str):
+    """逐文件拷贝 src 内容到 dst（覆盖），用于 Windows 上绕过文件锁。"""
+    if not os.path.exists(dst):
+        os.makedirs(dst, exist_ok=True)
+    for root, dirs, files in os.walk(src):
+        rel = os.path.relpath(root, src)
+        target_dir = os.path.join(dst, rel) if rel != '.' else dst
+        os.makedirs(target_dir, exist_ok=True)
+        for fname in files:
+            s = os.path.join(root, fname)
+            d = os.path.join(target_dir, fname)
+            # 先删除旧文件（忽略锁错误）
+            if os.path.exists(d):
+                try:
+                    os.remove(d)
+                except PermissionError:
+                    pass  # 旧文件被锁时跳过，新文件直接覆盖写入试试
+            shutil.copy2(s, d)
+
+
+def _publish_train(db_cfg):
+    """构建新向量库 + 热替换（由 publish_sync 同步调用）。"""
+    try:
 
         knowledge_dir = db_cfg.knowledge_abs
         staging_path = os.path.join(knowledge_dir, "few_shot_examples_staging.json")
@@ -315,139 +457,159 @@ def _publish_train(db_cfg):
         embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
         docs = [_build_fewshot_document(r) for r in merged]
 
-        Chroma.from_documents(
+        store = Chroma.from_documents(
             documents=docs,
             embedding=embeddings,
             collection_name="few_shot_sql",
             persist_directory=new_db_path,
         )
-        _log.info("新向量库构建完成: %d 条", len(docs))
+        _log.info("新向量库构建完成: %d 条", len(merged))
 
-        # 3. 原子替换
-        # 3a. 备份旧库
-        if os.path.exists(old_db_path):
-            if os.path.exists(old_backup_path):
-                shutil.rmtree(old_backup_path)
-            os.rename(old_db_path, old_backup_path)
+        # 释放 ChromaDB 文件锁
+        _close_chroma_store(store)
+        del store, embeddings, docs
+        import gc; gc.collect()
+        time.sleep(0.5)  # 给系统一点时间释放文件句柄
 
-        # 3b. 新库上线
-        os.rename(new_db_path, old_db_path)
+        # 3. 文件级拷贝替换（绕过 Windows 目录锁）
+        _copy_tree_replace(new_db_path, old_db_path)
+        shutil.rmtree(new_db_path, ignore_errors=True)
+        _log.info("向量库替换完成")
 
-        # 3c. 更新 JSON
+        # 4. 更新 JSON + 清空暂存区
         _write_json(json_path, merged)
-
-        # 3d. 清空暂存区
         _write_json(staging_path, [])
-
-        # 3e. 清理旧备份
-        if os.path.exists(old_backup_path):
-            shutil.rmtree(old_backup_path)
-
-        with _publish_status_lock:
-            _publish_status = "done"
-            _publish_message = f"发布完成: +{new_count} 条新案例已生效 (共 {len(merged)} 条)"
-
         _log.info("热切换完成: 共 %d 条案例", len(merged))
-
     except Exception as e:
-        _log.exception("后台训练失败")
-        with _publish_status_lock:
-            _publish_status = "error"
-            _publish_message = f"训练失败: {str(e)[:100]}"
+        _log.exception("训练失败")
+        raise
 
 
-def publish_in_background():
-    """启动后台线程执行训练+热切换。非阻塞，立即返回。"""
-    global _publish_status
-    with _publish_status_lock:
-        if _publish_status == "training":
-            return  # 已在训练中
-
+def publish_sync() -> tuple:
+    """同步执行训练+热切换，返回 (ok: bool, message: str)。
+    阻塞约 30 秒，期间前端显示 st.spinner。"""
     db_cfg = get_current_db_config()
-    _log.info("启动后台训练: %s", db_cfg.name)
-    t = threading.Thread(target=_publish_train, args=(db_cfg,), daemon=True)
-    t.start()
+    try:
+        _publish_train(db_cfg)
+        return True, "案例已发布到知识库"
+    except Exception as e:
+        _log.exception("同步训练失败")
+        return False, f"训练失败: {str(e)[:100]}"
 
 
-def get_publish_status() -> tuple:
-    """返回 (status: str, message: str)
-    status: "idle" | "training" | "done" | "error"
-    """
-    global _publish_status, _publish_message
-    with _publish_status_lock:
-        status = _publish_status
-        msg = _publish_message
-    return status, msg
+def rebuild_sync() -> tuple:
+    """同步执行全量重建，返回 (ok: bool, message: str)。"""
+    try:
+        knowledge_dir = get_current_db_config().knowledge_abs
+        json_path = os.path.join(knowledge_dir, "few_shot_examples.json")
+        old_db_path = os.path.join(knowledge_dir, "few_shot_chroma_db")
+        new_db_path = os.path.join(knowledge_dir, "few_shot_chroma_db_new")
 
+        records = _read_json(json_path)
+        _log.info("全量重建: %d 条案例", len(records))
 
-def reset_publish_status():
-    """将状态从 done/error 重置为 idle（前端消费通知后调用）"""
-    global _publish_status, _publish_message
-    with _publish_status_lock:
-        if _publish_status in ("done", "error"):
-            _publish_status = "idle"
-            _publish_message = ""
+        if os.path.exists(new_db_path):
+            shutil.rmtree(new_db_path)
 
+        embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
+        docs = [_build_fewshot_document(r) for r in records]
 
-def rebuild_vector_store_from_json():
-    """从 JSON 全量重建向量库（容灾按钮，也走后台线程）"""
-    global _publish_status
+        store = Chroma.from_documents(
+            documents=docs, embedding=embeddings,
+            collection_name="few_shot_sql", persist_directory=new_db_path,
+        )
 
-    def _rebuild():
-        global _publish_status, _publish_message
-        try:
-            with _publish_status_lock:
-                _publish_status = "training"
-                _publish_message = ""
+        _close_chroma_store(store)
+        del store, embeddings, docs
+        import gc; gc.collect()
+        time.sleep(0.5)
 
-            knowledge_dir = get_current_db_config().knowledge_abs
-            json_path = os.path.join(knowledge_dir, "few_shot_examples.json")
-            old_db_path = os.path.join(knowledge_dir, "few_shot_chroma_db")
-            new_db_path = os.path.join(knowledge_dir, "few_shot_chroma_db_new")
-            old_backup_path = os.path.join(knowledge_dir, "few_shot_chroma_db_old")
+        _copy_tree_replace(new_db_path, old_db_path)
+        shutil.rmtree(new_db_path, ignore_errors=True)
 
-            records = _read_json(json_path)
-            _log.info("全量重建: %d 条案例", len(records))
-
-            if os.path.exists(new_db_path):
-                shutil.rmtree(new_db_path)
-
-            embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
-            docs = [_build_fewshot_document(r) for r in records]
-
-            Chroma.from_documents(
-                documents=docs,
-                embedding=embeddings,
-                collection_name="few_shot_sql",
-                persist_directory=new_db_path,
-            )
-
-            if os.path.exists(old_db_path):
-                if os.path.exists(old_backup_path):
-                    shutil.rmtree(old_backup_path)
-                os.rename(old_db_path, old_backup_path)
-            os.rename(new_db_path, old_db_path)
-            if os.path.exists(old_backup_path):
-                shutil.rmtree(old_backup_path)
-
-            with _publish_status_lock:
-                _publish_status = "done"
-                _publish_message = f"向量库已重建: {len(records)} 条案例"
-
-        except Exception as e:
-            _log.exception("全量重建失败")
-            with _publish_status_lock:
-                _publish_status = "error"
-                _publish_message = f"重建失败: {str(e)[:100]}"
-
-    with _publish_status_lock:
-        if _publish_status == "training":
-            return
-
-    t = threading.Thread(target=_rebuild, daemon=True)
-    t.start()
+        return True, f"向量库已重建: {len(records)} 条案例"
+    except Exception as e:
+        _log.exception("全量重建失败")
+        return False, f"重建失败: {str(e)[:100]}"
 
 
 def get_few_shot_count() -> int:
     """返回当前正式库案例总数"""
     return len(_read_json(get_few_shot_json_path()))
+
+
+def direct_import(records: list) -> int:
+    """导入案例：只写入 JSON，不去碰向量库。
+    训练由侧边栏「训练向量库」按钮单独触发，避免并发写入风险。
+    返回新增案例数。"""
+    json_path = get_few_shot_json_path()
+    existing = _read_json(json_path)
+
+    # 去重
+    seen_sigs = set()
+    for rec in existing:
+        sql = rec.get("sql", "")
+        seen_sigs.add(f"{sql[:100].strip().upper()}|{len(sql)}")
+
+    new_records = []
+    for rec in records:
+        sql = rec.get("sql", "")
+        sig = f"{sql[:100].strip().upper()}|{len(sql)}"
+        if sig not in seen_sigs:
+            existing.append(rec)
+            seen_sigs.add(sig)
+            new_records.append(rec)
+
+    new_count = len(new_records)
+    if new_count == 0:
+        _log.info("direct_import: 无新案例（全部重复）")
+        return 0
+
+    _write_json(json_path, existing)
+    _log.info("direct_import: JSON 已写入 (+%d, 共 %d 条)", new_count, len(existing))
+    return new_count
+
+
+def get_json_count() -> int:
+    """返回 JSON 中案例总数"""
+    return len(_read_json(get_few_shot_json_path()))
+
+
+def get_vector_db_count() -> int:
+    """返回向量库中已训练文档数"""
+    try:
+        store = Chroma(
+            collection_name="few_shot_sql",
+            embedding_function=OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL),
+            persist_directory=get_few_shot_db_path(),
+        )
+        return store._collection.count()
+    except Exception as e:
+        _log.warning("get_vector_db_count 失败: %s", e)
+        return 0
+
+
+def train_incremental() -> tuple:
+    """增量训练：只嵌入向量库中缺失的案例（按 JSON 追加顺序）。
+    返回 (trained_count: int, message: str)"""
+    json_records = _read_json(get_few_shot_json_path())
+    trained_count = get_vector_db_count()
+    untrained = json_records[trained_count:]
+
+    if not untrained:
+        return 0, "✅ 已是最新版本，无需训练"
+
+    try:
+        embeddings = OllamaEmbeddings(model="qwen3-embedding:8b", base_url=OLLAMA_BASE_URL)
+        docs = [_build_fewshot_document(r) for r in untrained]
+        store = Chroma(
+            collection_name="few_shot_sql",
+            embedding_function=embeddings,
+            persist_directory=get_few_shot_db_path(),
+        )
+        store.add_documents(docs)
+        _log.info("train_incremental: 增量训练 %d 条成功", len(untrained))
+        return len(untrained), f"✅ 训练成功，新增 {len(untrained)} 条"
+    except Exception as e:
+        _log.exception("train_incremental 失败")
+        return -1, f"❌ 训练失败: {str(e)[:80]}"
